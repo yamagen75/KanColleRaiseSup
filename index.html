@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Cond checker mod2 by hkuno9000</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Cond checker mod2</h1>
+        <p>艦これの艦娘疲労度、大破、ダメコン装備、遠征終了時刻などを右端に表示するGoogle Chrome拡張</p>
+
+        <p class="view"><a href="https://github.com/hkuno9000/cond_checker">View the Project on GitHub <small>hkuno9000/cond_checker</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/hkuno9000/cond_checker/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/hkuno9000/cond_checker/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/hkuno9000/cond_checker">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="%E4%BD%BF%E3%81%84%E6%96%B9" class="anchor" href="#%E4%BD%BF%E3%81%84%E6%96%B9"><span class="octicon octicon-link"></span></a>使い方</h1>
+
+<ol>
+<li>ソースコード一式をダウンロードする</li>
+<li>Google Chromeの拡張機能設定ページを開く</li>
+<li>[デベロッパー モード]にチェックを入れる</li>
+<li>[パッケージ化されていない拡張機能を読み込む]ボタンを押して、ダウンロードしてきたソースコード一式が含まれるディレクトリを指定する(これで拡張機能がインストールされる)</li>
+<li>Google Chromeの[開発/管理]メニューから[デベロッパー ツール]を起動する( <strong>デベロッパーツールを起動させておかないと動作しません</strong> ) F12 キーを押しても起動します。</li>
+<li>上記手順で拡張機能をインストールしたGoogle Chromeで艦これにアクセスする</li>
+<li>艦これを操作する(母港画面を開いたりする)と、ゲーム画面の右に疲労度が数値で表示される(49が平常、50以上でキラキラ)</li>
+</ol><h1>
+<a name="%E4%BB%95%E7%B5%84%E3%81%BF%E3%81%AA%E3%81%A9" class="anchor" href="#%E4%BB%95%E7%B5%84%E3%81%BF%E3%81%AA%E3%81%A9"><span class="octicon octicon-link"></span></a>仕組みなど</h1>
+
+<p>元々Google Chromeにあるネットワークをモニタリングする機能を使って、疲労度・大破中破小破・ダメコン装備有無・敵艦撃破数などを拾い出し、ゲーム画面の右端にテキスト表示します。完全にパッシブ動作で、ゲームサーバへのリクエスト送信はしません。自動実行機能もありません。</p>
+
+<h1>
+<a name="%E5%8F%82%E8%80%83%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88" class="anchor" href="#%E5%8F%82%E8%80%83%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88"><span class="octicon octicon-link"></span></a>参考プロジェクト</h1>
+
+<p>下記を元にして自分が欲しい機能を付け足しました。</p>
+
+<ul>
+<li>本家 <a href="https://github.com/kageroh/cond_checker">https://github.com/kageroh/cond_checker</a>
+</li>
+<li>一部機能をマージ <a href="https://github.com/t-f-m/cond_checker_mod">https://github.com/t-f-m/cond_checker_mod</a>
+</li>
+</ul>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/hkuno9000">hkuno9000</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
