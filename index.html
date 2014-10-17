@@ -1,73 +1,98 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
+
   <head>
-    <meta charset="utf-8">
+    <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Cond checker mod2 by hkuno9000</title>
+    <meta name="description" content="KanColle-YPS : 艦これ余所見プレイ支援">
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="javascripts/scale.fix.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>KanColle-YPS</title>
   </head>
+
   <body>
-    <div class="wrapper">
-      <header>
-        <h1 class="header">Cond checker mod2</h1>
-        <p class="header">艦これの艦娘疲労度、大破、ダメコン装備、遠征終了時刻などを右端に表示するGoogle Chrome拡張</p>
 
-        <ul>
-          <li class="download"><a class="buttons" href="https://github.com/hkuno9000/cond_checker/zipball/master">Download ZIP</a></li>
-          <li class="download"><a class="buttons" href="https://github.com/hkuno9000/cond_checker/tarball/master">Download TAR</a></li>
-          <li><a class="buttons github" href="https://github.com/hkuno9000/cond_checker">View On GitHub</a></li>
-        </ul>
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/hkuno9000/KanColle-YPS">View on GitHub</a>
 
-        <p class="header">This project is maintained by <a class="header name" href="https://github.com/hkuno9000">hkuno9000</a></p>
+          <h1 id="project_title">KanColle-YPS</h1>
+          <h2 id="project_tagline">艦これ余所見プレイ支援</h2>
 
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/hkuno9000/KanColle-YPS/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/hkuno9000/KanColle-YPS/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
 
-      </header>
-      <section>
-        <h1>
-<a name="%E4%BD%BF%E3%81%84%E6%96%B9" class="anchor" href="#%E4%BD%BF%E3%81%84%E6%96%B9"><span class="octicon octicon-link"></span></a>使い方</h1>
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h2>
+<a name="%E9%96%8B%E7%99%BA%E3%82%B3%E3%83%B3%E3%82%BB%E3%83%97%E3%83%88" class="anchor" href="#%E9%96%8B%E7%99%BA%E3%82%B3%E3%83%B3%E3%82%BB%E3%83%97%E3%83%88"><span class="octicon octicon-link"></span></a>開発コンセプト</h2>
+
+<ul>
+<li>艦これの画面から目を離していても、ゲーム進行状況をすべて把握することが目的です。</li>
+<li>遠征終了時刻や任務遂行状況を記録し、メモがわりに使えるようにします。</li>
+</ul>
+
+<h2>
+<a name="%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB%E6%96%B9%E6%B3%95" class="anchor" href="#%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB%E6%96%B9%E6%B3%95"><span class="octicon octicon-link"></span></a>インストール方法</h2>
+
+<p>Flash PlayerはChrome内蔵のほうを使用してください</p>
 
 <ol>
 <li>ソースコード一式をダウンロードする</li>
-<li>Google Chromeの拡張機能設定ページを開く</li>
+<li>Google Chromeの拡張機能設定ページを開く(右肩の三本線→設定→左列の拡張機能)</li>
 <li>[デベロッパー モード]にチェックを入れる</li>
 <li>[パッケージ化されていない拡張機能を読み込む]ボタンを押して、ダウンロードしてきたソースコード一式が含まれるディレクトリを指定する(これで拡張機能がインストールされる)</li>
-<li>Google Chromeの[開発/管理]メニューから[デベロッパー ツール]を起動する( <strong>デベロッパーツールを起動させておかないと動作しません</strong> ) F12 キーを押しても起動します。</li>
-<li>上記手順で拡張機能をインストールしたGoogle Chromeで艦これにアクセスする</li>
-<li>艦これを操作する(母港画面を開いたりする)と、ゲーム画面の右に疲労度が数値で表示される(49が平常、50以上でキラキラ)</li>
-<li>疲労度が一瞥できるように記号も併せて表示される(*:50以上、.:49、&gt;:49以下)</li>
-<li>遠征中の艦隊は、母港帰投時刻が追加表示される</li>
-<li>戦闘画面に入ると疲労度のかわりにダメージ（大破中破小破）が表示される。修復要員/女神の装備有無も表示される</li>
-<li>戦闘後の各種ドロップもある程度表示される</li>
-<li>あ号任務の進捗状況を表示する（出撃数36、ボス到達数24、ボス勝利数12、S勝利数6で達成）</li>
-<li>艦娘保有数、保有装備数、非ロック艦数、非ロック艦保有装備数を表示する</li>
-</ol><h1>
-<a name="%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A0%85" class="anchor" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A0%85"><span class="octicon octicon-link"></span></a>注意事項</h1>
+</ol>
+
+<h2>
+<a name="%E4%BD%BF%E3%81%84%E6%96%B9" class="anchor" href="#%E4%BD%BF%E3%81%84%E6%96%B9"><span class="octicon octicon-link"></span></a>使い方</h2>
+
+<ol>
+<li>Google Chromeの[開発/管理]メニューから[デベロッパー ツール]を起動する
 
 <ul>
-<li>表示する装備保有数は、装備破棄や装備保有艦娘の解体・ロスト・改修による装備減少に対応していないので、実際より多く表示される場合があります。</li>
+<li><strong>デベロッパーツールを起動させておかないと動作しません</strong></li>
+<li>Windows版は F12 キーを押しても起動します。</li>
+</ul>
+</li>
+<li>Google Chromeで艦これにログインすると、画面右側に「艦これ余所見プレイ支援」と表示されます。</li>
+<li>母港画面では、画面右側に「未ロック艦一覧、ロック装備一覧、任務、艦隊１～４」の各メニューが表示されます。</li>
+<li>メニューの[+]ボタンをクリックすると詳細が表示されます。
+
+<ul>
+<li>表示が画面下部に被る場合は「運営電文」を開いて画面を縦に伸ばしておくと良いでしょう。</li>
+</ul>
+</li>
+<li>艦隊１～４の Cond 値は49が平常で50以上がキラキラです。</li>
+<li>あ号任務についてはその内訳（出撃数、ボス勝利、ボス到達、S勝利）を表示します。</li>
+<li>戦闘画面では、画面右側に敵味方艦隊のダメージ(撃沈、大破、中破、小破)と戦果を表示します。</li>
+<li>戦闘後や遠征帰還後の資材増減を記録して表示します。</li>
+</ol>
+
+<h2>
+<a name="%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A0%85" class="anchor" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A0%85"><span class="octicon octicon-link"></span></a>注意事項</h2>
+
+<ul>
+<li>表示する装備保有数は、装備保有艦娘のロストによる装備減少に対応していないので、実際より多く表示される場合があります。</li>
 <li>修復要員、修復女神の装備表示は、修復発動後の変動に対応していない可能性があるので、表示を鵜呑みにすると危険です。大破進撃は自己責任でお願いします。</li>
-</ul><h1>
-<a name="todo" class="anchor" href="#todo"><span class="octicon octicon-link"></span></a>TODO</h1>
+</ul>
 
-<ul>
-<li>重複コードをリファクタリングする</li>
-<li>遂行中任務を表示する</li>
-</ul><h1>
-<a name="%E4%BB%95%E7%B5%84%E3%81%BF%E3%81%AA%E3%81%A9" class="anchor" href="#%E4%BB%95%E7%B5%84%E3%81%BF%E3%81%AA%E3%81%A9"><span class="octicon octicon-link"></span></a>仕組みなど</h1>
+<h2>
+<a name="%E4%BB%95%E7%B5%84%E3%81%BF%E3%81%AA%E3%81%A9" class="anchor" href="#%E4%BB%95%E7%B5%84%E3%81%BF%E3%81%AA%E3%81%A9"><span class="octicon octicon-link"></span></a>仕組みなど</h2>
 
 <p>元々Google Chromeにあるネットワークをモニタリングする機能を使って、サーバから送られてくる各種情報を拾って、ゲーム画面の右端にテキスト表示します。
 完全にパッシブ動作で、ゲームサーバへのリクエスト送信はしません。自動実行機能もありません。
 仕組み上、ゲーム画面の演出進行と、こちらの表示更新のタイミングが合いません。先に結果が見えてしまいますがご容赦ください。</p>
 
-<h1>
-<a name="%E5%8F%82%E8%80%83%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88" class="anchor" href="#%E5%8F%82%E8%80%83%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88"><span class="octicon octicon-link"></span></a>参考プロジェクト</h1>
+<h2>
+<a name="%E5%8F%82%E8%80%83%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88" class="anchor" href="#%E5%8F%82%E8%80%83%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88"><span class="octicon octicon-link"></span></a>参考プロジェクト</h2>
 
 <p>下記を元にして自分が欲しい機能を付け足しました。</p>
 
@@ -78,11 +103,17 @@
 </li>
 </ul>
       </section>
-      <footer>
-        <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">KanColle-YPS maintained by <a href="https://github.com/hkuno9000">hkuno9000</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
       </footer>
     </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-		
+
+    
+
   </body>
 </html>
