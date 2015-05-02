@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>艦これ情報</title>
+<link rel="stylesheet" type="text/css" href="material/bootstrap.css" />
+<link rel="stylesheet" type="text/css" href="dpnla.css" />
+<script type="text/javascript" charset="UTF-8" src="dpnla.js"></script>
+<script type="text/javascript" charset="UTF-8" src="devtools.js"></script>
+</head>
+<body id="dpnla">
+<div class="container-fluid">
+
+<div class="row mb3">
+ <div class="col-xs-6">
+  <ul id="t01" class="nav nav-pills nav-justified">
+   <li class="active"><a href="#">任務 他</a></li>
+   <li><a href="#">艦 隊</a></li>
+   <li><a href="#">艦 娘</a></li>
+   <li><a href="#">戦 闘</a></li>
+   <li><a href="#">その他</a></li>
+  </ul>
+ </div>
+ <div id="c01" class="col-xs-6"></div>
+</div>
+
+<div id="t01_1"></div>
+
+<div id="t01_2" class="hid">
+ <div class="row mb3">
+  <div id="c21" class="col-xs-12"></div>
+ </div>
+ <div id="t21_1" class="row"></div>
+ <div id="t21_2" class="row hid"></div>
+ <div id="t21_3" class="row hid"></div>
+ <div id="t21_4" class="row hid"></div>
+ <div id="t21_5" class="row hid"></div>
+</div>
+
+<div id="t01_3" class="hid">
+ <div class="row mb3">
+  <div class="col-xs-5">
+   <ul id="t31" class="nav nav-pills nav-justified">
+    <li class="active"><a href="#">全 艦</a></li>
+    <li><a href="#"><i class="icon-unlock cr1"></i>艦</a></li>
+    <li><a href="#">入 渠</a></li>
+    <li><a href="#">改 装</a></li>
+    <li><a href="#">工 廠</a></li>
+   </ul>
+  </div>
+  <div class="col-xs-7">
+   <div id="t31_1"></div>
+   <div id="t31_2" class="hid"></div>
+   <div id="t31_3" class="hid"></div>
+   <div id="t31_4" class="hid"></div>
+   <div id="t31_5" class="hid"></div>
+  </div>
+ </div>
+ <div class="row">
+  <div id="t31_1_a"></div>
+  <div id="t31_2_a" class="hid"></div>
+  <div id="t31_3_a" class="hid"></div>
+  <div id="t31_4_a" class="hid"></div>
+  <div id="t31_5_a" class="hid"></div>
+ </div>
+</div>
+
+<div id="t01_4" class="hid">
+ <div class="row">
+  <div class="col-xs-12">
+   <div id="c41" class="alert alert-info" role="alert">&nbsp;</div>
+  </div>
+ </div>
+ <div class="row">
+  <div class="col-xs-4">
+   <div class="panel panel-default">
+    <div id="c42" class="panel-heading ts5">&nbsp;</div>
+    <div id="c43" class="panel-body">&nbsp;</div>
+   </div>
+  </div>
+  <div id="c44" class="col-xs-4"></div>
+  <div id="c45" class="col-xs-4"></div>
+ </div>
+</div>
+
+<div id="t01_5" class="hid">
+ <div class="row mb3">
+  <div class="col-xs-12">
+   <ul id="t51" class="nav nav-pills nav-justified">
+    <li class="active"><a href="#"><i class="icon-lock cr2"></i> 装 備</a></li>
+    <li><a href="#"><i class="icon-unlock cr2"></i> 装 備</a></li>
+    <li><a href="#">ダブリ艦，改造可能艦</a></li>
+    <li><a href="#">記 録</a></li>
+    <li><a href="#">艦娘一覧</a></li>
+   </ul>
+  </div>
+ </div>
+ <div id="t51_1" class="row"></div>
+ <div id="t51_2" class="row hid"></div>
+ <div id="t51_3" class="row hid"></div>
+ <div id="t51_4" class="row hid"></div>
+ <div id="t51_5" class="row hid">
+  <div class="col-xs-12">
+   <div class="panel panel-default">
+    <div class="panel-heading ts5">艦娘一覧 コピー用 【 <i class="icon-lock"></i>艦のみ 】</div>
+    <div class="panel-body">
+     <textarea id="c55" cols="50" rows="15"></textarea>
+    </div>
+   </div>
+  </div>
+ </div>
+</div>
+
+
+<div class="hid">
+
+<div id="tp0_1">
+ <ul id="_%va0%_" class="nav nav-pills nav-justified">
+  <li><a href="#"><i class="icon-arrow-left mr0"></i></a></li><!--_%DLIMT%_-->
+  <li class="active"><a href="#">1</a></li><!--_%DLIMT%_-->
+  <li><a href="#">_%va0%_</a></li><!--_%DLIMT%_-->
+  <li><a href="#"><i class="icon-arrow-right mr0"></i></a></li>
+ </ul>
+</div>
+<div id="tp0_2">
+ <ul id="_%va0%_" class="nav nav-pills nav-justified"><!--_%DLIMT%_-->
+  <li class="active"><a href="#">_%va0%_</a></li><!--_%DLIMT%_-->
+  <li><a href="#">_%va0%_</a></li><!--_%DLIMT%_-->
+ </ul>
+</div>
+<div id="tp0_3">
+ <span class="ts5">_%va0%_</span>
+ <div class="panel panel-default">
+  <div class="panel-heading ts3">_%va1%_</div>
+  <table class="table table-condensed">
+   <tr class="ts1"><th class="ts2">任務名</th><th>達成度</th><th>チェック</th></tr><!--_%DLIMT%_-->
+   <tr class="ts19"><td class="ts20">_%va1%_</td><td>_%va0%_</td><td>_%va2%_</td></tr><!--_%DLIMT%_-->
+  </table>
+ </div>
+</div>
+
+<div id="tp1_1">
+艦娘 <span class="ts8_%va0%_">_%va2%_</span> / _%va3%_<span class="mb10"></span>
+装備 <span class="ts8_%va1%_">_%va4%_</span> / _%va5%_<span class="mb10"></span>
+<i class="icon-unlock cr1"></i>艦娘 _%va6%_<span class="mb10"></span>
+<i class="icon-unlock cr1"></i>艦娘装備 _%va7%_<!--_%DLIMT%_-->
+</div>
+<div id="tp1_2">
+ <div class="alert alert-info ts14" role="alert"><i class="icon-info-sign ts12"></i>_%va0%_</div><!--_%DLIMT%_-->
+ <div class="alert alert-danger ts14" role="alert"><i class="icon-remove-sign ts12"></i>_%va0%_</div><!--_%DLIMT%_-->
+ <div class="alert alert-warning" role="alert"><i class="icon-warning-sign"></i>_%va0%_</div><!--_%DLIMT%_-->
+ <div class="row">
+  <div class="col-xs-6"><!--_%DLIMT%_-->
+   <div class="panel panel-success">
+    <div class="panel-heading ts5">任務リスト _%va0%_ / _%va1%_ 【 遂行中のみ表示 】</div>
+    <table class="table table-condensed">
+     <tr class="ts1">
+      <th class="ts2">任務名</th>
+      <th>達成度</th>
+     </tr><!--_%DLIMT%_-->
+     <tr>
+      <td>_%va1%_</td>
+      <td class="ts3">_%va0%_</td>
+     </tr><!--_%DLIMT%_-->
+    </table>
+   </div><!--_%DLIMT%_-->
+  </div>
+  <div class="col-xs-6"><!--_%DLIMT%_-->
+  </div>
+ </div>
+<!--_%DLIMT%_-->
+ <div class="panel panel-info mb3">
+  <table class="table table-condensed">
+   <tr class="ts19">
+    <td><i class="icon-lock cr1"></i>艦娘</td>
+    <td><span class="cr4"><i class="icon-smile"></i>85<i class="icon-level-up mr0"></i></span></td>
+    <td><span class="cr4"><i class="icon-smile"></i>53<i class="icon-level-up mr0"></i></span></td>
+    <td><span class="cr4"><i class="icon-smile"></i>50<i class="icon-level-up mr0"></i></span></td>
+    <td class="ts23"><span class="label label-danger ts10">火力</span></td>
+    <td><span class="label label-primary ts10">雷装</span></td>
+    <td><span class="label label-warning ts10">対空</span></td>
+    <td><span class="label ts9 ts10">装甲</span></td>
+   </tr>
+   <tr class="ts19">
+    <td>_%va0%_</td>
+    <td>_%va1%_</td>
+    <td>_%va2%_</td>
+    <td>_%va3%_</td>
+    <td class="ts23">_%va4%_</td>
+    <td>_%va5%_</td>
+    <td>_%va6%_</td>
+    <td>_%va7%_</td>
+   </tr>
+  </table>
+ </div>
+<!--_%DLIMT%_-->
+ <div class="panel panel-info mb3">
+  <table class="table table-condensed">
+   <tr class="ts19">
+    <td><span class="label label-danger">大破</span></td>
+    <td><span class="label label-warning">中破</span></td>
+    <td><span class="label ts9">小破</span></td>
+    <td><span class="label label-default">軽微</span></td>
+    <td rowspan="2" class="ts22 ts23">_%va0%_</td>
+    <td rowspan="2" class="ts22 ts23">_%va1%_</td>
+   </tr>
+   <tr class="ts19">
+    <td>_%va2%_</td>
+    <td>_%va3%_</td>
+    <td>_%va4%_</td>
+    <td>_%va5%_</td>
+   </tr>
+  </table>
+ </div>
+<!--_%DLIMT%_-->
+<button type="button" id="b12n" class="btn btn-info">修理中：_%va0%_ <i class="icon-arrow-right mr0"></i></button>
+<!--_%DLIMT%_-->
+<button type="button" id="b12k" class="btn btn-warning">建造中：_%va0%_ <i class="icon-arrow-right mr0"></i></button>
+<!--_%DLIMT%_-->
+<button type="button" class="btn btn-default" disabled="disabled">_%va0%_</button>
+</div>
+<div id="tp1_3">
+<!--_%DLIMT%_--><span class="label label-success">編成</span>
+<!--_%DLIMT%_--><span class="label label-danger">出撃</span>
+<!--_%DLIMT%_--><span class="label cr9">演習</span>
+<!--_%DLIMT%_--><span class="label cr12">遠征</span>
+<!--_%DLIMT%_--><span class="label ts9">補給/入渠</span>
+<!--_%DLIMT%_--><span class="label cr10">工廠</span>
+<!--_%DLIMT%_--><span class="label cr11">改装</span>
+<!--_%DLIMT%_--><span class="label cr12">達成</span><!--_%DLIMT%_--><span class="label label-success">80%</span><!--_%DLIMT%_--><span class="label cr9">50%</span><!--_%DLIMT%_-->
+<!--_%DLIMT%_--><span class="label label-warning">遂行中</span><!--_%DLIMT%_--><span class="label label-danger">未チェック</span><!--_%DLIMT%_-->
+</div>
+<div id="tp1_4">
+ <div class="panel panel-info">
+  <div class="panel-heading ts5">遠 征 中</div>
+  <table class="table table-condensed">
+   <tr class="ts1">
+    <th>艦隊</th>
+    <th>ID</th>
+    <th class="ts2">遠征名</th>
+    <th>終了日時</th>
+   </tr><!--_%DLIMT%_-->
+   <tr class="ts19">
+    <td>_%va0%_</td>
+    <td>_%va1%_</td>
+    <td class="ts20">_%va2%_</td>
+    <td>_%va3%_</td>
+   </tr><!--_%DLIMT%_-->
+  </table>
+ </div>
+<!--_%DLIMT%_--><span class="label label-primary"><!--_%DLIMT%_--></span><!--_%DLIMT%_-->
+</div>
+
+<div id="tp2_1">
+ <div class="col-xs-3">
+  <div class="panel panel-_%va4%_">
+   <div class="panel-heading ts5">_%va0%__%va1%_</div>
+   <table class="table table-condensed">
+    <tr class="ts1">
+     <th>C</th>
+     <th class="ts2">HP</th>
+     <th>Lv</th>
+     <th class="ts13">Exp</th>
+    </tr><!--_%DLIMT%_-->
+    <tr class="ts6">
+     <td class="ts3">_%va0%_</td>
+     <td>_%va1%_</td>
+     <td class="ts3">_%va2%_</td>
+     <td class="ts4">_%va3%_</td>
+    </tr>
+    <tr class="ts7">
+     <td class="ts18">_%va18%_</td>
+     <td>_%va4%_ / _%va5%_ _%va6%_</td>
+     <td colspan="2">_%va7%_ _%va8%_ _%va9%_</td>
+    </tr><!--_%DLIMT%_-->
+   </table>
+  </div>
+ </div>
+</div>
+<div id="tp2_2">
+ <div class="col-xs-12">
+  <div class="panel panel-_%va4%_">
+   <div class="panel-heading ts5">_%va0%__%va2%_</div>
+   <table class="table table-condensed">
+    <tr class="ts15">
+     <th>C</th>
+     <th class="ts2">HP</th>
+     <th>Lv</th>
+     <th class="ts13">Exp</th>
+     <th colspan="2">&nbsp;</th>
+    </tr><!--_%DLIMT%_-->
+    <tr class="ts16">
+     <td class="ts3">_%va0%_</td>
+     <td>_%va1%_</td>
+     <td class="ts3">_%va2%_</td>
+     <td class="ts4">_%va3%_</td>
+     <td><span class="mb10"></span>_%va13%_</td>
+     <td>_%va14%_</td>
+    </tr>
+    <tr class="ts17">
+     <td class="ts18">_%va18%_</td>
+     <td>_%va4%_ / _%va5%_</td>
+     <td colspan="2">_%va6%_ _%va17%_ _%va10%_ _%va11%_ _%va12%_</td>
+     <td><span class="mb10"></span>_%va15%_</td>
+     <td>_%va16%_</td>
+    </tr><!--_%DLIMT%_-->
+    <tr><td colspan="6">_%va0%_</td></tr>
+   </table>
+  </div>
+ </div>
+</div>
+<div id="tp2_3">
+<!--_%DLIMT%_--> <span class="badge pull-right">遠 征</span><!--_%DLIMT%_--> <span class="pull-right"><!--_%DLIMT%_--></span><!--_%DLIMT%_--><span class="badge">遠 征</span><!--_%DLIMT%_-->
+<!--_%DLIMT%_--><span class="label label-info">修復</span><!--_%DLIMT%_--><span class="label label-primary">退避</span><!--_%DLIMT%_-->
+</div>
+
+<div id="tp3_1">
+ <div class="col-xs-4">
+  <div class="panel panel-info">
+   <table class="table table-condensed ts11">
+    <tr class="ts1">
+     <th>&nbsp;</th>
+     <th>C</th>
+     <th>&nbsp;</th>
+     <th>Lv</th>
+     <th class="ts13">Exp</th>
+    </tr><!--_%DLIMT%_-->
+    <tr>
+     <td>_%va0%_</td>
+     <td class="ts3">_%va1%_</td>
+     <td>_%va5%_ _%va2%_ _%va6%_</td>
+     <td class="ts3">_%va3%_</td>
+     <td class="ts4">_%va4%_</td>
+    </tr><!--_%DLIMT%_-->
+   </table>
+  </div>
+ </div>
+</div>
+<div id="tp3_2">
+ <div class="col-xs-4">
+  <div class="panel panel-info">
+   <table class="table table-condensed ts11">
+    <tr class="ts1">
+     <th>&nbsp;</th>
+     <th>C</th>
+     <th>&nbsp;</th>
+     <th>&nbsp;</th>
+     <th>Lv</th>
+     <th class="ts13">Exp</th>
+    </tr><!--_%DLIMT%_-->
+    <tr>
+     <td>_%va0%_</td>
+     <td class="ts3">_%va1%_</td>
+     <td>_%va2%_ _%va6%_</td>
+     <td class="ts3">_%va7%_</td>
+     <td class="ts3">_%va3%_</td>
+     <td class="ts4">_%va4%_</td>
+    </tr><!--_%DLIMT%_-->
+   </table>
+  </div>
+ </div>
+</div>
+<div id="tp3_3">
+ <div class="col-xs-6">
+  <div class="panel panel-info">
+   <table class="table table-condensed ts11">
+    <tr class="ts1">
+     <th>&nbsp;</th>
+     <th>C</th>
+     <th>&nbsp;</th>
+     <th>Lv</th>
+     <th>HP</th>
+     <th>&nbsp;</th>
+     <th>修理時間</th>
+    </tr><!--_%DLIMT%_-->
+    <tr>
+     <td>_%va0%_</td>
+     <td class="ts3">_%va1%_</td>
+     <td>_%va2%_</td>
+     <td class="ts3">_%va3%_</td>
+     <td class="ts3">_%va4%_ / _%va5%_</td>
+     <td class="ts3">_%va6%_</td>
+     <td class="ts3">_%va7%_</td>
+    </tr><!--_%DLIMT%_-->
+   </table>
+  </div>
+ </div>
+</div>
+<div id="tp3_7">
+ <div class="col-xs-6">
+  <div class="panel panel-info">
+   <div class="panel-heading ts5">入渠ドック</div>
+   <table class="table table-condensed ts11">
+    <tr class="ts1">
+     <th>&nbsp;</th>
+     <th>C</th>
+     <th>&nbsp;</th>
+     <th>Lv</th>
+     <th>燃料</th>
+     <th>弾薬</th>
+     <th>鋼材</th>
+     <th>ボーキ</th>
+     <th>&nbsp;</th>
+     <th>完了日時</th>
+    </tr><!--_%DLIMT%_-->
+    <tr class="ts19">
+     <td>_%va0%_</td>
+     <td>_%va1%_</td>
+     <td>_%va2%_</td>
+     <td>_%va3%_</td>
+     <td>_%va4%_</td>
+     <td>_%va5%_</td>
+     <td>_%va6%_</td>
+     <td>_%va7%_</td>
+     <td>_%va8%_</td>
+     <td>_%va9%_</td>
+    </tr><!--_%DLIMT%_-->
+   </table>
+  </div>
+ </div>
+</div>
+<div id="tp3_4">
+ <div class="col-xs-6">
+  <div class="panel panel-info">
+   <table class="table table-condensed ts11">
+    <tr class="ts1">
+     <th>&nbsp;</th>
+     <th>C</th>
+     <th>&nbsp;</th>
+     <th>&nbsp;</th>
+     <th>&nbsp;</th>
+     <th>&nbsp;</th>
+     <th>&nbsp;</th>
+     <th>Lv</th>
+     <th>Exp</th>
+    </tr><!--_%DLIMT%_-->
+    <tr>
+     <td>_%va0%_</td>
+     <td class="ts3">_%va1%_</td>
+     <td>_%va2%_</td>
+     <td>_%va5%_</td>
+     <td>_%va6%_</td>
+     <td>_%va7%_</td>
+     <td>_%va8%_</td>
+     <td class="ts3">_%va3%_</td>
+     <td class="ts4">_%va4%_</td>
+    </tr><!--_%DLIMT%_-->
+   </table>
+  </div>
+ </div>
+</div>
+<div id="tp3_5">
+ <div class="col-xs-12">
+  <div class="panel panel-danger">
+   <div class="panel-heading ts5">建造ドック</div>
+   <table class="table table-condensed ts11">
+    <tr class="ts1">
+     <th>進捗</th>
+     <th>艦名</th>
+     <th>燃料</th>
+     <th>弾薬</th>
+     <th>鋼材</th>
+     <th>ボーキ</th>
+     <th>開発資材</th>
+     <th>完成日時</th>
+    </tr><!--_%DLIMT%_-->
+    <tr class="ts19">
+     <td>_%va0%_</td>
+     <td>_%va1%_</td>
+     <td>_%va2%_</td>
+     <td>_%va3%_</td>
+     <td>_%va4%_</td>
+     <td>_%va5%_</td>
+     <td>_%va6%_</td>
+     <td>_%va7%_</td>
+    </tr><!--_%DLIMT%_-->
+   </table>
+  </div>
+ </div>
+</div>
+<div id="tp3_6">
+<!--_%DLIMT%_--><i class="icon-unlock cr1"></i><!--_%DLIMT%_--> <span class="label label-default ts10"><i class="icon-wrench mr0"></i></span><!--_%DLIMT%_--><i class="icon-suitcase mr0"></i><!--_%DLIMT%_-->
+<!--_%DLIMT%_--> <span class="label label-info ts10">修復</span><!--_%DLIMT%_--><span class="label label-danger ts10">火力</span><!--_%DLIMT%_--><span class="label label-primary ts10">雷装</span><!--_%DLIMT%_--><span class="label label-warning ts10">対空</span><!--_%DLIMT%_--><span class="label ts9 ts10">装甲</span><!--_%DLIMT%_-->
+</div>
+
+<div id="tp4_1">
+ <div class="panel panel-default mb3">
+  <div id="_%va2%_" class="panel-heading ts5">_%va0%_</div>
+  <table class="table table-condensed">
+   <tr class="ts15">
+    <th>&nbsp;</th>
+    <th>&nbsp;</th>
+    <th>Lv</th>
+    <th>HP</th>
+    <th>&nbsp;</th>
+    <th>&nbsp;</th>
+   </tr><!--_%DLIMT%_-->
+   <tr class="ts19 ts25">
+    <td>_%va0%_</td>
+    <td class="ts20">_%va1%_</td>
+    <td>_%va2%_</td>
+    <td>_%va3%_</td>
+    <td>_%va4%_</td>
+    <td>_%va5%_</td>
+   </tr><!--_%DLIMT%_-->
+   <tr class="ts25"><td colspan="6">_%va1%_</td></tr>
+  </table>
+ </div>
+<!--_%DLIMT%_--><h3 class="panel-title"><!--_%DLIMT%_--></h3><!--_%DLIMT%_-->
+<span class="ts5 cr6"><i class="icon-warning-sign"></i>潜水艦注意</span><!--_%DLIMT%_-->
+<span class="ts21 cr6"><i class="icon-warning-sign"></i>修理発動</span><!--_%DLIMT%_-->
+<span class="ts21"><!--_%DLIMT%_--></span><!--_%DLIMT%_--><span class="cr6"><i class="icon-warning-sign"></i><!--_%DLIMT%_-->
+</div>
+
+<div id="tp5_1">
+ <div class="col-xs-12">
+  <div class="panel panel-default">
+   <div class="panel-heading ts5"><i class="icon-lock"></i> 装備のみ<span class="mb10"></span><i class="icon-lock"></i> 【 _%va0%_ 】<span class="mb10"></span>改修中 【 _%va1%_ 】</div>
+   <table class="table table-condensed">
+    <tr class="ts1">
+     <th class="ts2">装備名</th><th>個数</th><th class="ts2">使用艦娘</th>
+     <th class="ts2 ts23 ts24">装備名</th><th>個数</th><th class="ts2">使用艦娘</th>
+    </tr><!--_%DLIMT%_-->
+    <tr>
+     <td nowrap>_%va0%_</td><td class="ts3" nowrap>_%va1%_ / _%va2%_</td><td>_%va3%_</td>
+     <td class="ts23 ts24" nowrap>_%va4%_</td><td class="ts3" nowrap>_%va5%_ / _%va6%_</td><td>_%va7%_</td>
+    </tr><!--_%DLIMT%_-->
+   </table>
+  </div>
+ </div>
+</div>
+<div id="tp5_5">
+ <div class="col-xs-12">
+  <div class="panel panel-default">
+   <div class="panel-heading ts5"><i class="icon-unlock"></i> 装備のみ<span class="mb10"></span><i class="icon-unlock"></i> 【 _%va0%_ 】<span class="mb10"></span>改修中 【 _%va1%_ 】</div>
+   <table class="table table-condensed">
+    <tr class="ts1">
+     <th class="ts13">個数</th><th class="ts2 ts24">装備名</th>
+     <th class="ts13 ts23">個数</th><th class="ts2 ts24">装備名</th>
+     <th class="ts13 ts23">個数</th><th class="ts2 ts24">装備名</th>
+    </tr><!--_%DLIMT%_-->
+    <tr>
+     <td class="ts4">_%va1%_</td><td class="ts24">_%va0%_</td>
+     <td class="ts4 ts23">_%va3%_</td><td class="ts24">_%va2%_</td>
+     <td class="ts4 ts23">_%va5%_</td><td class="ts24">_%va4%_</td>
+    </tr><!--_%DLIMT%_-->
+   </table>
+  </div>
+ </div>
+</div>
+<div id="tp5_2">
+ <div class="col-xs-8">
+  <div class="panel panel-default">
+   <div class="panel-heading ts5">ダブリ艦 【 <i class="icon-lock"></i>艦のみ 】 _%va0%_隻</div>
+   <table class="table table-condensed">
+    <tr class="ts15"><th></th></tr><!--_%DLIMT%_-->
+    <tr><td>_%va0%_</td></tr><!--_%DLIMT%_-->
+   </table>
+  </div>
+ </div>
+</div>
+<div id="tp5_3">
+ <div class="col-xs-4">
+  <div class="panel panel-default">
+   <div class="panel-heading ts5">改造可能艦 【 <i class="icon-lock"></i>艦のみ 】 _%va0%_隻</div>
+   <table class="table table-condensed">
+    <tr class="ts15"><th></th></tr><!--_%DLIMT%_-->
+    <tr><td>_%va0%_</td></tr><!--_%DLIMT%_-->
+   </table>
+  </div>
+ </div>
+</div>
+<div id="tp5_4">
+ <div class="col-xs-12">
+  <div class="panel panel-default">
+   <div class="panel-heading ts5">記 録</div>
+   <table class="table table-condensed">
+    <tr class="ts15"><th></th></tr><!--_%DLIMT%_-->
+    <tr><td>_%va0%_</td></tr><!--_%DLIMT%_-->
+   </table>
+  </div>
+ </div>
+</div>
+
+</div>
+
+<div id="pmb01" class="panel panel-warning pmb11">
+ <div class="panel-body">
+  <div class="pull-right"><a href="#" id="pmb02"><i class="icon-remove-sign"></i></a></div>
+  <div class="pmb12"><i class="icon-warning-sign pmb13"></i><span id="pmb03"></span></div>
+ </div>
+</div>
+
+</div>
+</body>
+</html>

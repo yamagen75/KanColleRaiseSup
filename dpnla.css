@@ -1,0 +1,131 @@
+/* アイコンフォント等 */
+
+/* FONT PATH */
+@font-face {
+  font-family: 'FontAwesome';
+  src: url('material/fontawesome-webfont.woff?v=3.2.1') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+/* FONT AWESOME CORE */
+[class^="icon-"],
+[class*=" icon-"] {
+  font-family: FontAwesome;
+  font-weight: normal;
+  font-style: normal;
+  text-decoration: inherit;
+  -webkit-font-smoothing: antialiased;
+  *margin-right: .3em;
+}
+[class^="icon-"]:before,
+[class*=" icon-"]:before {
+  text-decoration: inherit;
+  display: inline-block;
+  speak: none;
+}
+a [class^="icon-"],
+a [class*=" icon-"] {
+  display: inline;
+}
+
+.icon-lock:before {
+  content: "\f023";
+}
+.icon-unlock:before {
+  content: "\f09c";
+}
+.icon-wrench:before {
+  content: "\f0ad";
+}
+.icon-suitcase:before {
+  content: "\f0f2";
+}
+.icon-arrow-left:before {
+  content: "\f060";
+}
+.icon-arrow-right:before {
+  content: "\f061";
+}
+.icon-info-sign:before {
+  content: "\f05a";
+}
+.icon-warning-sign:before {
+  content: "\f071";
+}
+.icon-remove-sign:before {
+  content: "\f057";
+}
+.icon-smile:before {
+  content: "\f118";
+}
+.icon-level-up:before {
+  content: "\f148";
+}
+
+/* スタイル設定 */
+
+#dpnla { padding-top:3px; }
+#dpnla .nav { margin-top:0; }
+#dpnla .panel { margin-bottom:0; }
+#dpnla .alert { margin-bottom:3px; }
+
+#dpnla i { margin-right:2px; }
+#dpnla i.mr0 { margin-right:0; }
+#dpnla .hid { display:none; }
+
+#dpnla .mb3 { margin-bottom:3px; }
+#dpnla .mb10 { display:inline-block; width:10px; }
+#dpnla .mb11 { display:inline-block; width:96px; }
+
+#dpnla .ts1 th { font-size:84%; text-align:center; }
+#dpnla .ts15 th { font-size:84%; text-align:center; padding-top:0; padding-bottom:0; }
+#dpnla th.ts2 { text-align:left; }
+#dpnla th.ts13 { text-align:right; }
+
+#dpnla .ts19 td { text-align:center; }
+#dpnla .ts6 td { padding-bottom:0; }
+#dpnla .ts7 td { border:none; padding-top:3px; }
+#dpnla .ts16 td { padding-bottom:0; padding-top:1px; }
+#dpnla .ts17 td { border:none; padding-top:0; padding-bottom:2px; }
+#dpnla .ts11 td { padding-top:5px; padding-bottom:6px; }
+#dpnla .ts25 td { padding-bottom:1px; padding-top:0; }
+#dpnla td.ts20 { text-align:left; }
+#dpnla .ts23 { border-left:1px solid #ddd; }
+#dpnla .ts24 { padding-left:12px; }
+
+#dpnla .ts3 { text-align:center; }
+#dpnla .ts4 { text-align:right; }
+#dpnla .ts5 { font-weight:bold; }
+#dpnla .ts8 { font-size:132%; font-weight:bold; }
+#dpnla .ts12 { font-size:124%; }
+#dpnla .ts18 { color:#aaa; font-size:84%; text-align:center; }
+#dpnla .ts21 { font-size:84%; }
+#dpnla .ts22 { vertical-align:middle; }
+
+#dpnla .ts9 { background-color:#bfa810; }
+#dpnla .ts10 { padding-left:3px; padding-right:3px; }
+#dpnla .ts14 { padding-top:4px; padding-bottom:4px; }
+
+#dpnla .ts26 {  }
+
+#dpnla .cr1 { color:#e58d89; }
+#dpnla .cr2 { color:#aaa; }
+#dpnla .cr3 { color:#666; }
+#dpnla .cr4 { text-shadow: 0 0 7px #ff0, 0 0 7px #ff0, 0 0 7px #ff0; }
+#dpnla .cr5 { font-weight:bold; text-shadow: 0 0 7px #ff0, 0 0 7px #ff0, 0 0 7px #ff0; }
+#dpnla .cr6 { color:#dc4442; }
+#dpnla .cr7 { text-shadow: 0 0 7px #f95, 0 0 7px #f95, 0 0 7px #f95; }
+#dpnla .cr8 { text-shadow: 0 0 7px #f65, 0 0 7px #f65, 0 0 7px #f65; }
+#dpnla .cr9 { background-color:#93cd6e; }
+#dpnla .cr10 { background-color:#9c725f; }
+#dpnla .cr11 { background-color:#b698c9; }
+#dpnla .cr12 { background-color:#59bcbe; }
+
+#dpnla .cr13 {  }
+
+#dpnla .pmb11 { position:absolute; display:none; z-index:1; box-shadow:8px 8px 6px -6px #777; }
+#dpnla .pmb11 a { font-size:148%; color:#dc4442; padding-right:3px; }
+#dpnla .pmb11 a:hover { color:#e58d89; text-decoration:none; }
+#dpnla .pmb12 { padding:0 6px; }
+#dpnla .pmb13 { font-size:196%; color:#ded011; }
+

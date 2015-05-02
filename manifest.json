@@ -1,22 +1,23 @@
 {
-	"manifest_version": 2,
-	"name": "KanColle-YPS",
-	"version": "0.0.4",
-	"description": "艦これの余所見プレイを支援する(cond_checker改造版)",
-	"background": {
-		"scripts": ["background.js"]
-	},
-	"content_scripts": [
-		{
-			"matches": ["http://www.dmm.com/netgame/social/-/gadgets/=/app_id=854854/"],
-			"js": ["content.js"]
-		}
-	],
-	"permissions": [
-		"webRequest",
-		"http://*/kcsapi/api_get_member/ship2",
-		"http://*/kcsapi/api_port/port"
-	],
-	"devtools_page": "devtools.html"
+  "manifest_version": 2,
+  "name": "艦これ艦娘育成支援",
+  "version": "1.0.0",
+  "description": "艦これの艦娘育成を支援する(KanColle-YPS改造版)",
+  "icons": {
+    "16": "material/icon.png",
+    "48": "material/icon.png",
+    "128": "material/icon.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://www.dmm.com/netgame/social/-/gadgets/=/app_id=854854/"],
+      "js": ["content.js"]
+    },
+    {
+      "matches": ["http://osapi.dmm.com/gadgets/ifr?*"],
+      "js": ["contsub.js"],
+      "all_frames" : true
+    }
+  ],
+  "devtools_page": "devtools.html"
 }
-
