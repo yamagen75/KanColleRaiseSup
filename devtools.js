@@ -309,10 +309,12 @@ function fraction_percent_name(now, max) {	// now:1, max:2 -> "1/2(50%)"
 }
 
 function kira_name(cond) {
-	if(cond >= 85){
+	if(cond > 84){
 		return '<span class="cr5">'+ cond +'</span>'; // 三重キラ
+	}else if(cond > 52){
+		return '<span class="cr4">'+ cond +'</span>'; // 回避向上キラ
 	}else if(cond > 49){
-		return '<span class="cr4">'+ cond +'</span>'; // キラ
+		return '<span class="cr13">'+ cond +'</span>'; // キラ
 	}else if(cond == 49){
 		return ''; // normal
 	}else if(cond < 20){
@@ -320,8 +322,8 @@ function kira_name(cond) {
 	}else if(cond < 30){
 		return '<span class="cr7">'+ cond +'</span>'; // 橙疲労
 	}else{
-		return ''+ cond; // recovering
-	} /* 53～84:回避向上キラ 30～49:疲労 */
+		return ''+ cond; // recovering 疲労
+	}
 }
 
 function material_name(id) {

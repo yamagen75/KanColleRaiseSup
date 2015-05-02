@@ -111,17 +111,18 @@ a [class*=" icon-"] {
 #dpnla .cr1 { color:#e58d89; }
 #dpnla .cr2 { color:#aaa; }
 #dpnla .cr3 { color:#666; }
-#dpnla .cr4 { text-shadow: 0 0 7px #ff0, 0 0 7px #ff0, 0 0 7px #ff0; }
-#dpnla .cr5 { font-weight:bold; text-shadow: 0 0 7px #ff0, 0 0 7px #ff0, 0 0 7px #ff0; }
+#dpnla .cr4 { text-shadow:0 0 7px #ff0, 0 0 7px #ff0, 0 0 7px #ff0; }
+#dpnla .cr5 { font-weight:bold; text-shadow:0 0 7px #ff0, 0 0 7px #ff0, 0 0 7px #ff0; }
 #dpnla .cr6 { color:#dc4442; }
-#dpnla .cr7 { text-shadow: 0 0 7px #f95, 0 0 7px #f95, 0 0 7px #f95; }
-#dpnla .cr8 { text-shadow: 0 0 7px #f65, 0 0 7px #f65, 0 0 7px #f65; }
+#dpnla .cr7 { text-shadow:0 0 7px #f95, 0 0 7px #f95, 0 0 7px #f95; }
+#dpnla .cr8 { text-shadow:0 0 7px #f65, 0 0 7px #f65, 0 0 7px #f65; }
 #dpnla .cr9 { background-color:#93cd6e; }
 #dpnla .cr10 { background-color:#9c725f; }
 #dpnla .cr11 { background-color:#b698c9; }
 #dpnla .cr12 { background-color:#59bcbe; }
+#dpnla .cr13 { text-shadow:1px 1px 3px #dd0; }
 
-#dpnla .cr13 {  }
+#dpnla .cr14 {  }
 
 #dpnla .pmb11 { position:absolute; display:none; z-index:1; box-shadow:8px 8px 6px -6px #777; }
 #dpnla .pmb11 a { font-size:148%; color:#dc4442; padding-right:3px; }
