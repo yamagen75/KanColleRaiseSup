@@ -61,11 +61,7 @@ function Ship(data, ship) {
 Ship.prototype.name_lv = function() {
 	return ship_name(this.ship_id) + ' Lv' + this.lv;
 };
-/*
-Ship.prototype.kira_cond_diff_name = function() {
-	return kira_name(this.c_cond) + this.c_cond + diff_name(this.c_cond, this.p_cond);
-};
-*/
+
 Ship.prototype.fuel_name = function() {
 	var max = $mst_ship[this.ship_id].api_fuel_max;		var ra = ['',''];
 	var rc = ['<span class="label label-success">','</span>'];
@@ -106,6 +102,20 @@ Ship.prototype.begin_shipid = function() {
 	var mst = $mst_ship[this.ship_id];
 	return mst.yps_begin_shipid ? mst.yps_begin_shipid : this.ship_id;
 };
+
+Ship.prototype.slot_names = function() {
+	var slot = this.slot;
+	var onslot = this.onslot;
+	var maxslot = $mst_ship[this.ship_id].api_maxeq;
+	var a = ['','','',''];
+	for (var i = 0; i < slot.length; ++i) {
+		var value = $slotitem_list[slot[i]];
+		if (value) {
+			a[i] = slotitem_name(value.item_id, value.level, onslot[i], maxslot[i]);
+		}
+	}
+	return a;
+}
 
 Ship.prototype.onslot_name = function() {
 	var mx = $mst_ship[this.ship_id].api_maxeq;		var ra = ['',''];
@@ -417,6 +427,14 @@ function slotitem_name(id, lv, n, max) {
 	return name;
 }
 
+function slotitem_names(idlist) {
+	if (!idlist) return '';
+	var a = idlist.map(function(id) {
+		return slotitem_name(id);
+	});
+	return a.join('，');
+}
+
 function ship_name(id) {
 	var ship = $mst_ship[id];
 	if (ship) {
@@ -453,16 +471,7 @@ function shiplist_names(list) {	// Shipの配列をlv降順に並べて、","区
 	}
 	return names.join(', ');
 }
-/*
-function msec_name(msec) {
-	var sec = msec / 1000;
-	var min = sec / 60;
-	var hh = min / 60;
-	if (hh  >= 2) return hh.toFixed(1) + '時間';
-	if (min >= 2) return min.toFixed() + '分';
-	return sec.toFixed() + '秒';
-}
-*/
+
 function damage_name(nowhp, maxhp) {
 	var r = nowhp / maxhp;
 	return (r <= 0) ? '<span class="label label-primary">撃沈</span>'
@@ -535,18 +544,6 @@ function slotitem_use(slot, item_id) {
 	return false;
 }
 
-function slotitem_names(slot, onslot, maxslot) {
-	var a = ['','','',''];
-	if (!slot) return a;
-	for (var i = 0; i < slot.length; ++i) {
-		var value = $slotitem_list[slot[i]];
-		if (value) {
-			a[i] = slotitem_name(value.item_id, value.level, onslot[i], maxslot[i]);
-		}
-	}
-	return a;
-}
-
 function slotitem_delete(slot) {
 	if (!slot) return;
 	slot.forEach(function(id) {
@@ -581,15 +578,7 @@ function is_airplane(item) {
 		return false;
 	}
 }
-/*
-function hp_status(nowhp, maxhp) {
-	return (nowhp < 0 ? 0 : nowhp) + '/' + maxhp + ':' + damage_name(nowhp, maxhp);
-}
 
-function hp_status_on_battle(nowhp, maxhp, beginhp) {
-	return (nowhp < 0 ? 0 : nowhp) + '/' + maxhp + diff_name(nowhp, beginhp) + ':' + damage_name(nowhp, maxhp);
-}
-*/
 function push_fleet_status(tp, deck) {
 	var lv_sum = 0;
 	var fleet_ships = 0;
@@ -621,8 +610,7 @@ function push_fleet_status(tp, deck) {
 		rb = ship.fuel_name();	ra[7] = rb[0];	ra[10] = rb[1];
 		rb = ship.bull_name();	ra[8] = rb[0];	ra[11] = rb[1];
 		rb = ship.onslot_name();	ra[9] = rb[0];	ra[12] = rb[1];
-		rb = slotitem_names(ship.slot, ship.onslot, $mst_ship[ship.ship_id].api_maxeq);
-		ra[13] = rb[0];		ra[14] = rb[1];		ra[15] = rb[2];		ra[16] = rb[3];
+		rb = ship.slot_names();		ra[13] = rb[0];		ra[14] = rb[1];		ra[15] = rb[2];		ra[16] = rb[3];
 		ra[18] = diff_name(ship.c_cond, ship.p_cond);
 		rt[0] += dpnla.tmprep(2,ra,tp[0][1]);
 		rt[1] += dpnla.tmprep(2,ra,tp[1][1]);
@@ -639,21 +627,6 @@ function push_fleet_status(tp, deck) {
 	return rt;
 }
 
-//------------------------------------------------------------------------
-// デバッグダンプ.
-//
-/* function debug_print_mst() {
-	var msg = ['YPS_mst_slotitem', '\t==id\t==name\t==type0\t==type1\t==type2\t==type3'];
-	for (var id in $mst_slotitem) {
-		var item = $mst_slotitem[id];
-		msg.push('\t' + item.api_id + '\t' + item.api_name + '\t' + item.api_type.join('\t'));
-	}
-	var req = [];
-	req.push('## DEBUG mst_slotitem');
-	req.push(msg);
-	chrome.extension.sendRequest(req);
-}
-*/
 //------------------------------------------------------------------------
 // イベントハンドラ.
 //
@@ -1221,7 +1194,6 @@ function on_port(json) {
 	if(kdocks > 0){
 		dpnla.addevent(dpnla.ge('b12k'),'click',function(){ dpnla.tabsel('t01',2); dpnla.tabsel('t31',4); });
 	}
-	// chrome.extension.sendRequest(req);
 }
 
 function on_mission_check(category) {
@@ -1259,7 +1231,6 @@ function on_mission_check(category) {
 	}
 	ht = dpnla.tmprep(2,ra,tp[0]) + ha + tp[2];
 	if(rc > 0) dpnla.pmbopen(220,40,380,170,ht);
-//if (req.length > 1) chrome.extension.sendRequest(req);
 }
 
 function on_next_cell(json) {
@@ -1268,6 +1239,7 @@ function on_next_cell(json) {
 	var g = json.api_data.api_itemget;
 	var h = json.api_data.api_happening;
 	var area = d.api_maparea_id + '-' + d.api_mapinfo_no + '-' + d.api_no;
+	var arow = ' <i class="icon-arrow-right"></i>';
 	$next_mapinfo = $mst_mapinfo[d.api_maparea_id * 10 + d.api_mapinfo_no];
 	if (e) {
 		$enemy_id = e.api_enemy_id;
@@ -1292,20 +1264,17 @@ function on_next_cell(json) {
 			ha = tp[0] + ha + tp[2];
 			dpnla.tmpviw(0,'c45',dpnla.tmprep(2,ra,ha));
 		}
-//	chrome.extension.sendRequest('## next enemy\n' + area + ':' + msg);
-		dpnla.tmpviw(1,'c41',' <i class="icon-arrow-right"></i>Enemy '+ area +' '+ msg);
+		dpnla.tmpviw(1,'c41',arow +'Enemy '+ area +' '+ msg);
 		dpnla.tmpviw(0,'c43','&nbsp;');
 	}
 	if (g) {
 		var msg = material_name(g.api_id) + 'x' + g.api_getcount;
-//	chrome.extension.sendRequest('## next item\n' + area + ':' + msg);
-		dpnla.tmpviw(1,'c41',' <i class="icon-arrow-right"></i>Item '+ area +' '+ msg);
+		dpnla.tmpviw(1,'c41',arow +'Item '+ area +' '+ msg);
 	}
 	if (h) {
 		var msg = material_name(h.api_mst_id) + 'x' + h.api_count;
 		if (h.api_dentan) msg += '(電探により軽減あり)';
-//	chrome.extension.sendRequest('## next loss\n' + area + ':' + msg);
-		dpnla.tmpviw(1,'c41',' <i class="icon-arrow-right"></i>Loss '+ area +' '+ msg);
+		dpnla.tmpviw(1,'c41',arow +'Loss '+ area +' '+ msg);
 	}
 }
 
@@ -1332,17 +1301,17 @@ function on_battle_result(json) {
 	var mvp   = d.api_mvp;
 	var mvp_c = d.api_mvp_combined;
 	var lost  = d.api_lost_flag;
-	var msg  = '';
+	var tp = dpnla.tmpget('tp4_1');
+	var msg = tp[3] +'battle result'+ tp[4];
 	var drop_ship_name = g ? g.api_ship_type + '：' + g.api_ship_name : null;
 	var drop_item_name = h ? $mst_useitem[h.api_useitem_id].api_name : null;
-	var tp = dpnla.tmpget('tp4_1');
 	$escape_info = d.api_escape;	// on_goback_port()で使用する.
 	if (e) {
 		var rank = d.api_win_rank;
 		var e_name = e.api_deck_name;
 		var e_fmat = formation_name($enemy_formation_id);
 		dpnla.tmpviw(0,'c46',e_name +'('+ e_fmat +')');
-		msg = e_name;
+		msg += e_name;
 		if (d.api_ship_id) {
 			var total = count_unless(d.api_ship_id, -1);
 			msg += '(' + d.api_dests + '/' + total + ')';
@@ -1397,7 +1366,6 @@ function on_battle_result(json) {
 	if (drop_item_name) {
 		msg += '<br />'+ tp[3] +'drop item'+ tp[4] + drop_item_name;
 	}
-//chrome.extension.sendRequest('## battle result\n' + msg);
 	dpnla.tmpviw(1,'c43',msg);
 }
 
@@ -1446,6 +1414,9 @@ function calc_kouku_damage(airplane, hp, kouku, hc) {
 	}
 	if (kouku.api_stage2) {	// 防空戦.
 		airplane.f_lostcount += kouku.api_stage2.api_f_lostcount;
+		if (kouku.api_stage2.api_air_fire) {
+			airplane.air_fire = kouku.api_stage2.api_air_fire;
+		}
 	}
 	calc_damage(hp, kouku.api_stage3);				// 航空爆撃雷撃戦.
 	calc_damage(hp, kouku.api_stage3_combined, hc);	// 連合第二艦隊：航空爆撃雷撃戦.
@@ -1574,7 +1545,8 @@ function on_battle(json) {
 	var airplane = {
 		seiku : null, 				// 制空権.
 		touch : d.api_touch_plane,	// 触接. 夜戦はd.にある、昼戦はd.api_kouku.state1.にある.
-		f_lostcount : 0				// 非撃墜数.
+		f_lostcount : 0,			// 非撃墜数.
+		air_fire : null				// 対空カットイン.
 	};
 	calc_kouku_damage(airplane, nowhps, d.api_kouku, nowhps_c); // 航空戦.
 	calc_kouku_damage(airplane, nowhps, d.api_kouku2, nowhps_c); // 航空戦第二波.
@@ -1617,15 +1589,27 @@ function on_battle(json) {
 	req.push($next_enemy);
 	if (fmt) req.push(fmt);
 	if (d.api_search) {
-		req.push('索敵：'+ search_name(d.api_search[0])); // d.api_search[1] は敵索敵か??
+		req.push('索敵：' + search_name(d.api_search[0])); // d.api_search[1] は敵索敵か??
 	}
 	if (airplane.touch) {
-		var t0 = airplane.touch[0]; if (t0 != -1) req.push('触接中：'+ slotitem_name(t0));
-		var t1 = airplane.touch[1]; if (t1 != -1) req.push('被触接中：'+ slotitem_name(t1));
+		var t0 = airplane.touch[0]; if (t0 != -1) req.push('触接中：' + slotitem_name(t0));
+		var t1 = airplane.touch[1]; if (t1 != -1) req.push('被触接中：' + slotitem_name(t1));
 	}
 	if (airplane.seiku != null) req.push(seiku_name(airplane.seiku));
+	if (airplane.air_fire != null) {
+		var air_fire = airplane.air_fire;
+		var idx = air_fire.api_idx;
+		var api_ship = 0;
+		if ($combined_flag && idx >= 6) {
+			api_ship = $fdeck_list[2].api_ship[idx - 6]; // 連合第二艦隊決め打ち
+		} else {
+			api_ship = fdeck.api_ship[idx];
+		}
+		var ship = $ship_list[api_ship];
+		req.push('対空カットイン(' + air_fire.api_kind + ')：' + ship.name_lv() + ' 【' + slotitem_names(air_fire.api_use_items) + '】');
+	}
 
-	if ($beginhps) req.push('緒戦被害：'+ $guess_info_str +'，推定：'+ $guess_win_rank);
+	if ($beginhps) req.push('緒戦被害：'+ $guess_info_str + '，推定：'+ $guess_win_rank);
 	if (!$beginhps) $beginhps = beginhps;
 	if (!$beginhps_c) $beginhps_c = beginhps_c;
 	if (d.api_escape_idx) {
@@ -1667,7 +1651,6 @@ function on_battle(json) {
 		$enemy_list[$enemy_id] = enemy_fleet;
 		update_enemy_list();
 	}
-//chrome.extension.sendRequest(req);
 	dpnla.tmpviw(0,'c43',req.join('<br />') +'<br />');
 }
 
@@ -1686,8 +1669,6 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			update_mst_useitem(json.api_data.api_mst_useitem);
 			update_mst_mission(json.api_data.api_mst_mission);
 			update_mst_mapinfo(json.api_data.api_mst_mapinfo);
-	//	chrome.extension.sendRequest("## ロード完了");
-			// debug_print_mst();
 			var tp = dpnla.tmpget('tp1_2');
 			var ht = dpnla.tmprep(0,' ゲーム情報の取得に成功しました',tp[0]);
 			dpnla.tmpviw(0,'t01_1',ht);
