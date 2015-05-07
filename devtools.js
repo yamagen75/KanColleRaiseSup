@@ -94,7 +94,6 @@ Ship.prototype.max_kyouka = function() {
 		mst.api_raig[1] - mst.api_raig[0],	// 雷装.
 		mst.api_tyku[1] - mst.api_tyku[0],	// 対空.
 		mst.api_souk[1] - mst.api_souk[0]		// 装甲.
-/*	mst.api_luck[1] - mst.api_luck[0]	*/	// 運.
 	];
 };
 
@@ -631,7 +630,6 @@ function push_fleet_status(tp, deck) {
 // イベントハンドラ.
 //
 function on_port(json) {
-	var unlockitem_list = {};
 	var unlock_names = [];
 	var lock_condlist = [];
 	var lock_kyoukalist = [];
@@ -661,22 +659,17 @@ function on_port(json) {
 		if (value) {
 			var i = value.item_id;
 			var lv = value.level;
-			if(value.locked){
-				if (!lockeditem_list[i]) lockeditem_list[i] = [];
-			if (!lockeditem_list[i][lv])
-				lockeditem_list[i][lv] = {count:0, shiplist:[]};
-			lockeditem_list[i][lv].count++;
-			lockeditem_count++;
-			}else{
-				if(i != -1){
-					if(!unlockitem_list[i]) unlockitem_list[i] = [];
-					if(!unlockitem_list[i][lv]) unlockitem_list[i][lv] = { count:0 };
-					unlockitem_list[i][lv].count++;
+			var lc = 1;
+			if(i != -1){
+				if(value.locked){
+					lc = 0;		lockeditem_count++;
 				}
+				if (!lockeditem_list[i]) lockeditem_list[i] = [];
+				if (!lockeditem_list[i][lc]) lockeditem_list[i][lc] = [];
+				if (!lockeditem_list[i][lc][lv]) lockeditem_list[i][lc][lv] = { count:0, shiplist:[] };
+				lockeditem_list[i][lc][lv].count++;
+				if (lv) leveling_slotitem++;
 			}
-		}
-		if (value && value.level) {
-			leveling_slotitem++;
 		}
 	}
 	//
@@ -687,7 +680,6 @@ function on_port(json) {
 		if (!ship.locked) {
 			var n = count_unless(ship.slot, -1); // スロット装備数.
 			unlock_slotitem += n;
-			
 			ship.slot_flg = n; // 装備持ちなら.
 			unlock_names.push(ship);
 			if (ship.lv >= 10) unlock_lv10++;
@@ -718,8 +710,7 @@ function on_port(json) {
 		if (ship.slot) {
 			ship.slot.forEach(function(id) {
 				var value = $slotitem_list[id];
-				if (value && value.locked)
-					lockeditem_list[value.item_id][value.level].shiplist.push(ship);
+				if (value && value.locked) lockeditem_list[value.item_id][0][value.level].shiplist.push(ship);
 			});
 		}
 		if (ship.can_kaizou()) kaizou_list.push(ship);
@@ -885,59 +876,35 @@ function on_port(json) {
 			var bb = $mst_slotitem[b];
 			var ret = aa.api_type[2] - bb.api_type[2]; // 装備分類の大小判定.
 			if (!ret) ret = aa.api_sortno - bb.api_sortno; // 分類内の大小判定.
-			// if (!ret) ret = a - b; // 種別ID値での大小判定.
 			return ret;
 		});
-		tp = dpnla.tmpget('tp5_1');		ca = 0;		cb = 0;
-		ra = [lockeditem_count,leveling_slotitem];
-		ht = dpnla.tmprep(2,ra,tp[0]);	ra = ['','','','','','','',''];
+		tp = dpnla.tmpget('tp5_1');		ca = 0;		cb = 0;		ht = tp[0];
+		var tc = dpnla.tmpget('tp5_5');		var rb = ['','','','','','','','',''];
+		ra = [lockeditem_count,(items - lockeditem_count),leveling_slotitem];
+		var hb = dpnla.tmprep(2,ra,tc[0]);	ra = ['','','',''];
 		lockeditem_ids.forEach(function(id) {
-			for (var lv in lockeditem_list[id]) {
-				var item = lockeditem_list[id][lv];
-				if(ca == 0 && cb > 0){
-					ht += dpnla.tmprep(2,ra,tp[1]);		ra = ['','','','','','','',''];
-				}
-				i = ca * 4;		ra[i] = slotitem_name(id, lv);	ra[(i + 1)] = item.shiplist.length;
-				ra[(i + 2)] = item.count;		ra[(i + 3)] = shiplist_names(item.shiplist);	ca++;
-				if(ca > 1){
-					ca = 0;		cb++;
-				}
-			}
-		});
-		ht += dpnla.tmprep(2,ra,tp[1]) + tp[2];
-		dpnla.tmpviw(0,'t51_1',ht);
-	}else{
-		dpnla.tmpviw(0,'t51_1','');
-	}
-	// アンロック装備一覧
-	var unlockitem_ids = Object.keys(unlockitem_list);
-	if (unlockitem_ids.length > 0) {
-		unlockitem_ids.sort(function(a, b) {	// 種別ID配列を表示順に並べ替える.
-			var aa = $mst_slotitem[a];
-			var bb = $mst_slotitem[b];
-			var ret = aa.api_type[2] - bb.api_type[2]; // 装備分類の大小判定.
-			if (!ret) ret = aa.api_sortno - bb.api_sortno; // 分類内の大小判定.
-			return ret;
-		});
-		tp = dpnla.tmpget('tp5_5');		ca = 0;		cb = 0;
-		ra = [(items - lockeditem_count),leveling_slotitem];
-		ht = dpnla.tmprep(2,ra,tp[0]);	ra = ['','','','','',''];
-		unlockitem_ids.forEach(function(id) {
-			for (var lv in unlockitem_list[id]) {
-				var item = unlockitem_list[id][lv];
-				if(ca == 0 && cb > 0){
-					ht += dpnla.tmprep(2,ra,tp[1]);		ra = ['','','','','',''];
-				}
-				i = ca * 2;		ra[i] = slotitem_name(id, lv);	ra[(i + 1)] = item.count;		ca++;
-				if(ca > 2){
-					ca = 0;		cb++;
+			for (var lc in lockeditem_list[id]) {
+				for (var lv in lockeditem_list[id][lc]) {
+					var item = lockeditem_list[id][lc][lv];
+					if(ca == 0 && cb > 0){
+						hb += dpnla.tmprep(2,rb,tc[1]);		rb = ['','','','','','','','',''];
+					}
+					ra[0] = slotitem_name(id, lv);	ra[1] = item.shiplist.length;		ra[2] = item.count;
+					if(ra[1] > 0){
+						ra[3] = shiplist_names(item.shiplist);	ht += dpnla.tmprep(2,ra,tp[1]);
+					}
+					i = ca * 3;		rb[i] = ra[0];	rb[(i + 1)] = ra[2];	ca++;
+					if(lc < 1) rb[(i + 2)] = tc[3];
+					if(ca > 2){
+						ca = 0;		cb++;
+					}
 				}
 			}
 		});
-		ht += dpnla.tmprep(2,ra,tp[1]) + tp[2];
-		dpnla.tmpviw(0,'t51_2',ht);
+		ht += tp[2];	dpnla.tmpviw(0,'t51_1',ht);
+		hb += dpnla.tmprep(2,rb,tc[1]) + tc[2];		dpnla.tmpviw(0,'t51_2',hb);
 	}else{
-		dpnla.tmpviw(0,'t51_2','');
+		dpnla.tmpviw(0,'t51_1','');		dpnla.tmpviw(0,'t51_2','');
 	}
 	//
 	// 改造可能一覧、近代化改修一可能覧を表示する.
