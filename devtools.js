@@ -658,7 +658,7 @@ function on_port(json) {
 		var value = $slotitem_list[id];
 		if (value) {
 			var i = value.item_id;
-			var lv = value.level;
+			var lv = 10 - value.level;
 			var lc = 1;
 			if(i != -1){
 				if(value.locked){
@@ -668,7 +668,7 @@ function on_port(json) {
 				if (!lockeditem_list[i][lc]) lockeditem_list[i][lc] = [];
 				if (!lockeditem_list[i][lc][lv]) lockeditem_list[i][lc][lv] = { count:0, shiplist:[] };
 				lockeditem_list[i][lc][lv].count++;
-				if (lv) leveling_slotitem++;
+				if (lv < 10) leveling_slotitem++;
 			}
 		}
 	}
@@ -710,7 +710,9 @@ function on_port(json) {
 		if (ship.slot) {
 			ship.slot.forEach(function(id) {
 				var value = $slotitem_list[id];
-				if (value && value.locked) lockeditem_list[value.item_id][0][value.level].shiplist.push(ship);
+				if (value && value.locked) {
+					lockeditem_list[value.item_id][0][(10 - value.level)].shiplist.push(ship);
+				}
 			});
 		}
 		if (ship.can_kaizou()) kaizou_list.push(ship);
@@ -878,31 +880,40 @@ function on_port(json) {
 			if (!ret) ret = aa.api_sortno - bb.api_sortno; // 分類内の大小判定.
 			return ret;
 		});
-		tp = dpnla.tmpget('tp5_1');		ca = 0;		cb = 0;		ht = tp[0];
-		var tc = dpnla.tmpget('tp5_5');		var rb = ['','','','','','','','',''];
-		ra = [lockeditem_count,(items - lockeditem_count),leveling_slotitem];
-		var hb = dpnla.tmprep(2,ra,tc[0]);	ra = ['','','',''];
+		var tc = dpnla.tmpget('tp5_5');		var rb = ['','',''];
+		ky = 't52';		ca = 0;		cb = 1;		cc = 3;		cd = 1;
+		var hb = '<div id="'+ ky +'_1">';
+		tp = dpnla.tmpget('tp5_1');		ht = tp[0];		ra = ['','','',''];
 		lockeditem_ids.forEach(function(id) {
 			for (var lc in lockeditem_list[id]) {
 				for (var lv in lockeditem_list[id][lc]) {
 					var item = lockeditem_list[id][lc][lv];
-					if(ca == 0 && cb > 0){
-						hb += dpnla.tmprep(2,rb,tc[1]);		rb = ['','','','','','','','',''];
+					if(ca == 0){
+						if(cb > cc){
+							cb = 1;		cd++;
+						}
+						if(cb == 1 && cd > 1) hb += '</div><div id="'+ ky +'_'+ cd +'" class="hid">';
+						hb += tc[1];
 					}
-					ra[0] = slotitem_name(id, lv);	ra[1] = item.shiplist.length;		ra[2] = item.count;
+					ra[0] = slotitem_name(id,(10 - lv));	ra[1] = item.shiplist.length;		ra[2] = item.count;
 					if(ra[1] > 0){
 						ra[3] = shiplist_names(item.shiplist);	ht += dpnla.tmprep(2,ra,tp[1]);
 					}
-					i = ca * 3;		rb[i] = ra[0];	rb[(i + 1)] = ra[2];	ca++;
-					if(lc < 1) rb[(i + 2)] = tc[3];
-					if(ca > 2){
-						ca = 0;		cb++;
+					rb[0] = ra[0];	rb[1] = ra[2];	rb[2] = '';
+					if(lc < 1) rb[2] = tc[4];
+					hb += dpnla.tmprep(2,rb,tc[2]);		ca++;
+					if(ca > 9){
+						ca = 0;		cb++;		hb += tc[3];
 					}
 				}
 			}
 		});
 		ht += tp[2];	dpnla.tmpviw(0,'t51_1',ht);
-		hb += dpnla.tmprep(2,rb,tc[1]) + tc[2];		dpnla.tmpviw(0,'t51_2',hb);
+		if(ca > 0) hb += tc[3];
+		hb += '</div>';
+		ra = [lockeditem_count,(items - lockeditem_count),leveling_slotitem,dpnla.tmpagemk(ky,cd),hb];
+		dpnla.tmpviw(0,'t51_2',dpnla.tmprep(2,ra,tc[0]));
+		dpnla.tabinit(1,ky);	dpnla.tabdef(ky);
 	}else{
 		dpnla.tmpviw(0,'t51_1','');		dpnla.tmpviw(0,'t51_2','');
 	}
