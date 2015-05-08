@@ -23,11 +23,12 @@ htmb += 'document.getElementById("emorgp1").style.width = fc; ';
 htmb += 'document.getElementById("emorgp2").style.display = fa; ';
 htmb += 'document.getElementById("emorgp3").style.display = fb;';
 htmb += ' } function orgdmmhedonoff(pt){ var fa = "none"; var fb = "inline-block"; var fc = "none"; ';
-htmb += 'if(pt > 0){ fa = "inline-block"; fb = "none"; fc = "block"; } ';
+htmb += 'var fd = "816px"; ';
+htmb += 'if(pt > 0){ fa = "inline-block"; fb = "none"; fc = "block"; fd = "996px"; } ';
 htmb += 'document.getElementById("emorgp4").style.display = fb; ';
 htmb += 'document.getElementById("emorgp5").style.display = fa; ';
-htmb += 'document.getElementById("dmm-ntgnavi-renew").style.display = fc;';
-htmb += ' }';
+htmb += 'document.getElementById("dmm-ntgnavi-renew").style.display = fc; ';
+htmb += 'document.body.style.minWidth = fd; }';
 /* 操作するオブジェクト(area-game,game_frame,dmm-ntgnavi-renew)が取得出来れば実行する */
 var contb = document.getElementById('area-game');
 var contc = document.getElementById('game_frame');
@@ -35,6 +36,7 @@ var contd = document.getElementById('dmm-ntgnavi-renew');
 if(!(contb == undefined || contc == undefined || contd == undefined)){
 	contb.style.textAlign = 'left';		contb.style.marginTop = '5px';
 	contd.style.display = 'none';		contc.width = '840px';
+	document.body.style.minWidth = '816px';
 	scrp.innerHTML = htmb;	document.head.appendChild(scrp);
 	cont.innerHTML = htma;	document.body.appendChild(cont);
 }
