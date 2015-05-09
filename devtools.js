@@ -1189,10 +1189,13 @@ function on_mission_check(category) {
 					if(rc < 2) rc = 1;
 				}else if(quest.api_state == 1){
 					rb[2] = tb[13];		rc = 2;
-				}else if(quest.api_progress_flag == 2){
-					rb[0] = tb[9];
-				}else if(quest.api_progress_flag == 1){
-					rb[0] = tb[10];
+				}
+				if(rb[0] == ''){
+					if(quest.api_progress_flag == 2){
+						rb[0] = tb[9];
+					}else if(quest.api_progress_flag == 1){
+						rb[0] = tb[10];
+					}
 				}
 				ha += dpnla.tmprep(2,rb,tp[1]);
 			}
