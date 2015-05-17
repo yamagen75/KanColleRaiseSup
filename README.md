@@ -52,7 +52,7 @@ Flash PlayerはChrome内蔵のほうを使用してください
 ![戦闘](http://yamagen75.github.io/KanColleRaiseSup/SS/11.png)
 ![使用中装備](http://yamagen75.github.io/KanColleRaiseSup/SS/12.png)
 ![全装備](http://yamagen75.github.io/KanColleRaiseSup/SS/13.png)
-![ダブリ艦＆改造可能艦](http://yamagen75.github.io/KanColleRaiseSup/SS/14.png)
+![母港艦娘状況](http://yamagen75.github.io/KanColleRaiseSup/SS/14.png)
 ![艦娘一覧コピー用](http://yamagen75.github.io/KanColleRaiseSup/SS/15.png)
 ![任務チェックメッセージ](http://yamagen75.github.io/KanColleRaiseSup/SS/16.png)
 

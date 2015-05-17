@@ -35,6 +35,7 @@ var $beginhps_c = null;
 var $f_damage = 0;
 var $guess_win_rank = '?';
 var $guess_info_str = '';
+var $guess_debug_log = false;
 
 //-------------------------------------------------------------------------
 // Ship クラス.
@@ -59,7 +60,7 @@ function Ship(data, ship) {
 }
 
 Ship.prototype.name_lv = function() {
-	return ship_name(this.ship_id) + ' Lv' + this.lv;
+	return ship_name(this.ship_id) + ' Lv'+ this.lv;
 };
 
 Ship.prototype.fuel_name = function() {
@@ -572,6 +573,7 @@ function is_airplane(item) {
 	case 11:// 水上爆撃機.
 	case 25:// オートジャイロ.
 	case 26:// 対潜哨戒機.
+	case 41:// 大型飛行艇.
 		return true;
 	default:
 		return false;
@@ -635,6 +637,8 @@ function on_port(json) {
 	var lock_kyoukalist = [];
 	var lock_beginlist = {};
 	var lock_repairlist = [];
+	var unowned_names = [];
+	var owned_ship_idset = {};
 	var cond85 = 0;
 	var cond53 = 0;
 	var cond50 = 0;
@@ -676,6 +680,7 @@ function on_port(json) {
 	// ロック艦のcond別一覧、未ロック艦一覧、ロック装備持ち艦を検出する.
 	for (var id in $ship_list) {
 		var ship = $ship_list[id];
+		owned_ship_idset[ship.begin_shipid()] = true;
 		lock_condlist.push(ship);
 		if (!ship.locked) {
 			var n = count_unless(ship.slot, -1); // スロット装備数.
@@ -721,6 +726,12 @@ function on_port(json) {
 	for (var id in lock_beginlist) {
 		var a = lock_beginlist[id];
 		if (a.length > 1) double_count += a.length - 1; // ダブリ艦数を集計する.
+	}
+	for (var id in $mst_ship) {
+		var mst = $mst_ship[id];
+		if (mst.yps_begin_shipid) continue; // 改造型を除外する.
+		if (!mst.api_afterlv) continue; // 改造不能型（季節艦、深海棲艦）を除外する.
+		if (!owned_ship_idset[id]) unowned_names.push(ship_name(id)); // 未所有艦名をリストに加える.
 	}
 	//
 	// 艦娘と装備数を検出する.
@@ -849,6 +860,16 @@ function on_port(json) {
 	}else{
 		dpnla.tmpviw(0,'t31_2_a','');		dpnla.tmpviw(0,'t31_2','');
 	}
+	// 未保有艦一覧
+	var unowned_count = unowned_names.length;
+	if (unowned_count > 0) {
+		tp = dpnla.tmpget('tp5_6');
+		ht = dpnla.tmprep(0,unowned_count,tp[0]);
+		for (var i in unowned_names) {
+			ht += dpnla.tmprep(0,unowned_names[i],tp[1]);
+		}
+		ht += tp[2];	mc[4] = ht;
+	}
 	// ロック艦ダブリ一覧
 	if (double_count > 0) {
 		tp = dpnla.tmpget('tp5_2');
@@ -932,7 +953,7 @@ function on_port(json) {
 		}
 		ht += tp[2];
 	}
-	ht = mc[3] + ht;	dpnla.tmpviw(0,'t51_3',ht);
+	ht = mc[4] + ht + mc[3];	dpnla.tmpviw(0,'t51_3',ht);
 	// 近代化改修可能艦一覧(ロック艦のみ)
 	var kyouka_count = [0,0,0,0];
 	if (lock_kyoukalist.length > 0) {
@@ -985,8 +1006,12 @@ function on_port(json) {
 		ky = 't34';		ca = 0;		cb = 1;		cc = 2;		cd = 1;
 		ht = '<div id="'+ ky +'_1">';		ra = new Array();
 		if (ndocks > 0) {
-			tp = dpnla.tmpget('tp3_7');		ht += tp[0];
+			tp = dpnla.tmpget('tp3_7');		ht += tp[0];	var ndoklst = new Array();
 			for (var id in $ndock_list) {
+				var d = $ndock_list[id];	ndoklst[d.api_id] = id;
+			}
+			for (var i in ndoklst) {
+				var id = ndoklst[i];
 				var d = $ndock_list[id];
 				var ship = $ship_list[id];
 				var c_date = new Date(d.api_complete_time);
@@ -996,7 +1021,7 @@ function on_port(json) {
 				ra[7] = d.api_item4;	ra[8] = tb[5];	ra[9] = dpnla.daytimchg(1,c_date);
 				ht += dpnla.tmprep(2,ra,tp[1]);
 			}
-			ht += tp[2];		cb = 2;
+			ht += tp[2];	cb = 2;
 		}
 		if (repairs > 0) {
 			tp = dpnla.tmpget('tp3_3');		ra = new Array();
@@ -1038,7 +1063,7 @@ function on_port(json) {
 			var k = $kdock_list[id];
 			var c_date = new Date(k.api_complete_time);
 			var complete = (k.api_state == 3 || c_date.getTime() < Date.now());	// api_state 3:完成, 2:建造中, 1:???, 0:空き, -1:未開放. ※ 1以下は$kdock_listに載せない.
-			ra[0] = (complete ? '完成！！' : '建造中');		ra[1] = ship_name(k.api_created_ship_id);
+			ra[0] = (complete ? '完成！' : '建造中');		ra[1] = ship_name(k.api_created_ship_id);
 			ra[2] = k.api_item1;	ra[3] = k.api_item2;	ra[4] = k.api_item3;	ra[5] = k.api_item4;
 			ra[6] = k.api_item5;	ra[7] = (complete ? '' : dpnla.daytimchg(1,c_date));
 			ht += dpnla.tmprep(2,ra,tp[1]);
@@ -1303,9 +1328,11 @@ function on_battle_result(json) {
 		if (rank != $guess_win_rank) {
 			$guess_info_str += '/' + $guess_win_rank + ' MISS!!';
 			msg += '<br />'+ tp[9] +'勝敗推定ミス'+ tp[8] +' '+ $guess_info_str;
-		}
-		if (/[BCDE]/.test(rank))	///@debug B勝利以下のみ記録する.
 			push_to_logbook($next_enemy + ', ' + $guess_info_str);
+		}
+		else if (/[DE]/.test(rank) || $guess_debug_log) {
+			push_to_logbook($next_enemy + ', ' + $guess_info_str);
+		}
 		var fleet = $enemy_list[$enemy_id];
 		if (fleet) {
 			fleet[0] = e_name +'('+ e_fmat +')';
@@ -1481,17 +1508,19 @@ function guess_win_rank(nowhps, maxhps, beginhps, nowhps_c, maxhps_c, beginhps_c
 	}
 	$f_damage = f_damage_total;
 	// %%% CUT HERE FOR TEST %%%
-	var f_damage_percent = 100 * f_damage_total / f_hp_total;
-	var e_damage_percent = 100 * e_damage_total / e_hp_total;
-	f_damage_percent = Math.floor(f_damage_percent); // 少数部を切り捨てる.
-	e_damage_percent = Math.floor(e_damage_percent); // 少数部を切り捨てる. 
-	var rate = e_damage_total == 0 ? 0   : // 潜水艦お見合い等ではDになるので敵ダメ判定を優先する(f_damage_total==0でも100にしない)
-			   f_damage_total == 0 ? 100 : // こちらが無傷なら1ダメ以上与えていればBなのでrateを100にする.
-			   e_damage_percent / (f_damage_percent == 0 ? 1 : f_damage_percent); // 0除算回避. 要検証!!! 敵味方とも1%未満の微ダメージのときの処理が曖昧.
-//	rate = Math.ceil(rate * 10) / 10; // 小数部2桁目を切り上げる.
+	var f_damage_percent = Math.floor(100 * f_damage_total / f_hp_total); // 自ダメージ百分率. 小数点以下切り捨て.
+	var e_damage_percent = Math.floor(100 * e_damage_total / e_hp_total); // 敵ダメージ百分率. 小数点以下切り捨て.
+	var rate = e_damage_percent == 0 ? 0   : // 潜水艦お見合い等ではDになるので敵ダメ判定を優先する.
+			   f_damage_percent == 0 ? 100 : // ゼロ除算回避、こちらが無傷なら1ダメ以上与えていればBなのでrateを100にする.
+			   e_damage_percent / f_damage_percent;
 	$guess_info_str = 'f_damage:' + fraction_percent_name(f_damage_total, f_hp_total) + '[' + f_lost_count + '/' + f_count + ']' + f_maxhp_total
 				+ ', e_damage:' + fraction_percent_name(e_damage_total, e_hp_total) + (e_leader_lost ? '[x' : '[') + e_lost_count + '/' + e_count + ']'
 				+ (isChase ? ', chase_rate:' : ', rate:') + Math.round(rate * 10000) / 10000
+				;
+	$guess_debug_log = (rate >= 2.49 && rate <= 2.51) // B/C判定閾値検証.
+				|| (rate >= 0.8864 && rate <= 0.9038) // C/D判定閾値検証.
+				|| (f_damage_total != 0 && f_damage_percent == 0) // 自ダメージ 1%未満時.
+				|| (e_damage_total != 0 && e_damage_percent == 0) // 敵ダメージ 1%未満時.
 				;
 	if (e_count == e_lost_count && f_lost_count == 0) {
 		return (f_damage_total == 0) ? '完S' : 'S';
@@ -1505,7 +1534,7 @@ function guess_win_rank(nowhps, maxhps, beginhps, nowhps_c, maxhps_c, beginhps_c
 	if (rate > 2.5) { // ほぼ確定. rate == 2.5 でC判定を確認済み.
 		return 'B';
 	}
-	if (rate > 0.9) { // 要検証!!! r == 0.958 でC判定を確認. rate == 0.8169 でD判定を確認済み. 0.817～0.957 の区間に閾値がある. 
+	if (rate > 0.9) { // 要検証!!! r == 0.9038 でC判定を確認. rate == 0.8864 でD判定を確認済み. 0.8864～0.9038 の区間に閾値がある.
 		return 'C';
 	}
 	if (f_lost_count < f_count/2) { // 要検証.
