@@ -164,10 +164,12 @@ function update_enemy_list() {
 	save_storage('enemy_list', $enemy_list);
 }
 
-function update_fdeck_list(list) {
+function update_fdeck_list(list, is_diff) {
 	if (!list) return;
-	$fdeck_list = {};
-	$ship_fdeck = {};
+	if (!is_diff) {
+		$fdeck_list = {};
+		$ship_fdeck = {};
+	}
 	list.forEach(function(deck) {
 		$fdeck_list[deck.api_id] = deck;
 		for (var i in deck.api_ship) {
@@ -289,9 +291,16 @@ function fraction_name(num, denom) {
 //
 function weekly_name() {
 	var w = get_weekly();
+	var a = [(w.sortie / 36),(w.win_boss / 12),(w.boss_cell / 24),(w.win_S / 6)];		var ac = 0;
+	for(var i in a){
+		if(a[i] > 1) a[i] = 1;
+		ac += a[i];
+	}
+	ac = Math.floor(ac / 4 * 100);
 	return ' 【出撃数： '+ fraction_name(w.sortie, 36)
 		+'，ボス勝利： '+ fraction_name(w.win_boss, 12)
-		+'，<br /><span class="mb11"></span>ボス到達： '+ fraction_name(w.boss_cell, 24)
+		+'，<br /><span class="mb11"></span>『 '+ ac +'% 』'
+		+'<span class="mb10"></span>ボス到達： '+ fraction_name(w.boss_cell, 24)
 		+'，S勝利： '+ fraction_name(w.win_S, 6)
 		+' 】';
 }
@@ -1003,10 +1012,10 @@ function on_port(json) {
 	var ndocks = Object.keys($ndock_list).length;
 	var repairs = lock_repairlist.length;
 	if (ndocks > 0 || repairs > 0) {
-		ky = 't34';		ca = 0;		cb = 1;		cc = 2;		cd = 1;
-		ht = '<div id="'+ ky +'_1">';		ra = new Array();
+		ky = 't34';		ca = 0;		cb = 1;		cc = 2;		cd = 1;		ht = '<div id="'+ ky +'_1">';
 		if (ndocks > 0) {
-			tp = dpnla.tmpget('tp3_7');		ht += tp[0];	var ndoklst = new Array();
+			ra = new Array();		var ndoklst = new Array();
+			tp = dpnla.tmpget('tp3_7');		ht += tp[0];
 			for (var id in $ndock_list) {
 				var d = $ndock_list[id];	ndoklst[d.api_id] = id;
 			}
@@ -1018,13 +1027,15 @@ function on_port(json) {
 				ra[0] = get_fdeck_num(ship.id);		ra[1] = kira_name(ship.c_cond);
 				ra[2] = ship_name(ship.ship_id);	ra[3] = ship.lv;
 				ra[4] = d.api_item1;	ra[5] = d.api_item2;	ra[6] = d.api_item3;
-				ra[7] = d.api_item4;	ra[8] = tb[5];	ra[9] = dpnla.daytimchg(1,c_date);
+				ra[7] = d.api_item4;	ra[8] = tb[5];
+				ra[9] = dpnla.daytimchg(1,c_date);
 				ht += dpnla.tmprep(2,ra,tp[1]);
 			}
 			ht += tp[2];	cb = 2;
 		}
 		if (repairs > 0) {
-			tp = dpnla.tmpget('tp3_3');		ra = new Array();
+			ra = new Array();
+			tp = dpnla.tmpget('tp3_3');
 			lock_repairlist.sort(function(a, b) { return b.ndock_time - a.ndock_time; }); // 修理所要時間降順で並べ替える.
 			for (var i in lock_repairlist) {
 				var ship = lock_repairlist[i];
@@ -1058,18 +1069,23 @@ function on_port(json) {
 	// 建造ドック一覧表示する.
 	var kdocks = Object.keys($kdock_list).length;
 	if (kdocks > 0) {
-		tp = dpnla.tmpget('tp3_5');		ht = tp[0];		ra = new Array();
+		ra = new Array();
+		tp = dpnla.tmpget('tp3_5');		ht = tp[0];
 		for (var id in $kdock_list) {
 			var k = $kdock_list[id];
 			var c_date = new Date(k.api_complete_time);
 			var complete = (k.api_state == 3 || c_date.getTime() < Date.now());	// api_state 3:完成, 2:建造中, 1:???, 0:空き, -1:未開放. ※ 1以下は$kdock_listに載せない.
-			ra[0] = (complete ? '完成！' : '建造中');		ra[1] = ship_name(k.api_created_ship_id);
-			ra[2] = k.api_item1;	ra[3] = k.api_item2;	ra[4] = k.api_item3;	ra[5] = k.api_item4;
-			ra[6] = k.api_item5;	ra[7] = (complete ? '' : dpnla.daytimchg(1,c_date));
+			ra[0] = (complete ? '完成！' : '建造中');
+			ra[1] = ship_name(k.api_created_ship_id);
+			ra[2] = k.api_item1;
+			ra[3] = k.api_item2;
+			ra[4] = k.api_item3;
+			ra[5] = k.api_item4;
+			ra[6] = k.api_item5;
+			ra[7] = (complete ? '' : dpnla.daytimchg(1,c_date));
 			ht += dpnla.tmprep(2,ra,tp[1]);
 		}
-		ht += tp[2];
-		dpnla.tmpviw(0,'t31_5_a',ht);
+		ht += tp[2];	dpnla.tmpviw(0,'t31_5_a',ht);
 	}else{
 		dpnla.tmpviw(0,'t31_5_a','');
 	}
@@ -1140,15 +1156,17 @@ function on_port(json) {
 		ht += dpnla.tmprep(2,ra,tp[10]);
 	}
 	mc[3] = ht;		mc[4] = tp[8];
-	//
-	// 各艦隊の情報を一覧表示する.
 	ht = ['','','','','',''];		ra = ['','','','',''];	var ma = ['全 艦 隊'];
 	var md = new Array();		var me = new Array();		var ta = new Array();
 	for(i = 0;i < 3;i++){
 		j = i + 1;	ky = 'tp2_'+ j;		tp[i] = dpnla.tmpget(ky);
 	}
+	//
+	// 各艦隊の情報を一覧表示する.
 	for (var f_id in $fdeck_list) {
-		var deck = $fdeck_list[f_id];		ky = '';	ra[0] = '';		ra[1] = '';		ra[4] = 'info';
+		ra[0] = '';		ra[1] = '';
+		ra[4] = 'info';		ky = '';
+		var deck = $fdeck_list[f_id];
 		if ($combined_flag && f_id < 3) {
 			ky = '◆';	ra[0] = '【連合】 ';	ra[4] = 'primary';
 		}
@@ -1431,8 +1449,7 @@ function calc_kouku_damage(airplane, hp, kouku, hc) {
 }
 
 function push_fdeck_status(ptn, fdeck, maxhps, nowhps, beginhps, airpl) {
-	var tp = dpnla.tmpget('tp4_1');		var ha = '';
-	var ra = ['','','','','',''];
+	var tp = dpnla.tmpget('tp4_1');		var ha = '';	var ra = ['','','','','',''];
 	for (var i = 1; i <= 6; ++i) {
 		var maxhp = maxhps[i];
 		if (maxhp == -1) continue;
@@ -1446,8 +1463,7 @@ function push_fdeck_status(ptn, fdeck, maxhps, nowhps, beginhps, airpl) {
 			if (repair) name += tp[7] +'修理要員x'+ repair + tp[8];
 			if (megami) name += tp[7] +'修理女神x'+ megami + tp[8];
 		}
-		ra[0] = i;	ra[1] = name;		ra[2] = shlv;
-		ra[3] = (nowhp < 0 ? 0 : nowhp) +'/'+ maxhp;
+		ra[0] = i;	ra[1] = name;		ra[2] = shlv;		ra[3] = (nowhp < 0 ? 0 : nowhp) +'/'+ maxhp;
 		ra[4] = diff_name(nowhp, beginhps[i]);	ra[5] = damage_name(nowhp, maxhp);
 		ha += dpnla.tmprep(2,ra,tp[1]);
 	}
@@ -1800,13 +1816,12 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		// 任務一覧.
 		func = function(json) { // 任務総数と任務リストを記録する.
 			var list = json.api_data.api_list;
-			if (!list) return;
 			$quest_count = json.api_data.api_count;
 			$quest_exec_count = json.api_data.api_exec_count;
 			if (json.api_data.api_disp_page == 1 && $quest_count != Object.keys($quest_list).length) {
 				$quest_list = {}; // 任務総数が変わったらリストをクリアする.
 			}
-			list.forEach(function(data) {
+			if (list) list.forEach(function(data) {
 				if (data == -1) return; // 最終ページには埋草で-1 が入っているので除外する.
 				$quest_list[data.api_no] = data;
 				if (data.api_no == 214) {
@@ -1839,6 +1854,14 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		func = function(json) { // 保有艦、艦隊一覧を更新してcond表示する.
 			update_ship_list(json.api_data, true);
 			update_fdeck_list(json.api_data_deck);
+			on_port(json);
+		};
+	}
+	else if (api_name == '/api_get_member/ship_deck') {
+		// 進撃. 2015-5-18メンテにて、ship2が廃止されて置き換わった.
+		func = function(json) { // 保有艦、艦隊一覧を更新してcond表示する.
+			update_ship_list(json.api_data.api_ship_data, false);
+			update_fdeck_list(json.api_data.api_deck_data, true);
 			on_port(json);
 		};
 	}
