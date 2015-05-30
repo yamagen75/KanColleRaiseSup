@@ -211,7 +211,8 @@ var dpnla = {
 	tab14init: function(vl){
 	/* 戦闘タブ初期化 */
 		this.tmpviw(0,'c41',vl);	this.tmpviw(0,'c42','&nbsp;');
-		this.tmpviw(0,'c43','&nbsp;');	this.tmpviw(0,'c44','');	this.tmpviw(0,'c45','');
+		this.tmpviw(0,'c43','&nbsp;');	this.tmpviw(0,'c44','');
+		this.tmpviw(0,'c45','');	this.tmpviw(0,'c47','');
 	},
 	pmbopen: function(la,ta,wa,ha,hb){
 	/* ポップアップメッセージボックスを開く */
@@ -244,6 +245,8 @@ var dpnla = {
 		switch(p){
 		 case 1:	// 12/31 23:59
 			r = a[1] +'/'+ a[2] +' '+ a[3] +':'+ a[4];	break;
+		 case 2:	// 12/31 23:59:59
+			r = a[1] +'/'+ a[2] +' '+ a[3] +':'+ a[4] +':'+ a[5];		break;
 		 default:	// 2014/12/31 23:59:59
 			r = a[0] +'/'+ a[1] +'/'+ a[2] +' '+ a[3] +':'+ a[4] +':'+ a[5];	break;
 		}
