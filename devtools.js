@@ -9,6 +9,8 @@ var $mst_mapinfo	= load_storage('mst_mapinfo');
 var $weekly			= load_storage('weekly');
 var $logbook		= load_storage('logbook', []);
 var $slotitem_list	= load_storage('slotitem_list');
+var $tmp_ship_id = -1000;	// ドロップ艦の仮ID.
+var $tmp_slot_id = -1000;	// ドロップ艦装備の仮ID.
 var $max_ship = 0;
 var $max_slotitem = 0;
 var $combined_flag = 0;
@@ -36,7 +38,9 @@ var $f_damage = 0;
 var $guess_win_rank = '?';
 var $guess_info_str = '';
 var $guess_debug_log = false;
+var $battle_info = '';
 var $request = null;
+var $newship_slots = null;
 
 //-------------------------------------------------------------------------
 // Ship クラス.
@@ -62,6 +66,10 @@ function Ship(data, ship) {
 
 Ship.prototype.name_lv = function() {
 	return ship_name(this.ship_id) + ' Lv'+ this.lv;
+};
+
+Ship.prototype.stype = function() {
+	return $mst_ship[this.ship_id].api_stype;
 };
 
 Ship.prototype.fuel_name = function() {
@@ -150,9 +158,35 @@ function update_ship_list(list, is_delta) {
 	var prev_ship_list = $ship_list;
 	if (!is_delta) $ship_list = {};
 	list.forEach(function(data) {
-		$ship_list[data.api_id] = new Ship(data, prev_ship_list[data.api_id]);
+		var prev = prev_ship_list[data.api_id];
+		var ship = new Ship(data, prev);
+		$ship_list[data.api_id] = ship;
+		if ($newship_slots && !prev) {
+			// ship2廃止によりドロップ艦の装備数が母港帰還まで反映できなくなったので、母港帰還時に新規入手艦の装備数を記録保存し、
+			// ドロップ時に装備数分のダミー装備IDを用意する. 初入手艦など未記録の艦は装備数0となるので、装備数が少なく表示される場合がある.
+			if (ship.id < 0) {	// on_battle_result で仮登録するドロップ艦の場合.
+				for (var slots = $newship_slots[ship.ship_id]; slots; --slots) { // 装備数未登録なら何もしない(装備数合計が少なく表示される)
+					$slotitem_list[$tmp_slot_id] = null; // 個数を合せるためnullのダミーエントリを追加する. 母港旗艦(slot_itemパケット)でリストが全更新される.
+					ship.slot.push($tmp_slot_id--); // 初期装備数分のダミー装備IDを載せる. 母港帰還(portパケット)により正しい値に上書きされる.
+				}
+			}
+			else if (ship.lv == 1) {	// 海域ドロップ、報酬、建造などにより新規入手したLv1艦の場合.
+				$newship_slots[ship.ship_id] = count_unless(ship.slot, -1); // 初期装備数を記録する.
+			}
+		}
 	});
+	if (!$newship_slots) {
+		// ゲーム開始直後の保有艦リスト更新では、別環境で入手済みの既存Lv1艦(装備変更の可能性あり)も新規入手扱いになるので都合が悪い.
+		// よって $newship_slots のロードをここで行い、開始直後の装備数記録をスキップする.
+		$newship_slots = load_storage('newship_slots');	// この環境で保存した新規艦の初期装備数をロードする.
+		for (var i in $init_newship_slots) {			// 既知艦の初期装備個数を上書きする.
+			var n = $init_newship_slots[i];
+			if (n != null)
+				$newship_slots[i] = n;
+		}
+	}
 	save_storage('ship_list', $ship_list);
+	save_storage('newship_slots', $newship_slots);
 }
 
 function delta_update_ship_list(list) {
@@ -745,10 +779,13 @@ function on_port(json) {
 		}
 		if (ship.can_kaizou()) kaizou_list.push(ship);
 	}
+	var lcdoublst = new Array();
 	var double_count = 0;
 	for (var id in lock_beginlist) {
 		var a = lock_beginlist[id];
-		if (a.length > 1) double_count += a.length - 1; // ダブリ艦数を集計する.
+		if (a.length > 1) { // ダブリ艦数を集計する.
+			double_count += a.length - 1;		lcdoublst.push({ s:a[0], list:a });
+		}
 	}
 	for (var id in $mst_ship) {
 		var mst = $mst_ship[id];
@@ -795,9 +832,7 @@ function on_port(json) {
 	tb = dpnla.tmpget('tp3_6');		tp = dpnla.tmpget('tp3_1');
 	if (lock_condlist.length > 0) {
 		lock_condlist.sort(function(a,b){
-			var aa = $mst_ship[a.ship_id];
-			var bb = $mst_ship[b.ship_id];
-			var rt = bb.api_stype - aa.api_stype;
+			var rt = b.stype() - a.stype();
 			if(!rt) rt = a.sortno - b.sortno;
 			if(!rt) rt = b.lv - a.lv;
 			if(!rt) rt = a.id - b.id;
@@ -897,11 +932,19 @@ function on_port(json) {
 	if (double_count > 0) {
 		tp = dpnla.tmpget('tp5_2');
 		ht = dpnla.tmprep(0,double_count,tp[0]);
-		for (var id in lock_beginlist) {
-			var a = lock_beginlist[id];
-			if (a.length > 1) ht += dpnla.tmprep(0,shiplist_names(a),tp[1]);
+		lcdoublst.sort(function(a,b){
+			var rt = b.s.stype() - a.s.stype();
+			if(!rt) rt = a.s.sortno - b.s.sortno;
+			if(!rt) rt = b.s.lv - a.s.lv;
+			if(!rt) rt = a.s.id - b.s.id;
+			return rt;
+		});
+		for (var i in lcdoublst) {
+			var a = lcdoublst[i];
+			ht += dpnla.tmprep(0,shiplist_names(a.list),tp[1]);
 		}
-		ht += tp[2];	mc[3] = ht;
+		ht += tp[2];
+		mc[3] = ht;
 	}
 	//
 	// 装備数、ロック装備一覧を表示する.
@@ -912,9 +955,7 @@ function on_port(json) {
 	} else if (space < 20) {
 		mb[1] = ' cr6';		mc[1] += '装備保有数の上限まで残り 【'+ space +' 】 '; // 警告表示.
 	}
-	tp = dpnla.tmpget('tp1_1');		mb[4] = items;
-	dpnla.tmpviw(0,'c01',dpnla.tmprep(2,mb,tp[0]));
-	// ロック装備一覧
+	tp = dpnla.tmpget('tp1_1');		mb[4] = items;	dpnla.tmpviw(0,'c01',dpnla.tmprep(2,mb,tp[0]));
 	var lockeditem_ids = Object.keys(lockeditem_list);
 	if (lockeditem_ids.length > 0) {
 		lockeditem_ids.sort(function(a, b) {	// 種別ID配列を表示順に並べ替える.
@@ -965,8 +1006,14 @@ function on_port(json) {
 	// 改造可能一覧、近代化改修一可能覧を表示する.
 	var kaizou_count = kaizou_list.length;	ht = '';
 	if (kaizou_count > 0) {
-		tp = dpnla.tmpget('tp5_3');
-		ht = dpnla.tmprep(0,kaizou_count,tp[0]);
+		tp = dpnla.tmpget('tp5_3');		ht = dpnla.tmprep(0,kaizou_count,tp[0]);
+		kaizou_list.sort(function(a,b){
+			var rt = b.stype() - a.stype();
+			if(!rt) rt = a.sortno - b.sortno;
+			if(!rt) rt = b.lv - a.lv;
+			if(!rt) rt = a.id - b.id;
+			return rt;
+		});
 		for (var i in kaizou_list) {
 			var ship = kaizou_list[i];
 			var sname = ship.name_lv();
@@ -1372,7 +1419,7 @@ function on_battle_result(json) {
 			fleet[0] = e_name +'('+ e_fmat +')';
 			update_enemy_list();
 		}
-		var log = $next_enemy +'('+ e_name +'):'+ rank;
+		var log = $next_enemy +'('+ e_name +'):'+ $battle_info +':'+ rank;
 		if (drop_ship_name) {
 			log += '+' + g.api_ship_name; // drop_ship_name; 艦種を付けると冗長すぎるので艦名のみとする.
 		}
@@ -1380,18 +1427,18 @@ function on_battle_result(json) {
 			log += '+' + drop_item_name;
 		}
 		$battle_log.push(log);
-		$last_mission[$battle_deck_id] = '前回出撃：'+ $battle_log.join(' →');
+		$last_mission[$battle_deck_id] = '前回出撃：' + $battle_log.join(' → ');
 	}
 	if (g) {
 		var drop_ship = {
-			api_id: -$battle_count - 1000, // 通常の背番号(1以上)と衝突しないように負の仮番号を作る. 母港に戻れば保有艦一覧が全体更新されるので、正しい背番号になる.
+			api_id: $tmp_ship_id--, // 通常の背番号(1以上)と衝突しないように負の仮番号を作る. 母港に戻れば保有艦一覧が全体更新されるので、正しい背番号になる.
 			api_ship_id: g.api_ship_id,
 			api_cond: 49,
 			api_lv: 1,
 			api_maxhp: 1,
 			api_nowhp: 1,
 			api_locked: 0,
-			api_slot: [-1,-1,-1,-1,-1],	// デフォルト装備が取れないので空にしておく. ドロップ艦は装備を持っている筈なので、母港に戻るまで装備一覧は正しくないことになる.
+			api_slot: [],	// デフォルト装備が取れないので空にしておく.
 			api_onslot: [0,0,0,0,0],
 			api_kyouka: [0,0,0,0,0],
 			api_exp: [0,100,0]
@@ -1637,10 +1684,12 @@ function on_battle(json) {
 	var fmt = null;
 	if (d.api_formation) {
 		$enemy_formation_id = d.api_formation[1];
-		fmt = formation_name(d.api_formation[0]) + ' / '
-			+ match_name(d.api_formation[2]) + ' / '
+		fmt = formation_name(d.api_formation[0]) + '/'
+			+ match_name(d.api_formation[2]) + '/'
 			+ formation_name(d.api_formation[1]);
-		if (d.api_support_flag) fmt += ' + ' + support_name(d.api_support_flag);
+		if (d.api_support_flag) fmt += '+' + support_name(d.api_support_flag);
+		$battle_info = fmt;
+		var rg = new RegExp('/',"g");		fmt = fmt.replace(rg,' / ');	fmt = fmt.replace('+',' + ');
 	}
 	var req = [];
 	dpnla.tmpviw(0,'c42',($next_mapinfo ? $next_mapinfo.api_name : '') +' battle'+ $battle_count);
@@ -1653,7 +1702,11 @@ function on_battle(json) {
 		var t0 = airplane.touch[0]; if (t0 != -1) req.push('触接中：' + slotitem_name(t0));
 		var t1 = airplane.touch[1]; if (t1 != -1) req.push('被触接中：' + slotitem_name(t1));
 	}
-	if (airplane.seiku != null) req.push(seiku_name(airplane.seiku));
+	if (airplane.seiku != null) {
+		var s = seiku_name(airplane.seiku);
+		req.push(s);
+		$battle_info += '/' + s;
+	}
 	if (airplane.air_fire != null) {
 		var air_fire = airplane.air_fire;
 		var idx = air_fire.api_idx;
@@ -1667,7 +1720,10 @@ function on_battle(json) {
 		req.push('対空カットイン(' + air_fire.api_kind + ')：' + ship.name_lv() + ' 【' + slotitem_names(air_fire.api_use_items) + '】');
 	}
 
-	if ($beginhps) req.push('緒戦被害：'+ $guess_info_str + '，推定：'+ $guess_win_rank);
+	if ($beginhps) {
+		req.push('緒戦被害：'+ $guess_info_str + '，推定：'+ $guess_win_rank);
+		$battle_info += '/追撃';
+	}
 	if (!$beginhps) $beginhps = beginhps;
 	if (!$beginhps_c) $beginhps_c = beginhps_c;
 	if (d.api_escape_idx) {
