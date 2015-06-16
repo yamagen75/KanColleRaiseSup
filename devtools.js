@@ -1033,7 +1033,7 @@ function on_port(json) {
 			if(!rt) rt = b.id - a.id;
 			return rt;
 		});
-		tp = dpnla.tmpget('tp3_4');		var ka = 0;		var kb = 0;		var kc = 0;
+		tp = dpnla.tmpget('tp3_4');		var ka = 0;		var kb = 0;		var kc = 0;		var kd = 0;
 		ky = 't35';		ca = 0;		cb = 1;		cc = 2;		cd = 1;
 		ht = '<div id="'+ ky +'_1">';	ra = new Array();
 		for (var i in lock_kyoukalist) {
@@ -1043,9 +1043,10 @@ function on_port(json) {
 			ra[5] = '';		ra[6] = '';		ra[7] = '';		ra[8] = '';
 			var max_k = ship.max_kyouka();
 			for (var j in max_k) {
-				if (max_k[j] > ship.kyouka[j]) {
+				kd = max_k[j] - ship.kyouka[j];
+				if (kd > 0) {
 					ka = j - 0;		kb = ka + 5;	kc = ka + 6;
-					kyouka_count[ka]++;		ra[kb] = tb[kc];
+					kyouka_count[ka]++;		ra[kb] = dpnla.tmprep(0,kd,tb[kc]);
 				}
 			}
 			if(ca == 0){
