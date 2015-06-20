@@ -131,8 +131,14 @@ Ship.prototype.charge = function(data) { ///< 補給.
 	this.fuel   = data.api_fuel;
 	this.bull   = data.api_bull;
 	this.onslot = data.api_onslot;
-	$material.charge[0] -= this.fuel - p_fuel;
-	$material.charge[1] -= this.bull - p_bull;
+	$material.charge[0] -= (this.fuel - p_fuel);
+	$material.charge[1] -= (this.bull - p_bull);
+};
+
+Ship.prototype.highspeed_repair = function() { ///< 高速修復.
+	this.nowhp = this.maxhp;
+	this.ndock_time = 0;
+	delete $ndock_list[this.id];
 };
 
 Ship.prototype.can_kaizou = function() {
@@ -571,7 +577,7 @@ function decode_postdata_params(params) {
 	params.forEach(function(data) {
 		var name  = decodeURI(data.name);
 		var value = decodeURI(data.value);
-		if (name && value) r[name] = value;
+		if (name && value) r[name] = (value == "" || isNaN(value)) ? value : value * 1;  // 数値文字列ならばNumberに変換して格納する. さもなくばstringのまま格納する.
 	});
 	return r;
 }
@@ -728,13 +734,15 @@ function update_material(material, sum) {
 			id = value.api_id;
 			value = value.api_value;
 		}
-		var now = $material.now[id-1];	// 初回はundefined.
+		var ib = id - 1;
+		var now = $material.now[ib];	// 初回はundefined.
 		var diff = diff_name(value, now);
 		if (diff.length) {
 			msg.push(material_name(id) +' '+ diff);
-			if (sum) sum[id-1] += value - now;
+			if (sum) sum[ib] += (value - now);
 		}
-		$material.pre[id-1] = $material.now[id-1] = value;
+		$material.pre[ib] = $material.now[ib];
+		$material.now[ib] = value;
 	}
 	$material.diff = msg.join(' ，');
 	if ($material.beg == null) $material.beg = $material.now.concat(); // 初回更新時にnowのコピーを保持する.
@@ -1297,7 +1305,7 @@ function print_port() {
 		if(ndocks > 0){
 			ra[0] = dpnla.tmprep(0,ndocks,tp[11]);
 		}else{
-			ra[0] = dpnla.tmprep(0,'修理中：0',tp[13]);
+			ra[0] = dpnla.tmprep(0,'入渠中：0',tp[13]);
 		}
 		if(kdocks > 0){
 			ra[1] = dpnla.tmprep(0,kdocks,tp[12]);
@@ -1449,7 +1457,7 @@ function on_next_cell(json) {
 		dpnla.tmpviw(0,'c43','&nbsp;');
 	}
 	if (g) {
-		$material.dropitem[g.api_id-1] += g.api_getcount;	// 道中ドロップによる資材増加を記録する.
+		$material.dropitem[(g.api_id - 1)] += g.api_getcount;	// 道中ドロップによる資材増加を記録する.
 		var msg = material_name(g.api_id) + 'x' + g.api_getcount;
 		dpnla.tmpviw(1,'c41',arow +'Item '+ area +' '+ msg);
 	}
@@ -1943,7 +1951,13 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		// 装備破棄.
 		func = function(json) {
 			var ids = decode_postdata_params(request.request.postData.params).api_slotitem_ids;
-			if (ids) slotitem_delete(ids.split('%2C'));		// 破棄した装備を、リストから抜く.
+			if (ids) {	// 破棄した装備を、リストから抜く.
+				if(isNaN(ids)){
+					slotitem_delete(ids.split('%2C'));
+				}else{
+					slotitem_delete([ids]);
+				}
+			}
 			diff_update_material(json.api_data.api_get_material, $material.destroyitem);	// 装備破棄による資材増加を記録する.
 			print_port();
 		};
@@ -1960,7 +1974,13 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 	else if (api_name == '/api_req_kaisou/powerup') {
 		// 近代化改修.
 		var ids = decode_postdata_params(request.request.postData.params).api_id_items;
-		if (ids) ship_delete(ids.split('%2C'));		// 素材として使った艦娘が持つ装備を、リストから抜く.
+		if (ids) {	// 素材として使った艦娘が持つ装備を、リストから抜く.
+			if(isNaN(ids)){
+				ship_delete(ids.split('%2C'));
+			}else{
+				ship_delete([ids]);
+			}
+		}
 		print_port();
 	}
 	else if (api_name == '/api_req_kousyou/remodel_slot') {
@@ -1985,8 +2005,8 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		// 艦隊編成.
 		var params = decode_postdata_params(request.request.postData.params);
 		var list = $fdeck_list[params.api_id].api_ship;	// 変更艦隊リスト.
-		var id  = parseInt(params.api_ship_id, 10);		// -2:一括解除, -1:解除, 他:艦娘ID.
-		var idx = parseInt(params.api_ship_idx, 10);	// -1:一括解除, 0..N:変更位置.
+		var id  = params.api_ship_id;		// -2:一括解除, -1:解除, 他:艦娘ID.
+		var idx = params.api_ship_idx;		// -1:一括解除, 0..N:変更位置.
 		if (id == -2) {
 			// 旗艦以外の艦を外す(-1を設定する).
 			for (var i = 1; i < list.length; ++i) list[i] = -1;
@@ -2051,7 +2071,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 				if (ship) ship.charge(data);
 			}
 			var now_baux = d.api_material[3];
-			if (d.api_use_bou) $material.charge[3] -= $material.pre[3] - now_baux;
+			if (d.api_use_bou) $material.charge[3] -= ($material.pre[3] - now_baux);
 			update_material(d.api_material);
 			print_port();
 		};
@@ -2066,7 +2086,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			for (var i = 0; i < d.api_bounus.length; ++i) {
 				var n  = d.api_bounus[i].api_count;
 				var id = d.api_bounus[i].api_item.api_id;
-				if (id >= 1 && id <= 8) $material.quest[id-1] += n;
+				if (id >= 1 && id <= 8) $material.quest[(id - 1)] += n;
 			}
 			// 直後に /api_get_member/material パケットが来るので print_port() は不要.
 		};
@@ -2101,6 +2121,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		now[5] -= params.api_highspeed;	// 高速修復材(バケツ). "0" or "1".
 		update_material(now, $material.ndock);
 		if (params.api_highspeed != 0) {
+			ship.highspeed_repair();	// 母港パケットで一斉更新されるまで対象艦の修復完了が反映されないので、自前で反映する.
 			print_port();	// 高速修復を使った場合は /api_get_member/ndock パケットが来ないので、ここで print_port() を行う.
 		}
 		else {
@@ -2109,10 +2130,25 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 	}
 	else if (api_name == '/api_req_nyukyo/speedchange') {
 		// 入渠中の高速修復実施.
-		// var ndock_id = decode_postdata_params(request.request.postData.params).api_ndock_id;
+		var params = decode_postdata_params(request.request.postData.params);
+		for (var ship_id in $ndock_list) {
+			if ($ndock_list[ship_id].api_id == params.api_ndock_id) {
+				$ship_list[ship_id].highspeed_repair(); break;	// 母港パケットで一斉更新されるまで対象艦の修復完了が反映されないので、自前で反映する.
+			}
+		}
 		var now = $material.now.concat();
 		--now[5];	// 高速修復材(バケツ).
 		update_material(now, $material.ndock);
+		print_port();
+	}
+	else if (api_name == '/api_req_kousyou/createship_speedchange') {
+		// 建造中の高速建造実施.
+		var params = decode_postdata_params(request.request.postData.params);
+		var k = $kdock_list[params.api_kdock_id];
+		if (k) k.api_state = 3; // 完成に変更する.
+		var now = $material.now.concat();
+		--now[4];	// 高速建造材(バーナー).
+		update_material(now, $material.createship);
 		print_port();
 	}
 	else if (api_name == '/api_port/port') {
@@ -2182,7 +2218,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 				case 3: id = 7; break; // 歯車.
 				case 4: id = get_item.api_useitem_id; break; // その他のアイテム.
 				}
-				if (id >= 1 && id <= 8 && get_item) $material.mission[id-1] += get_item.api_useitem_count;
+				if (id >= 1 && id <= 8 && get_item) $material.mission[(id - 1)] += get_item.api_useitem_count;
 			};
 			add_mission_item(d.api_useitem_flag[0], d.api_get_item1);
 			add_mission_item(d.api_useitem_flag[1], d.api_get_item2);
