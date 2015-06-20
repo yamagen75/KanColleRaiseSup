@@ -875,7 +875,7 @@ function print_port() {
 	//
 	// 資材変化を表示する.
 	mb[3] = $max_ship;	mb[5] = $max_slotitem;
-	ra[0] = '&nbsp;';		tb = ['現在値','収支累計','任　務','遠　征','道　中','補　給','入　渠','建　造','解　体','開　発','改　修','破　棄'];
+	ra[0] = '&nbsp;';		tb = ['現在値','収支累計','任　務','遠　征','道　中','解　体','廃　棄','補　給','入　渠','建　造','開　発','改　修'];
 	td = dpnla.tmpget('tp0_4');		tp = dpnla.tmpget('tp1_5');
 	mc[0] = tp[0] + dpnla.tmprep(0,'資材増減数 ： '+ $material.diff,td[0]);
 	for(i = 1;i < 9;i++){
@@ -894,16 +894,16 @@ function print_port() {
 			case 2:		ra = $material.quest;				break;
 			case 3:		ra = $material.mission;			break;
 			case 4:		ra = $material.dropitem;		break;
-			case 5:		ra = $material.charge;			break;
-			case 6:		ra = $material.ndock;				break;
-			case 7:		ra = $material.createship;	break;
-			case 8:		ra = $material.destroyship;	break;
-			case 9:		ra = $material.createitem;	break;
-			case 10:	ra = $material.remodelslot;	break;
-			case 11:	ra = $material.destroyitem;	break;
+			case 5:		ra = $material.destroyship;	break;
+			case 6:		ra = $material.destroyitem;	break;
+			case 7:		ra = $material.charge;			break;
+			case 8:		ra = $material.ndock;				break;
+			case 9:		ra = $material.createship;	break;
+			case 10:	ra = $material.createitem;	break;
+			case 11:	ra = $material.remodelslot;	break;
 		}
 		ra[8] = tb[i];	ra[9] = '';
-		if(i > 0 && i < 3) ra[9] = ' ts31';
+		if(i == 1 || i == 2 || i == 7) ra[9] = ' ts31';
 		mc[0] += dpnla.tmprep(2,ra,tp[2]);
 	}
 	mc[0] += tp[3];
