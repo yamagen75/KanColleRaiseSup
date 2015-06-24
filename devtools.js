@@ -126,13 +126,17 @@ Ship.prototype.bull_name = function() {
 };
 
 Ship.prototype.charge = function(data) { ///< 補給.
-	var p_fuel = this.fuel;
-	var p_bull = this.bull;
+	var d_fuel  = data.api_fuel - this.fuel;
+	var d_bull  = data.api_bull - this.bull;
+	if (this.lv > 99) {	// ケッコンカッコカリ艦は消費量15%軽減.
+		d_fuel = Math.floor(d_fuel * 0.85);
+		d_bull = Math.floor(d_bull * 0.85);
+	}
 	this.fuel   = data.api_fuel;
 	this.bull   = data.api_bull;
 	this.onslot = data.api_onslot;
-	$material.charge[0] -= (this.fuel - p_fuel);
-	$material.charge[1] -= (this.bull - p_bull);
+	$material.charge[0] -= d_fuel;
+	$material.charge[1] -= d_bull;
 };
 
 Ship.prototype.highspeed_repair = function() { ///< 高速修復.
@@ -734,15 +738,13 @@ function update_material(material, sum) {
 			id = value.api_id;
 			value = value.api_value;
 		}
-		var ib = id - 1;
-		var now = $material.now[ib];	// 初回はundefined.
+		var now = $material.now[id-1];	// 初回はundefined.
 		var diff = diff_name(value, now);
 		if (diff.length) {
 			msg.push(material_name(id) +' '+ diff);
-			if (sum) sum[ib] += (value - now);
+			if (sum) sum[id-1] += value - now;
 		}
-		$material.pre[ib] = $material.now[ib];
-		$material.now[ib] = value;
+		$material.pre[id-1] = $material.now[id-1] = value;
 	}
 	$material.diff = msg.join(' ，');
 	if ($material.beg == null) $material.beg = $material.now.concat(); // 初回更新時にnowのコピーを保持する.
@@ -1457,7 +1459,7 @@ function on_next_cell(json) {
 		dpnla.tmpviw(0,'c43','&nbsp;');
 	}
 	if (g) {
-		$material.dropitem[(g.api_id - 1)] += g.api_getcount;	// 道中ドロップによる資材増加を記録する.
+		$material.dropitem[g.api_id-1] += g.api_getcount;	// 道中ドロップによる資材増加を記録する.
 		var msg = material_name(g.api_id) + 'x' + g.api_getcount;
 		dpnla.tmpviw(1,'c41',arow +'Item '+ area +' '+ msg);
 	}
@@ -1491,17 +1493,15 @@ function on_battle_result(json) {
 	var mvp   = d.api_mvp;
 	var mvp_c = d.api_mvp_combined;
 	var lost  = d.api_lost_flag;
-	var tp = dpnla.tmpget('tp4_1');
-	var msg = tp[3] +'battle result'+ tp[4];
+	var tp = dpnla.tmpget('tp4_1');		var msg = tp[3] +'battle result'+ tp[4];
 	var drop_ship_name = g ? g.api_ship_type + '：' + g.api_ship_name : null;
 	var drop_item_name = h ? $mst_useitem[h.api_useitem_id].api_name : null;
 	$escape_info = d.api_escape;	// on_goback_port()で使用する.
 	if (e) {
 		var rank = d.api_win_rank;
-		var e_name = e.api_deck_name;
+		var e_name = e.api_deck_name;		msg += e_name;
 		var e_fmat = formation_name($enemy_formation_id);
 		dpnla.tmpviw(0,'c46',e_name +'('+ e_fmat +')');
-		msg += e_name;
 		if (d.api_ship_id) {
 			var total = count_unless(d.api_ship_id, -1);
 			msg += '(' + d.api_dests + '/' + total + ')';
@@ -1522,7 +1522,7 @@ function on_battle_result(json) {
 			fleet[0] = e_name +'('+ e_fmat +')';
 			update_enemy_list();
 		}
-		var log = $next_enemy +'('+ e_name +'):'+ $battle_info +':'+ rank;
+		var log = $next_enemy + '(' + e_name +'):'+ $battle_info +':'+ rank;
 		if (drop_ship_name) {
 			log += '+' + g.api_ship_name; // drop_ship_name; 艦種を付けると冗長すぎるので艦名のみとする.
 		}
@@ -1951,13 +1951,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		// 装備破棄.
 		func = function(json) {
 			var ids = decode_postdata_params(request.request.postData.params).api_slotitem_ids;
-			if (ids) {	// 破棄した装備を、リストから抜く.
-				if(isNaN(ids)){
-					slotitem_delete(ids.split('%2C'));
-				}else{
-					slotitem_delete([ids]);
-				}
-			}
+			if (ids) slotitem_delete(/%2C/.test(ids) ? ids.split('%2C') : [ids]);		// 破棄した装備を、リストから抜く.
 			diff_update_material(json.api_data.api_get_material, $material.destroyitem);	// 装備破棄による資材増加を記録する.
 			print_port();
 		};
@@ -1974,13 +1968,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 	else if (api_name == '/api_req_kaisou/powerup') {
 		// 近代化改修.
 		var ids = decode_postdata_params(request.request.postData.params).api_id_items;
-		if (ids) {	// 素材として使った艦娘が持つ装備を、リストから抜く.
-			if(isNaN(ids)){
-				ship_delete(ids.split('%2C'));
-			}else{
-				ship_delete([ids]);
-			}
-		}
+		if (ids) ship_delete(/%2C/.test(ids) ? ids.split('%2C') : [ids]);		// 素材として使った艦娘が持つ装備を、リストから抜く.
 		print_port();
 	}
 	else if (api_name == '/api_req_kousyou/remodel_slot') {
@@ -2071,7 +2059,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 				if (ship) ship.charge(data);
 			}
 			var now_baux = d.api_material[3];
-			if (d.api_use_bou) $material.charge[3] -= ($material.pre[3] - now_baux);
+			if (d.api_use_bou) $material.charge[3] -= $material.pre[3] - now_baux;
 			update_material(d.api_material);
 			print_port();
 		};
@@ -2086,7 +2074,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			for (var i = 0; i < d.api_bounus.length; ++i) {
 				var n  = d.api_bounus[i].api_count;
 				var id = d.api_bounus[i].api_item.api_id;
-				if (id >= 1 && id <= 8) $material.quest[(id - 1)] += n;
+				if (id >= 1 && id <= 8) $material.quest[id-1] += n;
 			}
 			// 直後に /api_get_member/material パケットが来るので print_port() は不要.
 		};
@@ -2218,7 +2206,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 				case 3: id = 7; break; // 歯車.
 				case 4: id = get_item.api_useitem_id; break; // その他のアイテム.
 				}
-				if (id >= 1 && id <= 8 && get_item) $material.mission[(id - 1)] += get_item.api_useitem_count;
+				if (id >= 1 && id <= 8 && get_item) $material.mission[id-1] += get_item.api_useitem_count;
 			};
 			add_mission_item(d.api_useitem_flag[0], d.api_get_item1);
 			add_mission_item(d.api_useitem_flag[1], d.api_get_item2);
