@@ -1428,6 +1428,7 @@ function on_next_cell(json) {
 	var d = json.api_data;
 	var e = json.api_data.api_enemy;
 	var g = json.api_data.api_itemget;
+	if (!g) g = json.api_data.api_itemget_eo_comment; // EO 1-6 海域ゴールの取得資源.
 	var h = json.api_data.api_happening;
 	var area = d.api_maparea_id + '-' + d.api_mapinfo_no + '-' + d.api_no;
 	var arow = ' <i class="icon-arrow-right"></i>';
