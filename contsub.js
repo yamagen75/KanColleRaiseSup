@@ -18,10 +18,12 @@ function getifmsrc(){
 		ht += 'document.getElementById("emorgb1").style.display = "none"; ';
 		ht += 'document.getElementById("flashWrap").innerHTML = ""; }';
 		sp.innerHTML = ht;	document.head.appendChild(sp);
-		var ba = document.createElement('button');	ba.id = 'emorgb1';
+		var ba = document.createElement('button');	ba.id = 'emorgb1';	ba.style.margin = '5px';
 		ba.innerHTML = '艦これをサブウィンドウで開く';	ba.setAttribute('onclick','subwinopen();');
-		ba.style.marginLeft = '315px';	ba.style.marginBottom = '3px';
-		document.getElementById('sectionWrap').insertBefore(ba,document.getElementById('contentsWrap'));
+		var bp = document.createElement('div');
+		bp.style.whiteSpace = 'pre-wrap';	bp.style.position = 'absolute';	bp.style.backgroundColor = '#fff';
+		bp.style.top = '545px';	bp.style.left = '325px';	bp.style.width = '190px';	bp.style.height = '30px';
+		bp.appendChild(ba);		document.body.appendChild(bp);
 	}else{
 		window.setTimeout(getifmsrc,1000);
 	}
