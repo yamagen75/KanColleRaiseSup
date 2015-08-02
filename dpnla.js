@@ -4,11 +4,11 @@ var dpnla = {
 	dat: new Array(),	//データ保存用
 	init: function(){
 	/* 初期化 */
-		this.tabinit(0,'t01');
-		this.tabinit(2,'t31');
-		this.tabinit(0,'t51');
-		var cl = this.ge('pmb02');
-		if(cl != undefined) this.addevent(cl,'click',function(){ dpnla.pmbclose(); });
+		this.tabinit(0,'t01');	this.tabinit(0,'t11');	this.tabinit(2,'t31');
+		this.tabinit(2,'t41');	this.tabinit(0,'t51');	this.tabinit(0,'t56');
+		this.dat['pmbcloserunproc'] = null;
+		this.addevent(this.ge('pmb02'),'click',function(){ dpnla.pmbclose(); });
+		this.addevent(this.ge('b563c'),'click',function(){ dpnla.kcprecls(); });
 	},
 	tabinit: function(pt,id){
 	/* タブ初期化
@@ -124,9 +124,10 @@ var dpnla = {
 	},
 	tmpget: function(id){
 	/* テンプレート取得 */
-		var ob = this.ge(id);		var tp = '<!--_%DLIMT%_-->';
+		var ob = this.ge(id);		var tp = '';	var dm = '<!--_%DLIMT%_-->';
 		if(ob != undefined) tp = ob.innerHTML;
-		return tp.split('<!--_%DLIMT%_-->');
+		tp += dm;
+		return tp.split(dm);
 	},
 	tmprep: function(pt,ra,tp){
 	/* テンプレート置換
@@ -210,9 +211,94 @@ var dpnla = {
 	},
 	tab14init: function(vl){
 	/* 戦闘タブ初期化 */
-		this.tmpviw(0,'c41',vl);	this.tmpviw(0,'c42','&nbsp;');
-		this.tmpviw(0,'c43','&nbsp;');	this.tmpviw(0,'c44','');
-		this.tmpviw(0,'c45','');	this.tmpviw(0,'c47','');
+		this.tmpviw(0,'c41',vl);	this.tmpviw(0,'c42','&nbsp;');	this.tmpviw(0,'c44','');
+		this.tmpviw(0,'c45','');	this.tmpviw(0,'c47','');	this.tmpviw(0,'t41_1','');
+		this.tmpviw(0,'t41_2','');	this.tmpviw(0,'t41_2_a','');	this.tabsel('t41',0);
+	},
+	kcprecviw: function(pt){
+	/* 記録表示 pt 0:logbook 1:enemy_list 2:enemy_db */
+		var i = 0;	var j = 0;	var k = 0;	var va = null;	var vb = '';	var vc = null;	var vd = null;
+		switch(pt){
+		 case 0:
+			va = load_storage('logbook',[]);
+			for(i in va){
+				vb += va[i] +'\n';
+			}
+			break;
+		 case 1:
+			va = load_storage('enemy_list');
+			vb = '艦隊ID\t艦隊名(陣形)\t編成\n';
+			for(i in va){
+				vb += i +'\t'+ va[i].join('\t') +'\n';
+			}
+			break;
+		 case 2:
+			va = load_storage('enemy_db');	vd = Object.keys(va);
+			vd.sort(function(a,b){ return (a > b) ? 1 : -1; });
+			vb = '司令部Lv\t難度\t海域\t今週\t通算\t艦隊名(陣形)\t編成\n';
+			for(i in vd){
+				k = vd[i];
+				for(j in va[k].data){
+					vc = va[k].data[j];
+					vb += vc.lv +'\t'+ vc.r +'\t'+ k +'\t'+ vc.w +'\t'+ vc.n +'\t';
+					vb += vc.name.replace(/, /g,'\t') +'\n';
+				}
+			}
+			break;
+		}
+		this.ge('c57').value = vb;
+	},
+	kcprecdel: function(pt){
+	/* 記録消去確認 */
+		var ky = '';	var ra = new Array();
+		switch(pt){
+		 case 0:
+			ky = 'logbook';		ra = ['b561v','b561d'];		break;
+		 case 1:
+			ky = 'enemy_list';	ra = ['b562v','b562d'];		break;
+		 case 2:
+			ky = 'enemy_db';	ra = ['b562v','b562d'];		break;
+		}
+		this.dat['kcprecdelarg'] = [pt,ky,ra];
+		var ob = this.ge(ra[1]);
+		if(ob != undefined){
+			ob.disabled = true;		ob.style.visibility = 'hidden';		//無効化＆非表示
+		}
+		this.dat['pmbcloserunproc'] = function(){
+			var pa = dpnla.dat['kcprecdelarg'];
+			var oa = dpnla.ge(pa[2][1]);
+			if(oa != undefined){
+				oa.disabled = false;	oa.style.visibility = 'visible';	//有効化＆表示
+			}
+		};
+		var tp = this.tmpget('tp0_5');
+		var ra = ['本当に消去しても、よろしいですか？','pmb04','pmb05'];
+		this.pmbopen(330,70,280,100,this.tmprep(2,ra,tp[0]));
+		this.addevent(this.ge(ra[1]),'click',function(){ dpnla.kcprecdelgo(); });
+		this.addevent(this.ge(ra[2]),'click',function(){ dpnla.pmbclose(); });
+	},
+	kcprecdelgo: function(){
+	/* 記録消去 pt 0:logbook 1:enemy_list 2:enemy_db */
+		var va = {};	var pt = this.dat['kcprecdelarg'];
+		var ky = pt[1];		var ra = pt[2];		var ob = this.ge(ra[0]);
+		switch(pt[0]){
+		 case 0:
+			va = [];	$logbook = [];	break;
+		 case 1:
+			$enemy_list = {};		break;
+		 case 2:
+			$enemy_db = {};		break;
+		}
+		save_storage(ky,va);
+		if(ob != undefined){
+			ob.disabled = true;		ob.style.visibility = 'hidden';		//無効化＆非表示
+		}
+		this.dat['pmbcloserunproc'] = null;
+		this.pmbclose();
+	},
+	kcprecls: function(){
+	/* 記録表示欄クリア */
+		this.ge('c57').value = '';
 	},
 	pmbopen: function(la,ta,wa,ha,hb){
 	/* ポップアップメッセージボックスを開く */
@@ -226,12 +312,28 @@ var dpnla = {
 	},
 	pmbclose: function(){
 	/* ポップアップメッセージボックスを閉じる */
-		var po = this.ge('pmb01');
+		var ky = 'pmbcloserunproc';		var cp = this.dat[ky];
+		var po = this.ge('pmb01');	var mo = this.ge('pmb03');
+		if(cp) cp();
+		this.dat[ky] = null;
+		if(mo != undefined) mo.innerHTML = '';
 		if(po != undefined){
 			po.style.display = 'none';
 			po.style.left = '0px';	po.style.top = '0px';
 			po.style.width = '1px';		po.style.height = '1px';
 		}
+	},
+	getmbstrlen: function(s){
+	/* 文字数カウント */
+		var es = encodeURI(s);	var i = 0;	var ca = 0;		var cm = 0;
+		for(i = 0;i < es.length;i++){
+			if(es.charAt(i) == '%'){
+				i += 2;		cm++;
+			}else{
+				ca++;
+			}
+		}
+		return Math.floor(cm / 3) * 2 + ca;
 	},
 	daytimchg: function(p,d){
 	/* 日付オブジェクトの値を日時文字列に変換する */
