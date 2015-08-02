@@ -25,7 +25,20 @@
  <div id="c01" class="col-xs-6"></div>
 </div>
 
-<div id="t01_1"></div>
+<div id="t01_1">
+ <div class="row mb3">
+  <div class="col-xs-12">
+   <ul id="t11" class="nav nav-pills nav-justified">
+    <li class="active"><a href="#">任務リスト 他</a></li>
+    <li><a href="#">資材増減数</a></li>
+    <li><a href="#">資材増減歴</a></li>
+   </ul>
+  </div>
+ </div>
+ <div id="t11_1"></div>
+ <div id="t11_2" class="row hid"></div>
+ <div id="t11_3" class="row hid"></div>
+</div>
 
 <div id="t01_2" class="hid">
  <div class="row mb3">
@@ -74,16 +87,21 @@
  </div>
  <div class="row">
   <div class="col-xs-4">
-   <div class="panel panel-default">
-    <div id="c42" class="panel-heading ts5">&nbsp;</div>
-    <div id="c43" class="panel-body">&nbsp;</div>
+   <ul id="t41" class="nav nav-pills nav-justified mb3">
+    <li class="active"><a href="#" id="c42">&nbsp;</a></li>
+    <li><a href="#">戦闘詳報</a></li>
+   </ul>
+   <div id="t41_1"></div>
+   <div id="t41_2" class="hid"></div>
+  </div>
+  <div id="t41_1_a">
+   <div id="c44" class="col-xs-4"></div>
+   <div class="col-xs-4">
+    <div id="c45"></div>
+    <div id="c47"></div>
    </div>
   </div>
-  <div id="c44" class="col-xs-4"></div>
-  <div class="col-xs-4">
-   <div id="c45"></div>
-   <div id="c47"></div>
-  </div>
+  <div id="t41_2_a" class="hid"></div>
  </div>
 </div>
 
@@ -95,8 +113,7 @@
     <li><a href="#">装備一覧</a></li>
     <li><a href="#">母港艦娘状況</a></li>
     <li><a href="#">遠征交代要員</a></li>
-    <li><a href="#">記 録</a></li>
-    <li><a href="#">艦娘一覧</a></li>
+    <li><a href="#">艦娘一覧・記録</a></li>
    </ul>
   </div>
  </div>
@@ -104,14 +121,36 @@
  <div id="t51_2" class="hid"></div>
  <div id="t51_3" class="row hid"></div>
  <div id="t51_4" class="row hid"></div>
- <div id="t51_5" class="row hid"></div>
- <div id="t51_6" class="row hid">
-  <div class="col-xs-12">
+ <div id="t51_5" class="row hid">
+  <div class="col-xs-3">
    <div class="panel panel-default">
     <div class="panel-heading ts5">艦娘一覧 コピー用 【 <i class="icon-lock cr1"></i>艦のみ 】</div>
     <div class="panel-body">
-     <textarea id="c56" cols="50" rows="16"></textarea>
+     <textarea id="c56" cols="24" rows="16"></textarea>
     </div>
+   </div>
+  </div>
+  <div class="col-xs-7">
+   <div class="panel panel-default">
+    <div class="panel-heading ts5 ts34">各種記録の表示<span class="mb10"></span>
+     <button type="button" id="b563c" class="btn btn-success ts38"> <i class="icon-arrow-down"></i> ク リ ア <i class="icon-arrow-down mr0"></i> </button>
+    </div>
+    <div class="panel-body">
+     <textarea id="c57" cols="64" rows="16"></textarea>
+    </div>
+   </div>
+  </div>
+  <div class="col-xs-2">
+   <div class="panel panel-default">
+    <div class="panel-heading ts5">記録項目</div>
+    <div class="panel-body">
+     <ul id="t56" class="nav nav-pills nav-justified">
+      <li class="active"><a href="#">閲 覧</a></li>
+      <li><a href="#">消 去</a></li>
+     </ul>
+    </div>
+    <div id="t56_1"></div>
+    <div id="t56_2" class="hid"></div>
    </div>
   </div>
  </div>
@@ -135,6 +174,7 @@
  </ul>
 </div>
 <div id="tp0_3">
+ <i class="icon-warning-sign pmb13"></i>
  <span class="ts5">_%va0%_</span>
  <div class="panel panel-default">
   <div class="panel-heading ts3">_%va1%_</div>
@@ -147,7 +187,26 @@
 <div id="tp0_4">
  <div class="alert alert-info ts14" role="alert"><i class="icon-info-sign ts12"></i>_%va0%_</div><!--_%DLIMT%_-->
  <div class="alert alert-danger ts14" role="alert"><i class="icon-remove-sign ts12"></i>_%va0%_</div><!--_%DLIMT%_-->
- <div class="alert alert-warning" role="alert"><i class="icon-warning-sign"></i>_%va0%_</div>
+ <div class="alert alert-warning" role="alert"><i class="icon-warning-sign"></i>_%va0%_</div><!--_%DLIMT%_-->
+ <button type="button" id="_%va0%_" class="btn btn-info">_%va1%_</button><!--_%DLIMT%_-->
+ <button type="button" id="_%va0%_" class="btn btn-warning">_%va1%_</button><!--_%DLIMT%_-->
+ <button type="button" class="btn btn-default" disabled="disabled">_%va0%_</button><!--_%DLIMT%_-->
+ <div class="row">
+  <div class="col-xs-12">
+<!--_%DLIMT%_-->
+  </div>
+ </div><!--_%DLIMT%_-->
+</div>
+<div id="tp0_5">
+ <div class="ts3">
+  <div class="mb6">
+   <i class="icon-question-sign pmb14"></i>
+   <span class="ts5">_%va0%_</span>
+  </div>
+  <button type="button" id="_%va1%_" class="btn btn-default">　は　い　</button>
+  <span class="mb10"></span>
+  <button type="button" id="_%va2%_" class="btn btn-default">　いいえ　</button>
+ </div>
 </div>
 
 <div id="tp1_1">
@@ -157,18 +216,7 @@
 <i class="icon-unlock cr1"></i>艦娘装備 _%va7%_<!--_%DLIMT%_-->
 </div>
 <div id="tp1_2">
-<!--_%DLIMT%_-->
-<!--_%DLIMT%_-->
-<!--_%DLIMT%_-->
- <div class="row mb3">
-  <div class="col-xs-12">
-   <ul id="t11" class="nav nav-pills nav-justified">
-    <li class="active"><a href="#">任務リスト 他</a></li>
-    <li><a href="#">資材増減数</a></li>
-   </ul>
-  </div>
- </div>
- <div id="t11_1" class="row">
+ <div class="row">
   <div class="col-xs-6"><!--_%DLIMT%_-->
    <div class="panel panel-success">
     <div class="panel-heading ts5">任務リスト _%va0%_ / _%va1%_ 【 遂行中のみ表示 】</div>
@@ -232,11 +280,6 @@
   </table>
  </div>
 <!--_%DLIMT%_-->
-<button type="button" id="b12n" class="btn btn-info">入渠中：_%va0%_ <i class="icon-arrow-right mr0"></i></button>
-<!--_%DLIMT%_-->
-<button type="button" id="b12k" class="btn btn-warning">建造中：_%va0%_ <i class="icon-arrow-right mr0"></i></button>
-<!--_%DLIMT%_-->
-<button type="button" class="btn btn-default" disabled="disabled">_%va0%_</button>
 </div>
 <div id="tp1_3">
 <!--_%DLIMT%_--><span class="label label-success">編成</span>
@@ -280,36 +323,34 @@
  </div><!--_%DLIMT%_-->
 </div>
 <div id="tp1_5">
- <div id="t11_2" class="row hid">
-  <div class="col-xs-12"><!--_%DLIMT%_-->
-   <div class="panel panel-default">
-    <table class="table table-condensed">
-     <tr class="ts28">
-      <th width="80">_%va0%_</th>
-      <th>_%va1%_</th>
-      <th>_%va2%_</th>
-      <th>_%va3%_</th>
-      <th>_%va4%_</th>
-      <th>_%va5%_</th>
-      <th>_%va6%_</th>
-      <th>_%va7%_</th>
-      <th>_%va8%_</th>
-      <th>&nbsp;</th>
-     </tr><!--_%DLIMT%_-->
-     <tr class="ts32 ts27_%va9%_">
-      <td class="ts29">_%va8%_</td>
-      <td>_%va0%_</td>
-      <td>_%va1%_</td>
-      <td>_%va2%_</td>
-      <td>_%va3%_</td>
-      <td>_%va4%_</td>
-      <td>_%va5%_</td>
-      <td>_%va6%_</td>
-      <td>_%va7%_</td>
-      <td>&nbsp;</td>
-     </tr><!--_%DLIMT%_-->
-    </table>
-   </div>
+ <div class="col-xs-12"><!--_%DLIMT%_-->
+  <div class="panel panel-default">
+   <table class="table table-condensed">
+    <tr class="ts28">
+     <th width="80">_%va0%_</th>
+     <th>_%va1%_</th>
+     <th>_%va2%_</th>
+     <th>_%va3%_</th>
+     <th>_%va4%_</th>
+     <th>_%va5%_</th>
+     <th>_%va6%_</th>
+     <th>_%va7%_</th>
+     <th>_%va8%_</th>
+     <th>&nbsp;</th>
+    </tr><!--_%DLIMT%_-->
+    <tr class="ts32 ts27_%va9%_">
+     <td class="ts29">_%va8%_</td>
+     <td>_%va0%_</td>
+     <td>_%va1%_</td>
+     <td>_%va2%_</td>
+     <td>_%va3%_</td>
+     <td>_%va4%_</td>
+     <td>_%va5%_</td>
+     <td>_%va6%_</td>
+     <td>_%va7%_</td>
+     <td>&nbsp;</td>
+    </tr><!--_%DLIMT%_-->
+   </table>
   </div>
  </div>
 </div>
@@ -490,10 +531,10 @@
      <th>&nbsp;</th>
      <th>C</th>
      <th>&nbsp;</th>
-     <th>&nbsp;</th>
-     <th>&nbsp;</th>
-     <th>&nbsp;</th>
-     <th>&nbsp;</th>
+     <th><span class="label label-danger ts10">火力</span></th>
+     <th><span class="label label-primary ts10">雷装</span></th>
+     <th><span class="label label-warning ts10">対空</span></th>
+     <th><span class="label ts9 ts10">装甲</span></th>
      <th>Lv</th>
      <th>Exp</th>
     </tr><!--_%DLIMT%_-->
@@ -574,18 +615,136 @@
  </div><!--_%DLIMT%_-->
 <span class="ts21 cr6"><i class="icon-warning-sign"></i>修理発動</span><!--_%DLIMT%_-->
 <span class="ts21"><!--_%DLIMT%_--></span><!--_%DLIMT%_--><span class="cr6"><i class="icon-warning-sign"></i><!--_%DLIMT%_-->
-<div class="panel panel-default">
- <table class="table table-condensed">
-  <tr class="ts16">
-   <td class="ts4">Local ：</td>
-   <td width="100">_%va0%_</td>
-  </tr>
-  <tr class="ts16">
-   <td class="ts4">Server ：</td>
-   <td width="100">_%va1%_</td>
-  </tr>
- </table>
-</div><!--_%DLIMT%_-->
+ <div class="panel panel-default">
+  <table class="table table-condensed">
+   <tr class="ts16">
+    <td class="ts4">Local ：</td>
+    <td width="100">_%va0%_</td>
+   </tr>
+   <tr class="ts16">
+    <td class="ts4">Server ：</td>
+    <td width="100">_%va1%_</td>
+   </tr>
+  </table>
+ </div><!--_%DLIMT%_-->
+ <div class="panel panel-default">
+  <div class="panel-heading ts5">_%va0%_</div>
+  <div id="_%va1%_" class="panel-body">_%va2%_</div>
+ </div><!--_%DLIMT%_-->
+ <div class="panel panel-default mb3">
+  <table class="table table-condensed">
+   <tr class="ts15">
+    <th colspan="6" class="ts2">_%va0%_</th>
+   </tr>
+   <tr class="ts15">
+    <th>&nbsp;</th>
+    <th>&nbsp;</th>
+    <th>Lv</th>
+    <th>HP</th>
+    <th>&nbsp;</th>
+    <th>&nbsp;</th>
+   </tr><!--_%DLIMT%_-->
+  </table>
+ </div><!--_%DLIMT%_-->
+</div>
+<div id="tp4_2">
+ <div class="col-xs-8">
+  <div class="panel panel-default">
+   <table class="table table-condensed">
+    <tr class="ts15">
+     <th>種別</th>
+     <th>攻撃艦</th>
+     <th>防御艦</th>
+     <th>被撃墜/ダメージ</th>
+     <th>敵撃墜/戦果</th>
+     <th>使用装備</th>
+    </tr><!--_%DLIMT%_-->
+    <tr class="ts25">
+     <td rowspan="2">_%va0%_</td>
+     <td class="ts37">_%va1%_</td>
+     <td class="ts37">_%va2%_</td>
+     <td class="ts4 ts37">_%va4%_</td>
+     <td colspan="2" class="ts37">_%va3%_</td>
+    </tr>
+    <tr class="ts33">
+     <td colspan="5" class="ts4">_%va5%_</td>
+    </tr><!--_%DLIMT%_-->
+    <tr class="ts25">
+     <td colspan="2" class="ts37">_%va0%_</td>
+     <td colspan="4" class="ts4">_%va1%__%va2%__%va3%__%va4%__%va5%_</td>
+    </tr><!--_%DLIMT%_-->
+    <tr class="ts25">
+     <td colspan="2" class="ts37">_%va0%__%va1%_</td>
+     <td colspan="2" class="ts4 ts37">_%va2%__%va4%_</td>
+     <td colspan="2" class="ts37">_%va3%__%va5%_</td>
+    </tr><!--_%DLIMT%_-->
+    <tr class="ts25">
+     <td class="ts37">_%va0%_</td>
+     <td class="ts37">_%va1%_</td>
+     <td class="ts37">_%va2%_</td>
+     <td class="ts4 ts37">_%va4%_</td>
+     <td colspan="2" class="ts37">_%va3%__%va5%_</td>
+    </tr><!--_%DLIMT%_-->
+    <tr class="ts25">
+     <td class="ts37">_%va0%_</td>
+     <td class="ts37">_%va1%_</td>
+     <td class="ts37">_%va2%_</td>
+     <td class="ts4 ts37">_%va4%_</td>
+     <td colspan="2" class="ts4 ts37">_%va3%_<span class="mb10"></span>_%va5%_</td>
+    </tr><!--_%DLIMT%_-->
+   </table>
+  </div>
+ </div><!--_%DLIMT%_-->
+</div>
+<div id="tp4_3">
+ <div class="panel panel-default mb3">
+  <div class="panel-heading ts5">_%va0%_<span class="mb10"></span>敵遭遇回数記録</div>
+  <div class="panel-body">_%va1%_</div>
+  <div id="_%va2%_">
+   <div class="panel-body ts35">
+    <div class="ts3">
+     <p><i class="icon-warning-sign pmb13 pmb15"></i>
+      過去に遭遇した事の無い、<br />新しい敵艦隊に遭遇する場合も<br />ありますので、 ご留意ください。
+     </p><p>&nbsp;</p>
+    </div>
+   </div>
+  </div><!--_%DLIMT%_-->
+  <div id="_%va0%_" class="hid">
+   <table class="table table-condensed mb0">
+    <tr>
+     <td colspan="3" class="ts36">_%va1%_</td>
+    </tr>
+    <tr class="ts15">
+     <th>司令部Lv</th>
+     <th>今週</th>
+     <th>通算</th>
+    </tr>
+    <tr class="ts19 ts25">
+     <td>_%va2%_</td>
+     <td>_%va3%_</td>
+     <td>_%va4%_</td>
+    </tr>
+    <tr class="ts15">
+     <th>&nbsp;</th>
+     <th>&nbsp;</th>
+     <th>Lv</th>
+    </tr><!--_%DLIMT%_-->
+    <tr class="ts19 ts25">
+     <td>_%va0%_</td>
+     <td class="ts20">_%va1%_</td>
+     <td>_%va2%_</td>
+    </tr><!--_%DLIMT%_-->
+    <tr class="ts19 ts25">
+     <td>_%va0%_</td>
+     <td class="ts20 cr6">_%va1%_</td>
+     <td>_%va2%_</td>
+    </tr><!--_%DLIMT%_-->
+   </table>
+  </div><!--_%DLIMT%_-->
+ </div><!--_%DLIMT%_-->
+ <div class="panel panel-default mb3">
+  <span class="mb10"></span><span class="ts5 cr6"><i class="icon-warning-sign"></i>潜水艦可能性アリ 【 _%va0%_ / _%va1%_ 】</span>
+ </div><!--_%DLIMT%_-->
 </div>
 
 <div id="tp5_1">
@@ -597,7 +756,7 @@
      <th class="ts2">装備名</th><th>個数</th><th class="ts2">使用艦娘</th>
     </tr><!--_%DLIMT%_-->
     <tr>
-     <td nowrap>_%va0%_</td><td class="ts3" nowrap>_%va1%_ / _%va2%_</td><td>_%va3%_</td>
+     <td class="ts37">_%va0%_</td><td class="ts3 ts37">_%va1%_ / _%va2%_</td><td>_%va3%_</td>
     </tr><!--_%DLIMT%_-->
    </table>
   </div>
@@ -606,7 +765,7 @@
 <div id="tp5_5">
  <div class="row mb3">
   <div class="col-xs-5 ts24 ts3 ts5">
-   <i class="icon-lock cr3"></i> 【 _%va0%_ 】<span class="mb10"></span><i class="icon-unlock cr3"></i> 【 _%va1%_ 】<span class="mb10"></span>改修中 【 _%va2%_ 】
+   <i class="icon-lock cr3"></i>【 _%va0%_ 】<span class="mb10"></span><i class="icon-unlock cr3"></i>【 _%va1%_ 】<span class="mb10"></span>改修中【 _%va2%_ 】<span class="mb10"></span>改修max【 _%va5%_ 】
   </div>
   <div class="col-xs-7">_%va3%_</div>
  </div>
@@ -681,15 +840,30 @@
  </div><!--_%DLIMT%_-->
 </div>
 <div id="tp5_4">
- <div class="col-xs-12">
-  <div class="panel panel-default">
-   <div class="panel-heading ts5">記 録</div>
-   <table class="table table-condensed">
-    <tr class="ts15"><th></th></tr><!--_%DLIMT%_-->
-    <tr><td>_%va0%_</td></tr><!--_%DLIMT%_-->
-   </table>
-  </div>
- </div>
+ <table class="table table-condensed mb0">
+  <tr class="ts11 ts19">
+   <td>_%va0%_</td>
+  </tr>
+  <tr class="ts11 ts19">
+   <td>_%va1%_</td>
+  </tr>
+  <tr class="ts11 ts19">
+   <td>_%va2%_</td>
+  </tr>
+  <tr class="ts11 ts19">
+   <td>_%va3%_</td>
+  </tr>
+  <tr class="ts11 ts19">
+   <td>_%va4%_</td>
+  </tr>
+  <tr class="ts11 ts19">
+   <td>_%va5%_</td>
+  </tr>
+  <tr class="ts11 ts19">
+   <td>_%va6%_</td>
+  </tr>
+ </table>
+<!--_%DLIMT%_-->
 </div>
 
 </div>
@@ -697,7 +871,7 @@
 <div id="pmb01" class="panel panel-warning pmb11">
  <div class="panel-body">
   <div class="pull-right"><a href="#" id="pmb02"><i class="icon-remove-sign"></i></a></div>
-  <div class="pmb12"><i class="icon-warning-sign pmb13"></i><span id="pmb03"></span></div>
+  <div id="pmb03" class="pmb12"></div>
  </div>
 </div>
 

@@ -46,8 +46,17 @@ a [class*=" icon-"] {
 .icon-arrow-right:before {
   content: "\f061";
 }
+.icon-arrow-up:before {
+  content: "\f062";
+}
+.icon-arrow-down:before {
+  content: "\f063";
+}
 .icon-info-sign:before {
   content: "\f05a";
+}
+.icon-question-sign:before {
+  content: "\f059";
 }
 .icon-warning-sign:before {
   content: "\f071";
@@ -73,7 +82,9 @@ a [class*=" icon-"] {
 #dpnla i.mr0 { margin-right:0; }
 #dpnla .hid { display:none; }
 
+#dpnla .mb0 { margin-bottom:0; }
 #dpnla .mb3 { margin-bottom:3px; }
+#dpnla .mb6 { margin-bottom:6px; }
 #dpnla .mb10 { display:inline-block; width:10px; }
 #dpnla .mb11 { display:inline-block; width:40px; }
 
@@ -94,10 +105,12 @@ a [class*=" icon-"] {
 #dpnla .ts30 td { padding-top:5px; padding-bottom:5px; }
 #dpnla .ts31 td { border-top:1px solid #5cb85c; }
 #dpnla .ts32 td { padding-top:1px; padding-bottom:0; }
+#dpnla .ts33 td { border:none; padding-top:0; padding-bottom:0; }
 #dpnla td.ts20 { text-align:left; }
 #dpnla td.ts26 { text-align:right; }
 #dpnla td.ts29 { text-align:center; }
 #dpnla .ts23 { border-left:1px solid #ddd; }
+#dpnla .ts35 { border-top:1px solid #ddd; }
 #dpnla .ts24 { padding-top:7px; }
 
 #dpnla .ts3 { text-align:center; }
@@ -108,12 +121,16 @@ a [class*=" icon-"] {
 #dpnla .ts18 { color:#aaa; font-size:84%; text-align:center; }
 #dpnla .ts21 { font-size:84%; }
 #dpnla .ts22 { vertical-align:middle; }
+#dpnla .ts37 { white-space:nowrap; }
 
 #dpnla .ts9 { background-color:#bfa810; }
 #dpnla .ts10 { padding-left:3px; padding-right:3px; }
 #dpnla .ts14 { padding-top:4px; padding-bottom:4px; }
+#dpnla .ts34 { padding-top:2px; padding-bottom:2px; vertical-align:top; }
+#dpnla .ts36 { padding:4px 0 3px 8px; }
+#dpnla .ts38 { padding-top:0; padding-bottom:0; }
 
-#dpnla .ts33 {  }
+#dpnla .ts39 {  }
 
 #dpnla .cr1 { color:#e58d89; }
 #dpnla .cr2 { color:#aaa; }
@@ -136,4 +153,6 @@ a [class*=" icon-"] {
 #dpnla .pmb11 a:hover { color:#e58d89; text-decoration:none; }
 #dpnla .pmb12 { padding:0 6px; }
 #dpnla .pmb13 { font-size:196%; color:#ded011; }
+#dpnla .pmb14 { font-size:260%; color:#428bca; }
+#dpnla .pmb15 { line-height:1.0; }
 
