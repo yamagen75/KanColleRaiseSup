@@ -446,7 +446,7 @@ function kira_name(cond) {
 	}else if(cond > 49){
 		return '<span class="cr13">'+ cond +'</span>'; // キラ
 	}else if(cond == 49){
-		return ''; // normal
+		return '<span>'+ cond +'</span>'; // normal
 	}else if(cond < 20){
 		return '<span class="cr8">'+ cond +'</span>'; // 赤疲労
 	}else if(cond < 30){
@@ -893,7 +893,7 @@ function print_port() {
 		if (!ship.locked) {
 			var n = count_unless(ship.slot, -1); // スロット装備数.
 			unlock_slotitem += n;
-			
+
 			ship.slot_flg = n;      // 装備持ちなら、判定用.
 			unlock_names.push(ship);
 			if (ship.lv >= 10) unlock_lv10++;
@@ -906,7 +906,7 @@ function print_port() {
 			var max_k = ship.max_kyouka();
 			var flg_k = 0;
 			for (var i in max_k) {
-				
+
 				if (max_k[i] > ship.kyouka[i]) flg_k = 1;
 			}
 			if(flg_k > 0) lock_kyoukalist.push(ship);
@@ -2079,7 +2079,7 @@ function on_battle(json) {
 	var s = '';
 	if (result.seiku != null) {
 		    s = seiku_name(result.seiku);
-		
+
 		$battle_info += '/' + s;	s = ' 【 '+ s +' 】';
 	}
 	req.push('被撃墜数：'+ result.f_air_lostcount + s);
@@ -2145,7 +2145,7 @@ function on_battle(json) {
 	dpnla.tmpviw(0,'t41_2_a',ha);
 	push_fdeck_status(0, fdeck, maxhps, nowhps, beginhps);
 	if (nowhps_c) {
-		
+
 		push_fdeck_status(1, $fdeck_list[2], maxhps_c, nowhps_c, beginhps_c); // 連合第二艦隊は二番固定です.
 	}
 	ra = ['','','','','',''];		ha = '';
