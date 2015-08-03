@@ -449,7 +449,7 @@ function kira_name(cond) {
 		return '<span>'+ cond +'</span>'; // normal
 	}else if(cond < 20){
 		return '<span class="cr8">'+ cond +'</span>'; // 赤疲労
-	}else if(cond < 30){
+	}else if(cond < 33){
 		return '<span class="cr7">'+ cond +'</span>'; // 橙疲労
 	}else{
 		return ''+ cond; // recovering 疲労
