@@ -81,6 +81,9 @@ function Ship(data, ship) {
 	this.ship_id	= data.api_ship_id;
 	this.kyouka	= data.api_kyouka;	// 近代化改修による強化値[火力,雷装,対空,装甲,運].
 	this.nextlv	= data.api_exp[1];
+	if (data.api_slot_ex > 0) {		// api_slot_ex:: 0:増設スロットなし, -1:増設スロット空,　1以上:増設スロット装備ID.
+		this.slot.push(data.api_slot_ex);
+	}
 	this.sortno	= data.api_sortno;
 	this.slot_flg = 0;
 }
@@ -190,7 +193,7 @@ Ship.prototype.slot_names = function() {
 	var slot = this.slot;
 	var onslot = this.onslot;
 	var maxslot = $mst_ship[this.ship_id].api_maxeq;
-	var a = ['','','','',''];
+	var a = ['','','','','',''];
 	for (var i = 0; i < slot.length; ++i) {
 		var value = $slotitem_list[slot[i]];
 		if (value) {
@@ -376,6 +379,9 @@ function get_weekly() {
 			week      : wn
 		};
 	}
+	if ($weekly.monday_material == null) {
+		$weekly.monday_material = $material.now.concat(); save_weekly();
+	}
 	return $weekly;
 }
 
@@ -546,7 +552,7 @@ function slotitem_name(id, lv, alv, n, max) {
 	if (lv >= 10) name += '★max';		// 改修レベルを追加する.
 	else if (lv >= 1) name += '★+' + lv;	// 改修レベルを追加する.
 	if (alv >= 1) name = '<span class="mb12 cr4">'+ alv +'</span>'+ name;	// 熟練度を追加する.
-	if (is_airplane(item) && !isNaN(n)) name = '【'+ n +' '+ percent_name_unless100(n, max) +'】 '+ name; // 航空機なら、機数と搭載割合を追加する.
+	if (is_airplane(item) && n != null) name = (n == 0 && n < max) ? '【<span class="cr6">0 全滅</span> 】 '+ name : '【'+ n +' '+ percent_name_unless100(n, max) +'】 '+ name;	// 航空機なら、機数と搭載割合を追加する.
 	return name;
 }
 
@@ -757,8 +763,8 @@ function push_fleet_status(tp, deck) {
 	var lv_sum = 0;
 	var fleet_ships = 0;
 	var drumcan = {ships:0, sum:0, msg:''};
-	var j = 0;	var ra = new Array();		var rt = ['','',''];	var rb = new Array();
-	for(j = 0;j < 19;j++){
+	var j = 0;	var ra = new Array();		var rt = ['','',''];	var rb = new Array();		var tb = '';
+	for(j = 0;j < 20;j++){
 		ra[j] = '';
 	}
 	for (var i = 0, ship, s_id; ship = $ship_list[s_id = deck.api_ship[i]]; ++i) {
@@ -784,9 +790,9 @@ function push_fleet_status(tp, deck) {
 		rb = ship.bull_name();	ra[8] = rb[0];	ra[11] = rb[1];
 		rb = ship.onslot_name();	ra[9] = rb[0];	ra[12] = rb[1];
 		rb = ship.slot_names();		ra[13] = rb[0];		ra[14] = rb[1];		ra[15] = rb[2];		ra[16] = rb[3];
-		ra[18] = diff_name(ship.c_cond, ship.p_cond);
-		rt[0] += dpnla.tmprep(2,ra,tp[0][1]);
-		rt[1] += dpnla.tmprep(2,ra,tp[1][1]);
+		ra[18] = diff_name(ship.c_cond, ship.p_cond);		ra[19] = rb[5];		tb = tp[1][1];
+		if(rb[5] != '') tb = tp[1][2];
+		rt[0] += dpnla.tmprep(2,ra,tp[0][1]);		rt[1] += dpnla.tmprep(2,ra,tb);
 		var d = slotitem_count(ship.slot, 75);	// ドラム缶.
 		if (d) {
 			drumcan.ships++;
@@ -825,7 +831,7 @@ function update_material(material, sum) {
 	if ($material.beg == null) {
 		dpnla.matupdsave();		$material.beg = $material.now.concat(); // 初回更新時にnowのコピーを保持する.
 	}
-	if ($weekly.monday_material == null) $weekly.monday_material = $material.now.concat(); // 週初めにnowのコピーを保持する.
+	get_weekly();	// 週初めにnowのコピーを保持する.
 }
 
 function diff_update_material(diff_material, sum) {
@@ -971,13 +977,13 @@ function print_port() {
 	tc = ['&nbsp;','燃　料','弾　薬','鋼　材','ボーキ','高速建造','高速修復','開発資材','改修資材'];
 	td = dpnla.tmpget('tp0_4');		tp = dpnla.tmpget('tp1_5');
 	mc[0] = tp[0] + dpnla.tmprep(0,'資材増減数 ： '+ $material.diff,td[0]);
-	mc[0] += dpnla.tmprep(2,tc,tp[1]);	var ia = 0;
+	var weekly = get_weekly();	mc[0] += dpnla.tmprep(2,tc,tp[1]);	var ia = 0;
 	for(i = 0;i < 13;i++){
 		ra = new Array();
 		switch(i){
 			case 1:
 				for(j = 0;j < 8;j++){
-					ra[j] = $material.now[j] - $weekly.monday_material[j];
+					ra[j] = $material.now[j] - weekly.monday_material[j];
 				}
 				break;
 			case 2:
@@ -1469,7 +1475,7 @@ function print_port() {
 		}
 		ra[2] += ta[2] + tp[2][3];
 		ht[0] += dpnla.tmprep(2,ra,tp[0][0]) + ta[0] + tp[0][2];
-		ht[f_id] = dpnla.tmprep(2,ra,tp[1][0]) + ta[1] + dpnla.tmprep(0,ra[3],tp[1][2]);
+		ht[f_id] = dpnla.tmprep(2,ra,tp[1][0]) + ta[1] + dpnla.tmprep(0,ra[3],tp[1][3]);
 	}
 	for(i = 0;i < 5;i++){
 		j = i + 1;	ky = 't21_'+ j;		dpnla.tmpviw(0,ky,ht[i]);
@@ -1485,7 +1491,7 @@ function print_port() {
 		}
 		mc[3] += tp[2];
 	}
-	me = request_date_time();
+	me = request_date_time();		me.push(dpnla.kcpstimeview());
 	mc[3] += dpnla.tmprep(2,me,tp[5]) + mc[4];
 	dpnla.tmpviw(0,'t11_1',mc[3]);
 	if(ndocks > 0){
@@ -2202,7 +2208,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			update_mst_mapinfo(json.api_data.api_mst_mapinfo);
 			var tp = dpnla.tmpget('tp0_4');
 			var ht = tp[6] + dpnla.tmprep(0,' ゲーム情報の取得に成功しました',tp[0]) + tp[7];
-			dpnla.tmpviw(0,'t11_1',ht);
+			dpnla.tmpviw(0,'t11_1',ht);		dpnla.kcpstimeinit();
 		};
 	}
 	else if (api_name == '/api_get_member/slot_item') {
@@ -2563,6 +2569,11 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 					$mapinfo_rank[data.api_id] = data.api_eventmap.api_selected_rank;
 			});
 		};
+	}
+	else if (api_name == '/api_req_map/select_eventmap_rank') {
+		// 海域難易度の初回選択／変更.
+		var params = decode_postdata_params(request.request.postData.params);
+		$mapinfo_rank[params.api_maparea_id * 10 + params.api_map_no] = params.api_rank;	// 1:丙, 2:乙, 3:甲.
 	}
 	else if (api_name == '/api_req_map/start') {
 		// 海域初回選択.
