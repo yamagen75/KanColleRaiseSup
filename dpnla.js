@@ -357,6 +357,21 @@ var dpnla = {
 		}
 		return ra.concat();
 	},
+	kcpstimeinit: function(){
+	/* 開始日時を記憶 */
+		var a = new Date();		var b = new Date();
+		if($svDateTime) a = $svDateTime;
+		b.setTime(a.getTime());
+		this.dat['kcpstimesavedat'] = b;
+	},
+	kcpstimeview: function(){
+	/* 経過時間を返却 */
+		var b = this.dat['kcpstimesavedat'];	var a = new Date();
+		if(!b) b = new Date();
+		if($svDateTime) a = $svDateTime;
+		var c = a.getTime() - b.getTime();
+		return this.strtimchg(c,1);
+	},
 	pmbopen: function(la,ta,wa,ha,hb){
 	/* ポップアップメッセージボックスを開く */
 		var po = this.ge('pmb01');	var mo = this.ge('pmb03');
@@ -420,7 +435,7 @@ var dpnla = {
 		}
 		return r;
 	},
-	strtimchg: function(tm){
+	strtimchg: function(tm,pt){
 	/* ミリ秒の値を時分秒に変換する */
 		var a = new Array();	var i = 0;
 		a[0] = Math.floor(tm / 1000);		a[1] = Math.floor(a[0] / 60);
@@ -428,7 +443,9 @@ var dpnla = {
 		for(i = 2;i < 5;i++){
 			if(a[i] < 10) a[i] = '0'+ a[i];
 		}
-		return a[2] +':'+ a[4] +':'+ a[3];
+		var r = a[2] +':'+ a[4] +':'+ a[3];
+		if(pt) r = a[2] +':'+ a[4];
+		return r;
 	},
 	addevent: function(em,ty,fc){
 	/* エレメントへのイベント追加 */
