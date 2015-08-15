@@ -81,6 +81,9 @@ function Ship(data, ship) {
 	this.ship_id	= data.api_ship_id;
 	this.kyouka	= data.api_kyouka;	// 近代化改修による強化値[火力,雷装,対空,装甲,運].
 	this.nextlv	= data.api_exp[1];
+	if (data.api_slot_ex > 0) {		// api_slot_ex:: 0:増設スロットなし, -1:増設スロット空,　1以上:増設スロット装備ID.
+		this.slot.push(data.api_slot_ex);
+	}
 	this.sortno	= data.api_sortno;
 	this.slot_flg = 0;
 }
@@ -190,11 +193,11 @@ Ship.prototype.slot_names = function() {
 	var slot = this.slot;
 	var onslot = this.onslot;
 	var maxslot = $mst_ship[this.ship_id].api_maxeq;
-	var a = ['','','',''];
+	var a = ['','','','','',''];
 	for (var i = 0; i < slot.length; ++i) {
 		var value = $slotitem_list[slot[i]];
 		if (value) {
-			a[i] = slotitem_name(value.item_id, value.level, onslot[i], maxslot[i]);
+			a[i] = slotitem_name(value.item_id, value.level, value.alv, onslot[i], maxslot[i]);
 		}
 	}
 	return a;
@@ -372,8 +375,12 @@ function get_weekly() {
 			boss_cell : 0,
 			win_boss  : 0,
 			win_S     : 0,
+			monday_material : null,
 			week      : wn
 		};
+	}
+	if ($weekly.monday_material == null) {
+		$weekly.monday_material = $material.now.concat(); save_weekly();
 	}
 	return $weekly;
 }
@@ -538,13 +545,14 @@ function mission_clear_name(cr) {	///@param c	遠征クリア api_clear_result
 	}
 }
 
-function slotitem_name(id, lv, n, max) {
+function slotitem_name(id, lv, alv, n, max) {
 	var item = $mst_slotitem[id];
 	if (!item) return id.toString();	// unknown slotitem.
 	var name = item.api_name;
 	if (lv >= 10) name += '★max';		// 改修レベルを追加する.
 	else if (lv >= 1) name += '★+' + lv;	// 改修レベルを追加する.
-	if (is_airplane(item) && !isNaN(n)) name = '【'+ n +' '+ percent_name_unless100(n, max) +'】 '+ name; // 航空機なら、機数と搭載割合を追加する.
+	if (alv >= 1) name = '<span class="mb12 cr4">'+ alv +'</span>'+ name;	// 熟練度を追加する.
+	if (is_airplane(item) && n != null) name = (n == 0 && n < max) ? '【<span class="cr6">0 全滅</span> 】 '+ name : '【'+ n +' '+ percent_name_unless100(n, max) +'】 '+ name;	// 航空機なら、機数と搭載割合を追加する.
 	return name;
 }
 
@@ -690,7 +698,7 @@ function add_slotitem_list(data) {
 		});
 	}
 	else if (data.api_slotitem_id) {
-		$slotitem_list[data.api_id] = { item_id: data.api_slotitem_id, locked: data.api_locked, level: data.api_level };
+		$slotitem_list[data.api_id] = { item_id: data.api_slotitem_id, locked: data.api_locked, level: data.api_level, alv: data.api_alv };
 	}
 }
 
@@ -755,8 +763,8 @@ function push_fleet_status(tp, deck) {
 	var lv_sum = 0;
 	var fleet_ships = 0;
 	var drumcan = {ships:0, sum:0, msg:''};
-	var j = 0;	var ra = new Array();		var rt = ['','',''];	var rb = new Array();
-	for(j = 0;j < 19;j++){
+	var j = 0;	var ra = new Array();		var rt = ['','',''];	var rb = new Array();		var tb = '';
+	for(j = 0;j < 20;j++){
 		ra[j] = '';
 	}
 	for (var i = 0, ship, s_id; ship = $ship_list[s_id = deck.api_ship[i]]; ++i) {
@@ -782,9 +790,9 @@ function push_fleet_status(tp, deck) {
 		rb = ship.bull_name();	ra[8] = rb[0];	ra[11] = rb[1];
 		rb = ship.onslot_name();	ra[9] = rb[0];	ra[12] = rb[1];
 		rb = ship.slot_names();		ra[13] = rb[0];		ra[14] = rb[1];		ra[15] = rb[2];		ra[16] = rb[3];
-		ra[18] = diff_name(ship.c_cond, ship.p_cond);
-		rt[0] += dpnla.tmprep(2,ra,tp[0][1]);
-		rt[1] += dpnla.tmprep(2,ra,tp[1][1]);
+		ra[18] = diff_name(ship.c_cond, ship.p_cond);		ra[19] = rb[5];		tb = tp[1][1];
+		if(rb[5] != '') tb = tp[1][2];
+		rt[0] += dpnla.tmprep(2,ra,tp[0][1]);		rt[1] += dpnla.tmprep(2,ra,tb);
 		var d = slotitem_count(ship.slot, 75);	// ドラム缶.
 		if (d) {
 			drumcan.ships++;
@@ -817,8 +825,13 @@ function update_material(material, sum) {
 		}
 		$material.now[id-1] = value;
 	}
-	if (msg.length) $material.diff = msg.join(' ，');
-	if ($material.beg == null) $material.beg = $material.now.concat(); // 初回更新時にnowのコピーを保持する.
+	if (msg.length) {
+		dpnla.matupdsave();		$material.diff = msg.join(' ，');
+	}
+	if ($material.beg == null) {
+		dpnla.matupdsave();		$material.beg = $material.now.concat(); // 初回更新時にnowのコピーを保持する.
+	}
+	get_weekly();	// 週初めにnowのコピーを保持する.
 }
 
 function diff_update_material(diff_material, sum) {
@@ -832,7 +845,7 @@ function diff_update_material(diff_material, sum) {
 // 母港画面表示.
 //
 function print_port() {
-	var mb = ['','','','','','','',''];		var mc = ['','','','',''];
+	var mb = ['','','','','','','',''];		var mc = ['','','','',''];	var rlv = 0;	var alv = 0;
 	var unlock_names = [];
 	var lock_condlist = [];
 	var lock_kyoukalist = [];
@@ -867,7 +880,9 @@ function print_port() {
 		var value = $slotitem_list[id];
 		if (value) {
 			var i = value.item_id;
-			var lv = 10 - value.level;	var lc = 1;
+			var lv = 10 - value.level;	var lc = 1;		rlv = lv;		alv = 0;
+			if (value.alv >= 1) alv = value.alv;
+			lv += (16 - alv) * 16; // levelは1～10なので16の下駄を履く.
 			if(i != -1){
 				if(value.locked){
 					lc = 0;		lockeditem_count++;
@@ -876,9 +891,9 @@ function print_port() {
 				if (!lockeditem_list[i][lc]) lockeditem_list[i][lc] = [];
 				if (!lockeditem_list[i][lc][lv]) lockeditem_list[i][lc][lv] = { count:0, shiplist:[] };
 				lockeditem_list[i][lc][lv].count++;
-				if(lv < 1){
+				if(rlv < 1){
 				 levelmax_slotitem++;
-				}else if(lv < 10){
+				}else if(rlv < 10){
 				 leveling_slotitem++;
 				}
 			}
@@ -932,7 +947,10 @@ function print_port() {
 			ship.slot.forEach(function(id) {
 				var value = $slotitem_list[id];
 				if (value && value.locked) {
-					lockeditem_list[value.item_id][0][(10 - value.level)].shiplist.push(ship);
+					var lv = 10 - value.level;	alv = 0;
+					if (value.alv >= 1) alv = value.alv;
+					lv += (16 - alv) * 16; // levelは1～10なので16の下駄を履く.
+					lockeditem_list[value.item_id][0][lv].shiplist.push(ship);
 				}
 			});
 		}
@@ -955,35 +973,32 @@ function print_port() {
 	//
 	// 資材変化を表示する.
 	mb[3] = $max_ship;	mb[5] = $max_slotitem;
-	tb = ['現在値','収支累計','任　務','遠　征','道　中','解　体','廃　棄','補　給','入　渠','建造 改造','開　発','改　修'];
+	tb = ['現在値','週間収支','今回収支','任　務','遠　征','道　中','解　体','廃　棄','補　給','入　渠','建造 改造','開　発','改　修'];
 	tc = ['&nbsp;','燃　料','弾　薬','鋼　材','ボーキ','高速建造','高速修復','開発資材','改修資材'];
-	td = dpnla.tmpget('tp0_4');
-	tp = dpnla.tmpget('tp1_5');
+	td = dpnla.tmpget('tp0_4');		tp = dpnla.tmpget('tp1_5');
 	mc[0] = tp[0] + dpnla.tmprep(0,'資材増減数 ： '+ $material.diff,td[0]);
-	mc[0] += dpnla.tmprep(2,tc,tp[1]);
-	for(i = 0;i < 12;i++){
+	var weekly = get_weekly();	mc[0] += dpnla.tmprep(2,tc,tp[1]);	var ia = 0;
+	for(i = 0;i < 13;i++){
 		ra = new Array();
 		switch(i){
-			case 0:		ra = $material.now;		break;
 			case 1:
+				for(j = 0;j < 8;j++){
+					ra[j] = $material.now[j] - weekly.monday_material[j];
+				}
+				break;
+			case 2:
 				for(j = 0;j < 8;j++){
 					ra[j] = $material.now[j] - $material.beg[j];
 				}
 				break;
-			case 2:		ra = $material.quest;				break;
-			case 3:		ra = $material.mission;			break;
-			case 4:		ra = $material.dropitem;		break;
-			case 5:		ra = $material.destroyship;	break;
-			case 6:		ra = $material.destroyitem;	break;
-			case 7:		ra = $material.charge;			break;
-			case 8:		ra = $material.ndock;				break;
-			case 9:		ra = $material.createship;	break;
-			case 10:	ra = $material.createitem;	break;
-			case 11:	ra = $material.remodelslot;	break;
+			default:
+				ia = i - 1;
+				if(i == 0) ia = 0;
+				ra = dpnla.getmatupdary(ia);
+				break;
 		}
-		ra[8] = tb[i];
-		ra[9] = '';
-		if(i == 1 || i == 2 || i == 7) ra[9] = ' ts31';
+		ra[8] = tb[i];	ra[9] = '';
+		if(i == 1 || i == 2 || i == 3 || i == 8) ra[9] = ' ts31';
 		mc[0] += dpnla.tmprep(2,ra,tp[2]);
 	}
 	mc[0] += tp[3];		dpnla.tmpviw(0,'t11_2',mc[0]);
@@ -1158,7 +1173,8 @@ function print_port() {
 						if(cb == 1 && cd > 1) hb += '</div><div id="'+ ky +'_'+ cd +'" class="hid">';
 						hb += tc[1];
 					}
-					ra[0] = slotitem_name(id,(10 - lv));	ra[1] = item.shiplist.length;		ra[2] = item.count;
+					rlv = lv % 16;	alv = 16 - ((lv - rlv) / 16);
+					ra[0] = slotitem_name(id,(10 - rlv),alv);		ra[1] = item.shiplist.length;		ra[2] = item.count;
 					if(ra[1] > 0){
 						ra[3] = shiplist_names(item.shiplist);	ht += dpnla.tmprep(2,ra,tp[1]);
 					}
@@ -1459,7 +1475,7 @@ function print_port() {
 		}
 		ra[2] += ta[2] + tp[2][3];
 		ht[0] += dpnla.tmprep(2,ra,tp[0][0]) + ta[0] + tp[0][2];
-		ht[f_id] = dpnla.tmprep(2,ra,tp[1][0]) + ta[1] + dpnla.tmprep(0,ra[3],tp[1][2]);
+		ht[f_id] = dpnla.tmprep(2,ra,tp[1][0]) + ta[1] + dpnla.tmprep(0,ra[3],tp[1][3]);
 	}
 	for(i = 0;i < 5;i++){
 		j = i + 1;	ky = 't21_'+ j;		dpnla.tmpviw(0,ky,ht[i]);
@@ -1475,7 +1491,7 @@ function print_port() {
 		}
 		mc[3] += tp[2];
 	}
-	me = request_date_time();
+	me = request_date_time();		me.push(dpnla.kcpstimeview());
 	mc[3] += dpnla.tmprep(2,me,tp[5]) + mc[4];
 	dpnla.tmpviw(0,'t11_1',mc[3]);
 	if(ndocks > 0){
@@ -2136,7 +2152,8 @@ function on_battle(json) {
 			}else if(rb[0] == 0){
 				tc = tb[4];
 			}else if(rb[0] == 1){
-				if(dpnla.getmbstrlen(rb[1]) < 17) tc = tb[5];
+				// if(dpnla.getmbstrlen(rb[1]) < 17) tc = tb[5];
+				tc = tb[5];
 			}
 			ha += dpnla.tmprep(2,ra,tc);
 		}
@@ -2191,7 +2208,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			update_mst_mapinfo(json.api_data.api_mst_mapinfo);
 			var tp = dpnla.tmpget('tp0_4');
 			var ht = tp[6] + dpnla.tmprep(0,' ゲーム情報の取得に成功しました',tp[0]) + tp[7];
-			dpnla.tmpviw(0,'t11_1',ht);
+			dpnla.tmpviw(0,'t11_1',ht);		dpnla.kcpstimeinit();
 		};
 	}
 	else if (api_name == '/api_get_member/slot_item') {
@@ -2553,6 +2570,11 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			});
 		};
 	}
+	else if (api_name == '/api_req_map/select_eventmap_rank') {
+		// 海域難易度の初回選択／変更.
+		var params = decode_postdata_params(request.request.postData.params);
+		$mapinfo_rank[params.api_maparea_id * 10 + params.api_map_no] = params.api_rank;	// 1:丙, 2:乙, 3:甲.
+	}
 	else if (api_name == '/api_req_map/start') {
 		// 海域初回選択.
 		$battle_count = 0;
@@ -2599,7 +2621,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		$battle_count = 1;
 		$beginhps = null;
 		$beginhps_c = null;
-		$battle_log = [];		dpnla.tab14init('演習');
+		$battle_log = [];		dpnla.tab14init('');
 		func = on_battle;
 	}
 	else if (api_name == '/api_req_practice/midnight_battle') {

@@ -1,12 +1,12 @@
 /* ユーティリティ等 */
 if(typeof(dpnla) == 'undefined'){
 var dpnla = {
-	dat: new Array(),	//データ保存用
+	dat: new Array(),	// データ保存用
 	init: function(){
 	/* 初期化 */
 		this.tabinit(0,'t01');	this.tabinit(0,'t11');	this.tabinit(2,'t31');
 		this.tabinit(2,'t41');	this.tabinit(0,'t51');	this.tabinit(0,'t56');
-		this.dat['pmbcloserunproc'] = null;
+		this.dat['pmbcloserunproc'] = null;		this.matupdinit();
 		this.addevent(this.ge('pmb02'),'click',function(){ dpnla.pmbclose(); });
 		this.addevent(this.ge('b563c'),'click',function(){ dpnla.kcprecls(); });
 	},
@@ -262,13 +262,13 @@ var dpnla = {
 		this.dat['kcprecdelarg'] = [pt,ky,ra];
 		var ob = this.ge(ra[1]);
 		if(ob != undefined){
-			ob.disabled = true;		ob.style.visibility = 'hidden';		//無効化＆非表示
+			ob.disabled = true;		ob.style.visibility = 'hidden';	// 無効化＆非表示
 		}
 		this.dat['pmbcloserunproc'] = function(){
 			var pa = dpnla.dat['kcprecdelarg'];
 			var oa = dpnla.ge(pa[2][1]);
 			if(oa != undefined){
-				oa.disabled = false;	oa.style.visibility = 'visible';	//有効化＆表示
+				oa.disabled = false;	oa.style.visibility = 'visible';	// 有効化＆表示
 			}
 		};
 		var tp = this.tmpget('tp0_5');
@@ -291,7 +291,7 @@ var dpnla = {
 		}
 		save_storage(ky,va);
 		if(ob != undefined){
-			ob.disabled = true;		ob.style.visibility = 'hidden';		//無効化＆非表示
+			ob.disabled = true;		ob.style.visibility = 'hidden';	// 無効化＆非表示
 		}
 		this.dat['pmbcloserunproc'] = null;
 		this.pmbclose();
@@ -299,6 +299,78 @@ var dpnla = {
 	kcprecls: function(){
 	/* 記録表示欄クリア */
 		this.ge('c57').value = '';
+	},
+	matupdinit: function(){
+	/* 資材増減歴初期化 */
+		var k = this.getmatupdkey();
+		// this.addevent(this.ge('b141v'),'click',function(){ dpnla.matupdview(); });
+		// this.ge('i142v').value = '';
+		// this.ge('i143v').value = '';
+		
+	},
+	matupdsave: function(){
+	/* 資材増減歴保存 */
+		var k = this.getmatupdkey();
+		
+		this.matupdchgkey();
+		
+	},
+	matupdchgkey: function(){
+	/* 資材増減歴保存初期設定 */
+		var k = this.getmatupdkey();
+		
+	},
+	matupdview: function(){
+	/* 資材増減歴集計表示 */
+		// var fo = this.ge('i142v');
+		// var to = this.ge('i143v');
+		
+	},
+	getmatupdkey: function(){
+	/* 資材増減歴保存キー取得 */
+		var d = new Date();		var a = new Date();
+		if($svDateTime) d = $svDateTime;
+		var c = this.daytimchg(3,d);
+		if(c[3] < 5){
+			a.setTime(d.getTime() - (6 * 3600 * 1000));
+		}else{
+			a = d;
+		}
+		return this.daytimchg(4,a);
+	},
+	getmatupdary: function(pt){
+	/* 資材増減項目別配列取得 */
+		var ra = new Array();
+		switch(pt){
+			case 0:		ra = $material.now;		break;
+			case 1:		ra = $material.beg;		break;
+			case 2:		ra = $material.quest;				break;
+			case 3:		ra = $material.mission;			break;
+			case 4:		ra = $material.dropitem;		break;
+			case 5:		ra = $material.destroyship;	break;
+			case 6:		ra = $material.destroyitem;	break;
+			case 7:		ra = $material.charge;			break;
+			case 8:		ra = $material.ndock;				break;
+			case 9:		ra = $material.createship;	break;
+			case 10:	ra = $material.createitem;	break;
+			case 11:	ra = $material.remodelslot;	break;
+		}
+		return ra.concat();
+	},
+	kcpstimeinit: function(){
+	/* 開始日時を記憶 */
+		var a = new Date();		var b = new Date();
+		if($svDateTime) a = $svDateTime;
+		b.setTime(a.getTime());
+		this.dat['kcpstimesavedat'] = b;
+	},
+	kcpstimeview: function(){
+	/* 経過時間を返却 */
+		var b = this.dat['kcpstimesavedat'];	var a = new Date();
+		if(!b) b = new Date();
+		if($svDateTime) a = $svDateTime;
+		var c = a.getTime() - b.getTime();
+		return this.strtimchg(c,1);
 	},
 	pmbopen: function(la,ta,wa,ha,hb){
 	/* ポップアップメッセージボックスを開く */
@@ -341,20 +413,29 @@ var dpnla = {
 		a[0] = d.getYear();		a[1] = d.getMonth() + 1;	a[2] = d.getDate();
 		if(a[0] < 2000) a[0] += 1900;
 		a[3] = d.getHours();	a[4] = d.getMinutes();	a[5] = d.getSeconds();
+		var b = a.concat();		a[0] = ''+ a[0];
 		for(i = 1;i < 6;i++){
-			if(a[i] < 10) a[i] = '0'+ a[i];
+			if(a[i] < 10){
+				a[i] = '0'+ a[i];
+			}else{
+				a[i] = ''+ a[i];
+			}
 		}
 		switch(p){
 		 case 1:	// 12/31 23:59
 			r = a[1] +'/'+ a[2] +' '+ a[3] +':'+ a[4];	break;
 		 case 2:	// 12/31 23:59:59
 			r = a[1] +'/'+ a[2] +' '+ a[3] +':'+ a[4] +':'+ a[5];		break;
+		 case 3:	// 数値配列返却
+			r = new Array();	r = b;	break;
+		 case 4:	// 文字列配列返却
+			r = new Array();	r = a;	break;
 		 default:	// 2014/12/31 23:59:59
 			r = a[0] +'/'+ a[1] +'/'+ a[2] +' '+ a[3] +':'+ a[4] +':'+ a[5];	break;
 		}
 		return r;
 	},
-	strtimchg: function(tm){
+	strtimchg: function(tm,pt){
 	/* ミリ秒の値を時分秒に変換する */
 		var a = new Array();	var i = 0;
 		a[0] = Math.floor(tm / 1000);		a[1] = Math.floor(a[0] / 60);
@@ -362,7 +443,9 @@ var dpnla = {
 		for(i = 2;i < 5;i++){
 			if(a[i] < 10) a[i] = '0'+ a[i];
 		}
-		return a[2] +':'+ a[4] +':'+ a[3];
+		var r = a[2] +':'+ a[4] +':'+ a[3];
+		if(pt) r = a[2] +':'+ a[4];
+		return r;
 	},
 	addevent: function(em,ty,fc){
 	/* エレメントへのイベント追加 */

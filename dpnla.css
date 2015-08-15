@@ -87,10 +87,12 @@ a [class*=" icon-"] {
 #dpnla .mb6 { margin-bottom:6px; }
 #dpnla .mb10 { display:inline-block; width:10px; }
 #dpnla .mb11 { display:inline-block; width:40px; }
+#dpnla .mb12 { display:inline-block; width:16px; }
 
 #dpnla .ts1 th { font-size:84%; text-align:center; }
 #dpnla .ts15 th { font-size:84%; text-align:center; padding-top:0; padding-bottom:0; }
 #dpnla .ts28 th { font-size:92%; text-align:right; padding-top:1px; padding-bottom:0; }
+#dpnla .ts39 th { font-size:92%; text-align:left; padding-top:0; padding-bottom:0; }
 #dpnla th.ts2 { text-align:left; }
 #dpnla th.ts13 { text-align:right; }
 
@@ -129,8 +131,9 @@ a [class*=" icon-"] {
 #dpnla .ts34 { padding-top:2px; padding-bottom:2px; vertical-align:top; }
 #dpnla .ts36 { padding:4px 0 3px 8px; }
 #dpnla .ts38 { padding-top:0; padding-bottom:0; }
+#dpnla .ts40 { padding-left:10px; }
 
-#dpnla .ts39 {  }
+#dpnla .ts41 {  }
 
 #dpnla .cr1 { color:#e58d89; }
 #dpnla .cr2 { color:#aaa; }
