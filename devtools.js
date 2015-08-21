@@ -551,7 +551,7 @@ function slotitem_name(id, lv, alv, n, max) {
 	var name = item.api_name;
 	if (lv >= 10) name += '★max';		// 改修レベルを追加する.
 	else if (lv >= 1) name += '★+' + lv;	// 改修レベルを追加する.
-	if (alv >= 1) name = '<span class="mb12 cr4">'+ alv +'</span>'+ name;	// 熟練度を追加する.
+	if (alv >= 1) name += '<i class="icon-plane mr0 ml2"></i>+'+ alv;	// 熟練度を追加する.
 	if (is_airplane(item) && n != null) name = (n == 0 && n < max) ? '【<span class="cr6">0 全滅</span> 】 '+ name : '【'+ n +' '+ percent_name_unless100(n, max) +'】 '+ name;	// 航空機なら、機数と搭載割合を追加する.
 	return name;
 }
@@ -595,7 +595,7 @@ function shiplist_names(list) {	// Shipの配列をlv降順に並べて、","区
 		if (e.count > 1) name += ' x'+ e.count;	// 同一艦は x N で束ねる.
 		names[i] = name;
 	}
-	return names.join('，');
+	return names.join('，<wbr>');
 }
 
 function damage_name(nowhp, maxhp, pt) {
@@ -1439,17 +1439,19 @@ function print_port() {
 		ht += dpnla.tmprep(2,ra,tp[7]);
 	}
 	mc[3] = ht;		mc[4] = tp[5];
-	ht = ['','','','','',''];		ra = ['','','','',''];	var ma = ['全 艦 隊'];
+	ht = ['','','','',''];	ra = ['','','','',''];	var ma = ['全 艦 隊'];
 	var md = new Array();		var me = new Array();		var ta = new Array();
 	for(i = 0;i < 3;i++){
 		j = i + 1;	ky = 'tp2_'+ j;		tp[i] = dpnla.tmpget(ky);
 	}
+	ht[5] = '出撃中：'+ $battle_log.join(' <i class="icon-arrow-right"></i>');
 	//
 	// 各艦隊の情報を一覧表示する.
 	for (var f_id in $fdeck_list) {
+		ky = '';
 		ra[0] = '';		ra[1] = '';
-		ra[4] = 'info';		ky = '';
 		var deck = $fdeck_list[f_id];
+		ra[4] = 'info';
 		if ($combined_flag && f_id < 3) {
 			ky = '◆';	ra[0] = '【連合】 ';	ra[4] = 'primary';
 		}
@@ -1459,13 +1461,16 @@ function print_port() {
 		if (mission_end > 0) {
 			var d = new Date(mission_end);
 			var id = deck.api_mission[1];
-			me = new Array();		me[0] = f_id;		me[1] = id;
-			me[2] = $mst_mission[id].api_name;	me[3] = dpnla.daytimchg(1,d);
-			ra[1] = tp[2][1];		ra[2] += tp[2][4] +' '+ me[3] +' ';
+			me = new Array();		me[0] = f_id;		me[1] = id;		me[2] = $mst_mission[id].api_name;
+			$last_mission[f_id] = '前回遠征：' + me[2]; // 支援遠征では /api_req_mission/result が来ないので、ここで事前更新しておく.
+			me[3] = dpnla.daytimchg(1,d);		ra[1] = tp[2][1];		ra[2] += tp[2][4] +' '+ me[3] +' ';
 			ra[3] = '遠征 【'+ id +' 】 '+ me[2] +' ： '+ me[3];	md.push(me);
 		}
+		else if ($combined_flag && f_id == 2 && $battle_deck_id == 1) {
+			ra[3] = ht[5];
+		}
 		else if (deck.api_id == $battle_deck_id) {
-			ra[3] = '出撃中：'+ $battle_log.join(' <i class="icon-arrow-right"></i>');
+			ra[3] = ht[5];
 		}
 		else {
 			if ($last_mission[f_id])
@@ -1629,7 +1634,8 @@ function on_next_cell(json) {
 		if(ha != '') dpnla.tabinit(0,ky);
 		dpnla.tmpviw(1,'c41',arow +'Enemy '+ area);		dpnla.tabsel('t41',0);
 	}
-	ra = request_date_time();		dpnla.tmpviw(0,'c47',dpnla.tmprep(2,ra,tp[10]));
+	ra = request_date_time();		ra.push(dpnla.kcpstimeview());
+	dpnla.tmpviw(0,'c47',dpnla.tmprep(2,ra,tp[10]));
 }
 
 /// 護衛退避艦リストに艦IDを追加する. idx = 1..6, 7..12
@@ -1758,7 +1764,8 @@ function on_battle_result(json) {
 	if (drop_item_name) {
 		msg += '<br />'+ tp[3] +'drop item'+ tp[4] + drop_item_name;
 	}
-	var ra = request_date_time();	dpnla.tmpviw(0,'c47',dpnla.tmprep(2,ra,tp[10]));	dpnla.tmpviw(1,'c43',msg);
+	var ra = request_date_time();		ra.push(dpnla.kcpstimeview());
+	dpnla.tmpviw(0,'c47',dpnla.tmprep(2,ra,tp[10]));	dpnla.tmpviw(1,'c43',msg);
 }
 
 function calc_damage(result, hp, battle, hc) {
@@ -2178,7 +2185,8 @@ function on_battle(json) {
 	}
 	ra[0] = '&nbsp;';		ra[1] = '';		ra[2] = 'c46';
 	ha = tp[0] + ha + tp[2];	dpnla.tmpviw(0,'c45',dpnla.tmprep(2,ra,ha));
-	ra = request_date_time();		dpnla.tmpviw(0,'c47',dpnla.tmprep(2,ra,tp[10]));
+	ra = request_date_time();		ra.push(dpnla.kcpstimeview());
+	dpnla.tmpviw(0,'c47',dpnla.tmprep(2,ra,tp[10]));
 	var hb = req.join('<br />');	rg = new RegExp('f_damage:','g');		hb = hb.replace(rg,'味方:');
 	rg = new RegExp('e_damage:','g');		hb = hb.replace(rg,'敵:') +'<br />';
 	ra = [b_name,'c43',hb];		dpnla.tmpviw(0,'t41_1',dpnla.tmprep(2,ra,tp[11]));
@@ -2481,7 +2489,9 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			update_ship_list(json.api_data.api_ship);
 			update_fdeck_list(json.api_data.api_deck_port);
 			update_ndock_list(json.api_data.api_ndock);
-			if ($battle_deck_id > 0) $last_mission[$battle_deck_id] = '前回出撃：' + $battle_log.join(' <i class="icon-arrow-right"></i>');
+			var btlg = '前回出撃：' + $battle_log.join(' <i class="icon-arrow-right"></i>');
+			if ($battle_deck_id > 0) $last_mission[$battle_deck_id] = btlg;
+			if($combined_flag && $battle_deck_id == 1) $last_mission[2] = btlg;
 			$battle_deck_id = -1;
 			$ship_escape = {};
 			$combined_flag = json.api_data.api_combined_flag;	// 連合艦隊編成有無.

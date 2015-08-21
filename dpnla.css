@@ -70,6 +70,9 @@ a [class*=" icon-"] {
 .icon-level-up:before {
   content: "\f148";
 }
+.icon-plane:before {
+  content: "\f072";
+}
 
 /* スタイル設定 */
 
@@ -80,6 +83,7 @@ a [class*=" icon-"] {
 
 #dpnla i { margin-right:2px; }
 #dpnla i.mr0 { margin-right:0; }
+#dpnla i.ml2 { margin-left:2px; }
 #dpnla .hid { display:none; }
 
 #dpnla .mb0 { margin-bottom:0; }
@@ -87,7 +91,6 @@ a [class*=" icon-"] {
 #dpnla .mb6 { margin-bottom:6px; }
 #dpnla .mb10 { display:inline-block; width:10px; }
 #dpnla .mb11 { display:inline-block; width:40px; }
-#dpnla .mb12 { display:inline-block; width:16px; }
 
 #dpnla .ts1 th { font-size:84%; text-align:center; }
 #dpnla .ts15 th { font-size:84%; text-align:center; padding-top:0; padding-bottom:0; }
