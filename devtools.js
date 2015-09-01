@@ -197,7 +197,7 @@ Ship.prototype.slot_names = function() {
 	for (var i = 0; i < slot.length; ++i) {
 		var value = $slotitem_list[slot[i]];
 		if (value) {
-			a[i] = slotitem_name(value.item_id, value.level, value.alv, onslot[i], maxslot[i]);
+			a[i] = slotitem_name(value.item_id, value.level, value.alv, value.p_alv, onslot[i], maxslot[i]);
 		}
 	}
 	return a;
@@ -545,14 +545,20 @@ function mission_clear_name(cr) {	///@param c	遠征クリア api_clear_result
 	}
 }
 
-function slotitem_name(id, lv, alv, n, max) {
+function slotitem_name(id, lv, alv, p_alv, n, max) {
 	var item = $mst_slotitem[id];
 	if (!item) return id.toString();	// unknown slotitem.
 	var name = item.api_name;
 	if (lv >= 10) name += '★max';		// 改修レベルを追加する.
 	else if (lv >= 1) name += '★+' + lv;	// 改修レベルを追加する.
-	if (alv >= 1) name += '<i class="icon-plane mr0 ml2"></i>+'+ alv;	// 熟練度を追加する.
-	if (is_airplane(item) && n != null) name = (n == 0 && n < max) ? '【<span class="cr6">0 全滅</span> 】 '+ name : '【'+ n +' '+ percent_name_unless100(n, max) +'】 '+ name;	// 航空機なら、機数と搭載割合を追加する.
+	if (alv >= 1 || p_alv >= 1) {
+		var gmk = '<i class="icon-plane mr0 ml2"></i>';
+		if (alv >= 7) name += gmk +'max';	// 熟練度最大なら追加する.
+		else if (alv >= 1) name += gmk +'+'+ alv;		// さもなくば熟練度数値を追加する.
+		var diff = diff_name(alv, p_alv);
+		if (diff.length > 0) name += ' <span class="cr1">'+ diff +'</span>';	// 熟練度変化量を追加する.
+	}
+	if (is_airplane(item) && n != null) name  = (n == 0 && n < max) ? '【<span class="cr6">0 全滅</span> 】 '+ name : '【'+ n +' '+ percent_name_unless100(n, max) +'】 '+ name;	// 航空機なら、機数と搭載割合を追加する.
 	return name;
 }
 
@@ -690,15 +696,22 @@ function count_unless(a, value) {
 		return (a != value) ? 1 : 0;
 }
 
-function add_slotitem_list(data) {
+function add_slotitem_list(data, prev) {
 	if (!data) return;
 	if (data instanceof Array) {
 		data.forEach(function(e) {
-			add_slotitem_list(e);
+			add_slotitem_list(e, prev);
 		});
 	}
 	else if (data.api_slotitem_id) {
-		$slotitem_list[data.api_id] = { item_id: data.api_slotitem_id, locked: data.api_locked, level: data.api_level, alv: data.api_alv };
+		var item = { item_id: data.api_slotitem_id, locked: data.api_locked, level: data.api_level };
+		var alv = data.api_alv;
+		if (alv != null) {
+			var p_item = prev ? prev[data.api_id] : $slotitem_list[data.api_id];
+			item.p_alv = p_item ? p_item.alv : alv;
+			item.alv = alv;
+		}
+		$slotitem_list[data.api_id] = item;
 	}
 }
 
@@ -2252,8 +2265,9 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 	else if (api_name == '/api_get_member/slot_item') {
 		// 保有装備一覧表.
 		func = function(json) { // 保有する装備配列をリストに記録する.
+			var prev = $slotitem_list;
 			$slotitem_list = {};
-			add_slotitem_list(json.api_data);
+			add_slotitem_list(json.api_data, prev);
 			save_storage('slotitem_list', $slotitem_list);
 		};
 	}
