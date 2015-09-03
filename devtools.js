@@ -612,10 +612,10 @@ function damage_name(nowhp, maxhp, pt) {
 	}else if(r <= 0.25){
 		rt = '<span class="label label-danger">大破</span>';
 	}else if(r <= 0.50){
-		rt = '<span class="label label-default">中破</span>';
+		rt = '<span class="label label-warning">中破</span>';
 		if(pt) rt = '<span class="label label-warning">中破</span>';
 	}else if(r <= 0.75){
-		rt = '<span class="label label-default">小破</span>';
+		rt = '<span class="label label ts9">小破</span>';
 		if(pt) rt = '<span class="label ts9">小破</span>';
 	}else if(r <= 0.85){
 		rt = '<span class="label label-default"><i class="icon-wrench mr0"></i></span>'; // 軽微2.
