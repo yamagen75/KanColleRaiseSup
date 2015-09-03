@@ -4,8 +4,8 @@ var dpnla = {
 	dat: new Array(),	// データ保存用
 	init: function(){
 	/* 初期化 */
-		this.tabinit(0,'t01');	this.tabinit(0,'t11');	this.tabinit(2,'t31');
-		this.tabinit(2,'t41');	this.tabinit(0,'t51');	this.tabinit(0,'t56');
+		this.tabinit(0,'t01');	this.tabinit(0,'t11');	this.tabinit(2,'t31');	this.tabinit(2,'t41');
+		this.tabinit(0,'t51');	this.tabinit(0,'t56');	this.tabinit(2,'t53');
 		this.dat['pmbcloserunproc'] = null;		this.matupdinit();
 		this.addevent(this.ge('pmb02'),'click',function(){ dpnla.pmbclose(); });
 		this.addevent(this.ge('b563c'),'click',function(){ dpnla.kcprecls(); });
