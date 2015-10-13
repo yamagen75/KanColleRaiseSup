@@ -5,7 +5,7 @@ var dpnla = {
 	init: function(){
 	/* 初期化 */
 		this.tabinit(0,'t01');	this.tabinit(0,'t11');	this.tabinit(2,'t31');	this.tabinit(2,'t41');
-		this.tabinit(0,'t51');	this.tabinit(0,'t56');	this.tabinit(2,'t53');
+		this.tabinit(0,'t51');	this.tabinit(0,'t56');	this.tabinit(2,'t52');
 		this.dat['pmbcloserunproc'] = null;		this.matupdinit();
 		this.addevent(this.ge('pmb02'),'click',function(){ dpnla.pmbclose(); });
 		this.addevent(this.ge('b563c'),'click',function(){ dpnla.kcprecls(); });
@@ -185,10 +185,12 @@ var dpnla = {
 			ob.innerHTML = ha + ht;
 		}
 	},
-	tmpagemk: function(id,mx){
+	tmpagemk: function(id,mx,pt){
 	/* ページ切替タブ作成 */
-		var tp = this.tmpget('tp0_1');	var i = 0;
-		var ht = this.tmprep(0,id,tp[0]);		ht += tp[1];
+		var tk = 'tp0_1';		var i = 0;
+		if(pt) tk = 'tp0_2';
+		var tp = this.tmpget(tk);		var ht = this.tmprep(0,id,tp[0]);
+		ht += this.tmprep(0,1,tp[1]);
 		if(mx > 1){
 			for(i = 2;i <= mx;i++){
 				ht += this.tmprep(0,i,tp[2]);

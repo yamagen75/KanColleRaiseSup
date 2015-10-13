@@ -3,6 +3,9 @@
   "name": "艦これ艦娘育成支援",
   "version": "1.0.0",
   "description": "艦これの艦娘育成を支援する(KanColle-YPS改造版)",
+  "permissions": [
+    "storage"
+  ],
   "icons": {
     "16": "material/icon.png",
     "48": "material/icon.png",
