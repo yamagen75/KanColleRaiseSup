@@ -1487,7 +1487,7 @@ function print_port() {
 		ht += dpnla.tmprep(0,'任務リストを先頭から最終ページまでめくってください。',td[2]);
 	}
 	if (quests > 0) {
-		ra = ['','',''];
+		ra = ['','',''];	ca = 0;
 		var q_count = { daily:0, weekly:0, monthly:0 };
 		for (var id in $quest_list) {
 			var quest = $quest_list[id];
@@ -1511,7 +1511,9 @@ function print_port() {
 				}else if(quest.api_progress_flag == 1){
 					ra[0] = tb[10];
 				}
-				ra[1] = tb[quest.api_category] + quest.api_title;
+				ca = quest.api_category;
+				if(ca == 8) ca = 2;
+				ra[1] = tb[ca] + quest.api_title;
 				if (quest.api_no == 214) ra[1] += weekly_name();
 				ha += dpnla.tmprep(2,ra,tp[2]);
 			}
