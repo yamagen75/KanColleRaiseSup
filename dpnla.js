@@ -351,11 +351,12 @@ var dpnla = {
 			case 4:		ra = $material.dropitem;		break;
 			case 5:		ra = $material.destroyship;	break;
 			case 6:		ra = $material.destroyitem;	break;
-			case 7:		ra = $material.charge;			break;
-			case 8:		ra = $material.ndock;				break;
-			case 9:		ra = $material.createship;	break;
-			case 10:	ra = $material.createitem;	break;
-			case 11:	ra = $material.remodelslot;	break;
+			case 7:		ra = $material.autosupply;	break;
+			case 8:		ra = $material.charge;			break;
+			case 9:		ra = $material.ndock;				break;
+			case 10:	ra = $material.createship;	break;
+			case 11:	ra = $material.createitem;	break;
+			case 12:	ra = $material.remodelslot;	break;
 		}
 		return ra.concat();
 	},
