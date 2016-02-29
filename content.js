@@ -8,6 +8,7 @@ cont.style.backgroundColor = '#fff';
 cont.style.width = '650px';
 cont.style.height = '70px';
 cont.id = 'emorgp1';
+var hd_nvnm = 'dmm-ntgnavi';
 var htma = '<div id="emorgp2" style="margin:5px;">';
 htma += '<button type="button" onClick="orgplopenclose(1);" style="margin:0 20px 5px 0;"><< 閉じる</button>';
 htma += '<strong>艦これの艦娘育成を支援する GoogleChrome拡張</strong>';
@@ -32,16 +33,30 @@ htmb += 'var fd = "816px"; ';
 htmb += 'if(pt > 0){ fa = "inline-block"; fb = "none"; fc = "block"; fd = "996px"; } ';
 htmb += 'document.getElementById("emorgp4").style.display = fb; ';
 htmb += 'document.getElementById("emorgp5").style.display = fa; ';
-htmb += 'document.getElementById("dmm-ntgnavi-renew").style.display = fc; ';
-htmb += 'document.body.style.minWidth = fd; }';
-/* 操作するオブジェクト(area-game,game_frame,dmm-ntgnavi-renew)が取得出来れば実行する */
+htmb += 'orgdmmhedelemntget("'+ hd_nvnm +'").style.display = fc; ';
+htmb += 'document.body.style.minWidth = fd; } function orgdmmhedelemntget(nm){ ';
+htmb += 'var tgs = document.getElementsByTagName("div"); ';
+htmb += 'for(var i = 0;i < tgs.length;i++){ if(tgs[i].className == nm){ return tgs[i]; } } }';
+/* 操作するオブジェクト(area-game,game_frame,DMMヘッダ)が取得出来れば実行する */
 var contb = document.getElementById('area-game');
 var contc = document.getElementById('game_frame');
-var contd = document.getElementById('dmm-ntgnavi-renew');
-if(!(contb == undefined || contc == undefined || contd == undefined)){
+var contd = null;
+var hd_tgs = document.getElementsByTagName('div');
+for(var hd_i = 0;hd_i < hd_tgs.length;hd_i++){
+	if(hd_tgs[hd_i].className == hd_nvnm){
+		contd = hd_tgs[hd_i];		break;
+	}
+}
+var htmc = '';
+if(contb == undefined) htmc += '<div>area-gameが取得出来ません。</div>';
+if(contc == undefined) htmc += '<div>game_frameが取得出来ません。</div>';
+if(contd == null) htmc += '<div>'+ hd_nvnm +'が取得出来ません。</div>';
+if(htmc == ''){
 	contb.style.textAlign = 'left';		contb.style.marginTop = '5px';
 	contd.style.display = 'none';		contc.width = '840px';
 	document.body.style.minWidth = '816px';
 	scrp.innerHTML = htmb;	document.head.appendChild(scrp);
-	cont.innerHTML = htma;	document.body.appendChild(cont);
+}else{
+	htma = htmc;
 }
+cont.innerHTML = htma;	document.body.appendChild(cont);
