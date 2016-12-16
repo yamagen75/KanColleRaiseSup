@@ -467,10 +467,10 @@ function kira_name(cond) {
 	}else if(cond > 49){
 		return '<span class="cr13">'+ cond +'</span>'; // キラ
 	}else if(cond == 49){
-		return ''; // normal
+		return '<span>'+ cond +'</span>'; // normal
 	}else if(cond < 20){
 		return '<span class="cr8">'+ cond +'</span>'; // 赤疲労
-	}else if(cond < 30){
+	}else if(cond < 33){
 		return '<span class="cr7">'+ cond +'</span>'; // 橙疲労
 	}else{
 		return ''+ cond; // recovering 疲労
@@ -626,10 +626,10 @@ function damage_name(nowhp, maxhp, pt) {
 	}else if(r <= 0.25){
 		rt = '<span class="label label-danger">大破</span>';
 	}else if(r <= 0.50){
-		rt = '<span class="label label-default">中破</span>';
+		rt = '<span class="label label-warning">中破</span>';
 		if(pt) rt = '<span class="label label-warning">中破</span>';
 	}else if(r <= 0.75){
-		rt = '<span class="label label-default">小破</span>';
+		rt = '<span class="label label ts9">小破</span>';
 		if(pt) rt = '<span class="label ts9">小破</span>';
 	}else if(r <= 0.85){
 		rt = '<span class="label label-default"><i class="icon-wrench mr0"></i></span>'; // 軽微2.
