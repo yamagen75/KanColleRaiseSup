@@ -2044,7 +2044,7 @@ function calc_damage(result, title, battle, hp, hc) {
  					at = -i;		// 自軍第二艦隊 -1..-6
  				else
  					at = i;			// 自軍第一艦隊 1..6
- 				result.detail.push({ty:"雷撃戦", at: at, target: target, cl: battle_cl_name(battle.api_fcl[i]), damage: damage, hp: target_hp});
+ 				result.detail.push({ty:"雷撃", at: at, target: target, cl: battle_cl_name(battle.api_fcl[i]), damage: damage, hp: target_hp});
  			}
 		}
 	}
@@ -2063,7 +2063,7 @@ function calc_damage(result, title, battle, hp, hc) {
  					at = -6-i;	// 敵軍護衛艦隊 -7..-12
  				else
  					at = i+6;	// 敵軍主力艦隊 7..12
- 				result.detail.push({ty:"雷撃戦", at: at, target: target, cl: battle_cl_name(battle.api_ecl[i]), damage: damage, hp: target_hp});
+ 				result.detail.push({ty:"雷撃", at: at, target: target, cl: battle_cl_name(battle.api_ecl[i]), damage: damage, hp: target_hp});
  			}
 		}
 	}
@@ -2074,7 +2074,7 @@ function calc_damage(result, title, battle, hp, hc) {
 			var damage = battle.api_fdam[i];
 			if (battle.api_frai_flag[i] || battle.api_fbak_flag[i]) {
  				var target_hp = (hc && target < 0) ? hc[-target] : hp[target];
- 				result.detail.push({ty:"航空戦", target: target, cl: battle_cl_name(damage ? battle.api_fcl_flag[i]+1 : 0), damage: damage, hp: target_hp});
+ 				result.detail.push({ty:"空爆", target: target, cl: battle_cl_name(damage ? battle.api_fcl_flag[i]+1 : 0), damage: damage, hp: target_hp});
  			}
 		}
 	}
@@ -2085,7 +2085,7 @@ function calc_damage(result, title, battle, hp, hc) {
 			var damage = battle.api_edam[i];
 			if (battle.api_erai_flag[i] || battle.api_ebak_flag[i]) {
  				var target_hp = (hc && target < 0) ? hc[-target] : hp[target];
- 				result.detail.push({ty: (battle.api_fdam ? "航空戦" : "航空支援"), target: target, cl: battle_cl_name(damage ? battle.api_ecl_flag[i]+1 : 0), damage: damage, hp: target_hp});
+ 				result.detail.push({ty: (battle.api_fdam ? "空爆" : "支援空爆"), target: target, cl: battle_cl_name(damage ? battle.api_ecl_flag[i]+1 : 0), damage: damage, hp: target_hp});
  			}
 		}
 	}
@@ -2130,7 +2130,7 @@ function calc_kouku_damage(result, title, kouku, hp, hc) {
 		}
 		else {
 			result.detail.push({
-				ty: '防空戦',
+				ty: '防空',
 				ek: fraction_percent_name(st.api_e_lostcount, st.api_e_count),
 				fk: fraction_percent_name(st.api_f_lostcount, st.api_f_count)
 			});
