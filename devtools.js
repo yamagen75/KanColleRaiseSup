@@ -654,7 +654,7 @@ function damage_name(nowhp, maxhp, pt) {
 
 function battle_type_name(a) {
 	switch (a) {
-	case 0: return '砲撃戦';
+	case 0: return '砲撃';
 	case 1: return 'レーザー';
 	case 2: return '連撃';
 	case 3: return '主副カットイン';
@@ -667,7 +667,7 @@ function battle_type_name(a) {
 
 function battle_sp_name(a) {
 	switch (a) {
-	case 0: return '砲撃戦';
+	case 0: return '砲撃';
 	case 1: return '連撃';
 	case 2: return '主魚カットイン';
 	case 3: return '魚魚カットイン';
@@ -1944,7 +1944,7 @@ function on_battle_result(json) {
 	dpnla.tmpviw(0,'c47',dpnla.tmprep(2,ra,tp[10]));	dpnla.tmpviw(1,'c43',msg);
 }
 
-function calc_damage(result, hp, battle, hc) {
+function calc_damage(result, title, battle, hp, hc) {
 	// hp ::= [-1, friend1...6, enemy1...6]
 	// hc ::= [-1, combined1..6]
 	if (!battle) return;
@@ -2095,7 +2095,7 @@ function calc_damage(result, hp, battle, hc) {
 		repair_fdeck($fdeck_list[$battle_deck_id], $maxhps, hp);
 }
 
-function calc_kouku_damage(result, hp, kouku, hc) {
+function calc_kouku_damage(result, title, kouku, hp, hc) {
 	if (!kouku) return;
 	var mc = $maxhps_c;
 	if (kouku.api_stage1) {	// 制空戦.
@@ -2134,8 +2134,6 @@ function calc_kouku_damage(result, hp, kouku, hc) {
 			});
 		}
 	}
-	calc_damage(result, hp, kouku.api_stage3);				// 航空爆撃雷撃戦.
-	calc_damage(result, hp, kouku.api_stage3_combined, hc);	// 連合第二艦隊：航空爆撃雷撃戦.
 }
 
 function push_fdeck_status(ptn, fdeck, maxhps, nowhps, beginhps) {
@@ -2328,65 +2326,65 @@ function on_battle(json, battle_api_name) {
 		var t0 = d.api_flare_pos[0]; if (t0 != -1) result.detail.push({ty:'照明弾(夜戦)', at: nowhps_c ? -t0 : t0});
 		var t1 = d.api_flare_pos[1]; if (t1 != -1) result.detail.push({ty:'敵照明弾(夜戦)', at:t1+6});
 	}
-	calc_kouku_damage(result, nowhps, d.api_air_base_injection, nowhps_c); // 噴式強襲(基地航空隊).
-	calc_kouku_damage(result, nowhps, d.api_injection_kouku, nowhps_c); // 噴式強襲.
+	calc_kouku_damage(result, "噴式強襲(基地航空隊)", d.api_air_base_injection, nowhps, nowhps_c);
+	calc_kouku_damage(result, "噴式強襲", d.api_injection_kouku, nowhps, nowhps_c);
 	if (d.api_air_base_attack) {
 		d.api_air_base_attack.forEach(function(kouku) {
-			calc_kouku_damage(result, nowhps, kouku, nowhps_c);　// 2016.5 基地航空隊支援.
+			calc_kouku_damage(result, "基地航空隊支援", kouku, nowhps, nowhps_c);　// 2016.5
 		});
 	}
-	calc_kouku_damage(result, nowhps, d.api_kouku, nowhps_c); // 航空戦.
-	calc_kouku_damage(result, nowhps, d.api_kouku2, nowhps_c); // 航空戦第二波.
+	calc_kouku_damage(result, "航空戦",  d.api_kouku,  nowhps, nowhps_c);
+	calc_kouku_damage(result, "航空戦2", d.api_kouku2, nowhps, nowhps_c);
 	var ds = d.api_support_info;
 	if (ds) {
 		if (ds.api_support_airatack) ds.api_support_airattack = ds.api_support_airatack; // 綴り訂正.
-		if (d.api_support_flag == 1) calc_damage(result, nowhps, ds.api_support_airattack.api_stage3); // 1:航空支援.
-		if (d.api_support_flag == 2) calc_damage(result, nowhps, ds.api_support_hourai); // 2:支援射撃
-		if (d.api_support_flag == 3) calc_damage(result, nowhps, ds.api_support_hourai); // 3:支援長距離雷撃.
+		if (d.api_support_flag == 1) calc_damage(result, "航空支援", ds.api_support_airattack.api_stage3, nowhps);
+		if (d.api_support_flag == 2) calc_damage(result, "支援射撃", ds.api_support_hourai, nowhps);
+		if (d.api_support_flag == 3) calc_damage(result, "支援長距離雷撃", ds.api_support_hourai, nowhps);
 	}
-	calc_damage(result, nowhps, d.api_opening_taisen, nowhps_c);	// 対潜先制爆雷攻撃.　2016-06-30メンテ明けから追加.
-	calc_damage(result, nowhps, d.api_opening_atack, nowhps_c);	// 開幕雷撃.
-	calc_damage(result, nowhps, d.api_hougeki, nowhps_c);	// midnight
+	calc_damage(result, "先制爆雷", d.api_opening_taisen,  nowhps, nowhps_c);	// 対潜先制爆雷攻撃.　2016-06-30メンテ明けから追加.
+	calc_damage(result, "開幕雷撃", d.api_opening_atack,   nowhps, nowhps_c);	// 開幕雷撃.
+	calc_damage(result, "夜戦砲撃", d.api_hougeki,         nowhps, nowhps_c);	// midnightt
 	switch (nowhps_c ? $combined_flag : 0) {
 	default:// 不明.
 	case 0: // 通常艦隊.
 	if (nowhps_c) {	// 敵軍連合艦隊.
- 			calc_damage(result, nowhps, d.api_hougeki1, nowhps_c);	// 砲撃一巡目(友軍 vs 敵護衛艦隊).
- 			calc_damage(result, nowhps, d.api_raigeki,  nowhps_c);	// 雷撃戦(友軍からの攻撃対象は敵主力・護衛の双方).
- 			calc_damage(result, nowhps, d.api_hougeki2, nowhps_c);	// 砲撃二巡目(友軍 vs 敵主力艦隊).
- 			calc_damage(result, nowhps, d.api_hougeki3, nowhps_c);	// 砲撃三巡目(友軍からの攻撃対象は敵主力・護衛の双方).
+ 			calc_damage(result, "砲撃戦(護衛)", d.api_hougeki1, nowhps, nowhps_c);	// 砲撃一巡目(友軍 vs 敵護衛艦隊).
+ 			calc_damage(result, "雷撃戦(連合)", d.api_raigeki,  nowhps, nowhps_c);	// 雷撃戦(友軍からの攻撃対象は敵主力・護衛の双方).
+ 			calc_damage(result, "砲撃戦(主力)", d.api_hougeki2, nowhps, nowhps_c);	// 砲撃二巡目(友軍 vs 敵主力艦隊).
+ 			calc_damage(result, "砲撃戦(連合)", d.api_hougeki3, nowhps, nowhps_c);	// 砲撃三巡目(友軍からの攻撃対象は敵主力・護衛の双方).
  			break;
  		}
-		calc_damage(result, nowhps, d.api_hougeki1);	// 第一艦隊砲撃一巡目.
-		calc_damage(result, nowhps, d.api_hougeki2);	// 第一艦隊砲撃二巡目.
-		calc_damage(result, nowhps, d.api_raigeki);		// 第一艦隊雷撃戦.
+		calc_damage(result, "砲撃戦1", d.api_hougeki1, nowhps);	// 砲撃一巡目.
+		calc_damage(result, "砲撃戦2", d.api_hougeki2, nowhps);	// 砲撃二巡目.
+		calc_damage(result, "雷撃戦",  d.api_raigeki,  nowhps);	// 雷撃戦.
 		break;
 	case 1: // 連合艦隊(機動部隊).
 	case 3: // 連合艦隊(輸送護衛部隊).
 	if (nowhps_c.length > 7) {
- 			calc_damage(result, nowhps, d.api_hougeki1, nowhps_c);	// 第一艦隊砲撃(vs 敵主力).
- 			calc_damage(result, nowhps, d.api_hougeki2, nowhps_c);	// 第二艦隊砲撃(vs 敵護衛).
- 			calc_damage(result, nowhps, d.api_raigeki,  nowhps_c);	// 第二艦隊雷撃戦(vs 敵主力+敵護衛).
- 			calc_damage(result, nowhps, d.api_hougeki3, nowhps_c);	// 第一艦隊砲撃(vs 敵主力+敵護衛).
+ 			calc_damage(result, "第一砲撃戦(敵主力)", d.api_hougeki1, nowhps, nowhps_c);	// 第一艦隊砲撃(vs 敵主力).
+ 			calc_damage(result, "第二砲撃戦(敵護衛)", d.api_hougeki2, nowhps, nowhps_c);	// 第二艦隊砲撃(vs 敵護衛).
+ 			calc_damage(result, "第二雷撃戦(敵連合)", d.api_raigeki,  nowhps, nowhps_c);	// 第二艦隊雷撃戦(vs 敵主力+敵護衛).
+ 			calc_damage(result, "第一砲撃戦(敵連合)", d.api_hougeki3, nowhps, nowhps_c);	// 第一艦隊砲撃(vs 敵主力+敵護衛).
  			break;
  		}
-		calc_damage(result, nowhps, d.api_hougeki1, nowhps_c);	// 第二艦隊砲撃.
-		calc_damage(result, nowhps, d.api_raigeki, nowhps_c);	// 第二艦隊雷撃戦.
-		calc_damage(result, nowhps, d.api_hougeki2);	// 第一艦隊砲撃一巡目.
-		calc_damage(result, nowhps, d.api_hougeki3);	// 第一艦隊砲撃二巡目.
+ 		calc_damage(result, "第二砲撃戦",  d.api_hougeki1, nowhps, nowhps_c);	// 第二艦隊砲撃.
+ 		calc_damage(result, "第二雷撃戦",  d.api_raigeki,  nowhps, nowhps_c);	// 第二艦隊雷撃戦.
+ 		calc_damage(result, "第一砲撃戦1", d.api_hougeki2, nowhps);	// 第一艦隊砲撃一巡目.
+ 		calc_damage(result, "第一砲撃戦2", d.api_hougeki3, nowhps);	// 第一艦隊砲撃二巡目.
 		break;
 	case 2: // 連合艦隊(水上部隊).
 	if (nowhps_c.length > 7) {
- 			calc_damage(result, nowhps, d.api_hougeki1, nowhps_c);	// 第一艦隊砲撃(vs 敵主力).
- 			calc_damage(result, nowhps, d.api_hougeki2, nowhps_c);	// 第一艦隊砲撃(vs 敵主力+敵護衛).
- 			calc_damage(result, nowhps, d.api_hougeki3, nowhps_c);	// 第二艦隊砲撃(vs 敵護衛).
- 			calc_damage(result, nowhps, d.api_raigeki,  nowhps_c);	// 第二艦隊雷撃戦(vs 敵主力+敵護衛).
+ 			calc_damage(result, "第一砲撃戦(敵主力)", d.api_hougeki1, nowhps, nowhps_c);	// 第一艦隊砲撃(vs 敵主力).
+ 			calc_damage(result, "第一砲撃戦(敵連合)", d.api_hougeki2, nowhps, nowhps_c);	// 第一艦隊砲撃(vs 敵主力+敵護衛).
+ 			calc_damage(result, "第二砲撃戦(敵護衛)", d.api_hougeki3, nowhps, nowhps_c);	// 第二艦隊砲撃(vs 敵護衛).
+ 			calc_damage(result, "第二雷撃戦(敵連合)", d.api_raigeki,  nowhps, nowhps_c);	// 第二艦隊雷撃戦(vs 敵主力+敵護衛).
  			break;
  		}
-		calc_damage(result, nowhps, d.api_hougeki1);	// 第一艦隊砲撃一巡目.
-		calc_damage(result, nowhps, d.api_hougeki2);	// 第一艦隊砲撃二順目.
-		calc_damage(result, nowhps, d.api_hougeki3, nowhps_c);	// 第二艦隊砲撃.
-		calc_damage(result, nowhps, d.api_raigeki, nowhps_c);	// 第二艦隊雷撃戦.
+		calc_damage(result, "第一砲撃戦1", d.api_hougeki1, nowhps);	// 第一艦隊砲撃一巡目.
+ 		calc_damage(result, "第一砲撃戦2", d.api_hougeki2, nowhps);	// 第一艦隊砲撃二順目.
+ 		calc_damage(result, "第二砲撃戦",  d.api_hougeki3, nowhps, nowhps_c);	// 第二艦隊砲撃.
+ 		calc_damage(result, "第二雷撃戦",  d.api_raigeki,  nowhps, nowhps_c);	// 第二艦隊雷撃戦..
 		break;
 	}
 	if (!d.api_deck_id) d.api_deck_id = d.api_dock_id; // battleのデータは、綴りミスがあるので補正する.
@@ -2455,7 +2453,7 @@ function on_battle(json, battle_api_name) {
 		for (var i = 0; i < result.detail.length; ++i) {
 			var dt = result.detail[i];
 			rb = slotitem_names(dt.si);	ra = [dt.ty,ship_name_lv(dt.at),ship_name_lv(dt.target),'','',rb[1],''];
-			if (dt.damage && dt.target) ra[6]      =       damage_name(dt.hp, (dt.target < 0 ? maxhps_c[-dt.target] : maxhps[dt.target]));
+			if (dt.damage && dt.target) ra[6] = damage_name(dt.hp, (dt.target < 0 ? maxhps_c[-dt.target] : maxhps[dt.target]));
 			tc = tb[1];
 			if(dt.ek || dt.fk){	// 敵撃墜率、被撃墜率.
 				if(dt.ek) ra[3] = dt.ek;
