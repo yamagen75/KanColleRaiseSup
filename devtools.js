@@ -1948,6 +1948,7 @@ function calc_damage(result, title, battle, hp, hc) {
 	// hp ::= [-1, friend1...6, enemy1...6]
 	// hc ::= [-1, combined1..6]
 	if (!battle) return;
+	if (title) result.detail.push({ty: '【'+ title +'】'});
 	var mc = $maxhps_c;
 	if (battle.api_df_list && battle.api_damage) {
 		var df = battle.api_df_list;
@@ -2098,6 +2099,7 @@ function calc_damage(result, title, battle, hp, hc) {
 function calc_kouku_damage(result, title, kouku, hp, hc) {
 	if (!kouku) return;
 	var mc = $maxhps_c;
+	if(title) result.detail.push({ty: '【'+ title +'】'});
 	if (kouku.api_stage1) {	// 制空戦.
 		var st = kouku.api_stage1;
 		result.seiku = st.api_disp_seiku ? st.api_disp_seiku : 5; // 5: 噴式強襲.
@@ -2134,6 +2136,8 @@ function calc_kouku_damage(result, title, kouku, hp, hc) {
 			});
 		}
 	}
+	calc_damage(result, null, kouku.api_stage3, hp);				// 航空爆撃雷撃戦.
+	calc_damage(result, null, kouku.api_stage3_combined, hp, hc);	// 連合第二艦隊：航空爆撃雷撃戦.
 }
 
 function push_fdeck_status(ptn, fdeck, maxhps, nowhps, beginhps) {
