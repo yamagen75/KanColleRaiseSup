@@ -447,6 +447,11 @@ function weekly_name() {
 		+' 】';
 }
 
+function to_string(id,nullstr) {	///< id == null に対して代理文字列を返し、例外落ちしない.
+	if (id == null) return nullstr ? nullstr : '';
+	return id.toString();
+}
+
 function diff_name(now, prev) {		// now:1, prev:2 -> "(-1)"
 	var diff = now - prev;	// 演算項目のどちらかがundefinedなら減算結果はNaNとなる. 項目がnullならば0として減算する.
 	if (prev == null) return '';	// nullかundefinedなら増減なしと見做して空文字列を返す.
