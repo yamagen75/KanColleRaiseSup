@@ -578,6 +578,18 @@ function search_name(id) {	///@param id	索敵結果 api_search[]
 	}
 }
 
+function event_kind_name(id) {	///@param id	非戦闘マスのメッセージ api_event_kind.
+	switch (id) {
+		case 0: return '気のせいだった';
+		case 1: return '敵影を見ず';
+		case 2: return '能動分岐';
+		case 3: return '穏やかな海です';
+		case 4: return '穏やかな海峡です';
+		case 5: return '警戒が必要です';
+		default: return '??'+to_string(id);
+	}
+}
+
 function mission_clear_name(cr) {	///@param c	遠征クリア api_clear_result
 	switch (cr) {
 		case 1: return '成功';
@@ -1765,13 +1777,7 @@ function on_next_cell(json) {
 	}
 	else if (d.api_event_id == 6) {	// 非戦闘マス.
 		var msg = area;
-		switch (d.api_event_kind) {
-		case 0: msg += ':気のせいだった'; break;
-		case 1: msg += ':敵影を見ず'; break;
-		case 2: msg += ':能動分岐'; break;
-		case 3: msg += ':穏やかな海です'; break;
-		default: msg += ':??'; break;
-		}
+		msg += ':' + event_kind_name(d.api_event_kind);
 		$battle_log.push(msg);
 		dpnla.tmpviw(1,'c41',arow +'Skip '+ msg);
 	}
