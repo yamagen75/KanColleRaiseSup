@@ -2348,7 +2348,7 @@ function on_battle(json, battle_api_name) {
 	$maxhps = maxhps;
 	$maxhps_c = maxhps_c;
 	if (nowhps_c && maxhps_c[1] > 0) nowhps_c.has2nd = true; // 連合第二艦隊の有無を判定フラグに記憶する.
-	if (!d.api_deck_id) d.api_deck_id = d.api_dock_id; // battleのデータは、綴りミスがあるので補正する.
+	if (d.api_deck_id == null) d.api_deck_id = d.api_dock_id; // battleのデータは、綴りミスがあるので補正する.
 	if (d.api_escape_idx) {
 		d.api_escape_idx.forEach(function(idx) {
 			maxhps[idx] = -1;	// 護衛退避した艦を艦隊リストから抜く. idx=1..6
