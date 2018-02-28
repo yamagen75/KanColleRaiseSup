@@ -629,6 +629,31 @@ function slotitem_names(idlist) {
 	return rt;
 }
 
+function slotitem_hougeki_name(id) {
+	var item = $mst_slotitem[id];
+	if (!item) return 'item' + to_string(id);	// unknown slotitem.
+	var type = item.api_type[0];
+	switch (type) {
+	case 1: return '砲撃';
+	case 2: return '雷撃';
+	case 3: return '空爆';
+	case 5: return '対潜'; // 偵察機.
+	case 7: return '対潜';
+	default: return '??' + to_string(type);	// other type
+	}
+}
+
+function slotitem_hougeki_names(idlist) {
+	if (!idlist) return '';
+	var names = [];
+	for (var i in idlist) {
+		var id = idlist[i];
+		if (id > 0) names.push(slotitem_hougeki_name(id));
+		else if (id == -1) names.push('砲撃?'); // 対潜/空爆の場合あり. 装備ではなく相手艦種で決めている??
+	}
+	return names.join(', ');
+}
+
 function ship_name(id) {
 	var ship = $mst_ship[id];
 	if (ship) {
@@ -678,9 +703,9 @@ function damage_name(nowhp, maxhp, pt) {
 	return rt;
 }
 
-function battle_type_name(a) {
+function battle_type_name(a, si) {
 	switch (a) {
-	case 0: return '砲撃';
+	case 0: return slotitem_hougeki_names(si);
 	case 1: return 'レーザー';
 	case 2: return '連撃';
 	case 3: return '主副カットイン';
@@ -691,9 +716,9 @@ function battle_type_name(a) {
 	}
 }
 
-function battle_sp_name(a) {
+function battle_sp_name(a, si) {
 	switch (a) {
-	case 0: return '砲撃';
+	case 0: return slotitem_hougeki_names(si);
 	case 1: return '連撃';
 	case 2: return '主魚カットイン';
 	case 3: return '魚魚カットイン';
@@ -1991,8 +2016,8 @@ function calc_damage(result, title, battle, hp, hc, active_deck) {
 			var si = battle.api_si_list[i]; // 装備配列.
 			var cl = battle.api_cl_list[i]; // 命中配列.
 			var ty = null;	// 攻撃種別
-			if (battle.api_at_type) ty = battle_type_name(battle.api_at_type[i]);	// 昼戦攻撃種別.
-			if (battle.api_sp_list) ty = battle_sp_name(battle.api_sp_list[i]);		// 夜戦攻撃種別.
+			if (battle.api_at_type) ty = battle_type_name(battle.api_at_type[i], si);	// 昼戦攻撃種別.
+			if (battle.api_sp_list) ty = battle_sp_name(battle.api_sp_list[i]), si;		// 夜戦攻撃種別.
 			for (var j = 0; j < df[i].length; ++j) {
 				var target = df[i][j];
 				if (target == -1) continue;
@@ -2398,7 +2423,7 @@ function on_battle(json, battle_api_name) {
 		if (d.api_support_flag == 2) calc_damage(result, "支援射撃", ds.api_support_hourai, nowhps, nowhps_c);
 		if (d.api_support_flag == 3) calc_damage(result, "支援長距離雷撃", ds.api_support_hourai, nowhps, nowhps_c);
 	}
-	calc_damage(result, "先制爆雷", d.api_opening_taisen,  nowhps, nowhps_c);	// 対潜先制爆雷攻撃.　2016-06-30メンテ明けから追加.
+	calc_damage(result, "先制対潜", d.api_opening_taisen,  nowhps, nowhps_c);	// 対潜先制爆雷攻撃.　2016-06-30メンテ明けから追加.
 	calc_damage(result, "開幕雷撃", d.api_opening_atack,   nowhps, nowhps_c);	// 開幕雷撃.
 	calc_damage(result, "夜戦砲撃", d.api_hougeki,         nowhps, nowhps_c, d.api_active_deck);	// midnight
 	switch (nowhps_c ? $combined_flag : 0) {
