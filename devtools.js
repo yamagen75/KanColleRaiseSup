@@ -3017,9 +3017,9 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		};
 	}
 	else if (api_name == '/api_get_member/ship2') {
-		// 間宮、伊良湖使用.
+		// 間宮、伊良湖使用 または 月間任務 [給糧艦「伊良湖」の支援] クリア時.
 		func = function(json) { // 保有艦、艦隊一覧を更新してcond表示する.
-			update_ship_list(json.api_data);
+			delta_update_ship_list(json.api_data); // 間宮伊良湖では全艦、月間任務クリアで差分[1]のみ. 
 			update_fdeck_list(json.api_data_deck);
 			print_port();
 		};
