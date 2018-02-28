@@ -1962,28 +1962,20 @@ function on_battle_result(json) {
 function calc_damage(result, title, battle, hp, hc, active_deck) {
 	// hp ::= [-1, friend1...6, enemy1...6]
 	// hc ::= [-1, friend_combined1..6, enemy_combined1...6]
+	// active_deck ::= [friend, enemy] only for 12vs12 night battle
 	if (!battle) return;
+	if (!active_deck) {
+		active_deck = [1,1]; // 自軍第一艦隊, 敵軍主力艦隊.
+		if (hc && hc.has2nd)
+			active_deck[0] = 2; // 自軍第二艦隊.
+		if (hc && hc.length == 13)
+			active_deck[1] = 2; // 敵軍護衛艦隊.
+	}
 	if (title) result.detail.push({ty: '【'+ title +'】'});
 	if (battle.api_df_list && battle.api_damage) {
 		var df = battle.api_df_list;
 		var ae = battle.api_at_eflag;
 		for (var i = 1; i < df.length; ++i) {
-			var at = battle.api_at_list[i]; // 攻撃艦No. 自軍 1..6, 敵軍 7..12
-			if (hc) {
-				// 連合艦隊の番号補正.
-				if (ae == null) {
-					if (at <= 6 && hc.has2nd)
-						at = (active_deck && active_deck[0] == 1) ? at : -at; // 自軍第一艦隊 1..6 / 自軍第二艦隊 -1..6
-					else if (at > 6 && hc.length == 13)
-						at = (active_deck && active_deck[1] == 1) ? at : -at; // 敵軍通常艦隊 7..12 / 敵軍護衛艦隊 -7..12
-					else
-						; // 自軍第一艦隊 1..6, 敵軍主力艦隊 7..12
-				}
-				else if (ae[i] == 0)
-					at = at <= 6 ? at : 6-at;	// 自軍第一艦隊 1..6, 自軍第二艦隊 -1..-6
-				else // ae[i] == 1
-					at = at <= 6 ? 6+at : -at;	// 敵軍主力艦隊 7..12, 敵軍護衛艦隊 -7..-12
-			}
 			var si = battle.api_si_list[i]; // 装備配列.
 			var cl = battle.api_cl_list[i]; // 命中配列.
 			var ty = null;	// 攻撃種別
@@ -1992,20 +1984,32 @@ function calc_damage(result, title, battle, hp, hc, active_deck) {
 			for (var j = 0; j < df[i].length; ++j) {
 				var target = df[i][j];
 				if (target == -1) continue;
+				var at = battle.api_at_list[i];
 				if (hc) {
 					// 連合艦隊の番号補正.
 					if (ae == null) {
-					if (target <= 6 && hc.has2nd)
-						target = (active_deck && active_deck[0] == 1) ? target : -target; // 自軍第一艦隊 1..6 / 自軍第二艦隊 -1..6
-					else if (target > 6 && hc.length == 13)
-						target = (active_deck && active_deck[1] == 1) ? target : -target; // 敵軍通常艦隊 7..12 / 敵軍護衛艦隊 -7..12
-					else
-						; // 自軍第一艦隊 1..6, 敵軍主力艦隊 7..12
-				}	
-					else if (ae[i] == 1)
+						if (at <= 6 && active_deck[0] == 2)
+							at = -at; // 自軍第二艦隊 -1..-6
+						else if (at > 6 && active_deck[1] == 2)
+							at = -at; // 敵軍護衛艦隊 -7..-12
+						else
+							; // 自軍第一艦隊 1..6, 敵軍主力艦隊 7..12
+
+						if (target <= 6 && active_deck[0] == 2)
+							target = -target; // 自軍第二艦隊 -1..-6
+						else if (target > 6 && active_deck[1] == 2)
+							target = -target; // 敵軍護衛艦隊 -7..-12
+						else
+							; // 自軍第一艦隊 1..6, 敵軍主力艦隊 7..12
+					}
+					else if (ae[i] == 1) {
+						at = at <= 6 ? 6+at : -at;	// 敵軍主力艦隊 7..12, 敵軍護衛艦隊 -7..-12
 						target = target <= 6 ? target : 6-target;	// 自軍第一艦隊 1..6, 自軍第二艦隊 -1..-6
-					else // ae[i] == 0
+					}
+					else { // ae[i] == 0
+						at = at <= 6 ? at : 6-at;	// 自軍第一艦隊 1..6, 自軍第二艦隊 -1..-6
 						target = target <= 6 ? 6+target : -target;	// 敵軍主力艦隊 7..12, 敵軍護衛艦隊 -7..-12
+					}
 				}
 				var damage = battle.api_damage[i][j];
 				// 砲撃戦:敵味方ダメージ集計.
