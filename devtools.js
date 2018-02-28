@@ -541,6 +541,7 @@ function formation_name(id) {
 		case 3: return '輪形';
 		case 4: return '梯形';
 		case 5: return '単横';
+	    case 6: return '警戒';
 		case 11: return '連合対潜警戒';
 		case 12: return '連合前方警戒';
 		case 13: return '連合輪形陣';
