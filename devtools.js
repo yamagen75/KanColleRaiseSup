@@ -2039,12 +2039,12 @@ function on_battle_result(json) {
 		var e_leader_lost = (d.api_destsf != null) ? d.api_destsf : $e_leader_lost;
 		if (d.api_ship_id) {
 			var total = count_unless(d.api_ship_id, -1);
-			msg += '(' + d.api_dests + '/' + total + ')';
+			msg += '(' + e_lost_count + '/' + total + ')';
 			if (rank == 'S' && $f_damage == 0) rank = '完S';
 		}
 		msg += '：'+ rank;
 		$guess_info_str += ', f_lost:' + count_if(lost, 1); // 自轟沈数.
-		$guess_info_str += ', e_lost:' + (d.api_destsf ? 'x' : '') + d.api_dests; // 敵撃沈数.
+		$guess_info_str += ', e_lost:' + (e_leader_lost ? 'x' : '') + e_lost_count; // 敵撃沈数.
 		$guess_info_str += ', rank:' + rank;
 		if (rank != $guess_win_rank) {
 			$guess_info_str += '/' + $guess_win_rank + ' MISS!!';
