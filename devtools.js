@@ -712,6 +712,7 @@ function battle_type_name(a, si) {
 	case 4: return '主電カットイン';
 	case 5: return '主徹カットイン';
 	case 6: return '主主カットイン';
+	case 7: return '戦爆連合カットイン';
 	default: return a; // 不明.
 	}
 }
