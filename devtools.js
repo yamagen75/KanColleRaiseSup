@@ -19,7 +19,7 @@ var $fdeck_list = {};
 var $ship_fdeck = {};
 var $escape_info = null;
 var $ship_escape = {};	// 護衛退避したshipidのマップ.
-var $mapinfo_rank = {};	// 海域難易度 undefined:なし, 1:丙, 2:乙, 3:甲.
+var $mapinfo_rank = {};	// 海域難易度 undefined:なし, 1:丁, 2:丙, 3:乙, 4:甲.
 var $next_mapinfo = null;
 var $next_enemy = null;
 var $is_boss = false;
@@ -1983,9 +1983,10 @@ function on_battle_result(json) {
 		if ($next_mapinfo) {
 			var map_rank = $mapinfo_rank[$next_mapinfo.api_id];
 			switch (map_rank) {	// 難度選択海域ならば、艦隊名に難度表記を付加する.
-			case 1: e.api_deck_name += '@丙'; break;
-			case 2: e.api_deck_name += '@乙'; break;
-			case 3: e.api_deck_name += '@甲'; break;
+			case 1: e.api_deck_name += '@丁'; break;
+			case 2: e.api_deck_name += '@丙'; break;
+			case 3: e.api_deck_name += '@乙'; break;
+			case 4: e.api_deck_name += '@甲'; break;
 			}
 		}
 		var rank = d.api_win_rank;
@@ -3114,7 +3115,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 	else if (api_name == '/api_req_map/select_eventmap_rank') {
 		// 海域難易度の初回選択／変更.
 		var params = decode_postdata_params(request.request.postData.params);
-		$mapinfo_rank[params.api_maparea_id * 10 + params.api_map_no] = params.api_rank;	// 1:丙, 2:乙, 3:甲.
+		$mapinfo_rank[params.api_maparea_id * 10 + params.api_map_no] = params.api_rank;	// 1:丁, 2:丙, 3:乙, 4:甲.
 	}
 	else if (api_name == '/api_req_map/start') {
 		// 海域初戦陣形選択.
