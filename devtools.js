@@ -1781,6 +1781,12 @@ function on_next_cell(json) {
 		$battle_log.push(msg);
 		dpnla.tmpviw(1,'c41',arow +'Skip '+ msg);
 	}
+	else if (d.api_event_id == 9) {	// 揚陸地点マス.
+		var msg = area;
+		msg += ':揚陸地点';
+		$battle_log.push(msg);
+		print_next('next event', msg);
+	}
 	else {	// 戦闘マス.
 		var i = 0;	var ky = 't42';		var ha = '';	var rb = ['m'];		var tb = dpnla.tmpget('tp4_3');
 		var db = $enemy_db[$next_enemy = area];
