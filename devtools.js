@@ -213,6 +213,19 @@ Ship.prototype.slot_names = function() {
 	return a;
 };
 
+Ship.prototype.slot_seiku = function() {	///< 制空値.
+	var slot = this.slot;
+	var onslot = this.onslot;
+	var a = 0;
+	for (var i = 0; i < slot.length; ++i) {
+		var value = $slotitem_list[slot[i]];
+		if (value) {
+			a += slotitem_seiku(value.item_id, value.level, value.alv, onslot[i]);
+		}
+	}
+	return a;
+};
+
 //------------------------------------------------------------------------
 // データ保存と更新.
 //
@@ -615,6 +628,67 @@ function slotitem_name(id, lv, alv, p_alv, n, max) {
 	return name;
 }
 
+function slotitem_seiku(id, lv, alv, n) {
+	// https://gist.github.com/YSRKEN/4cdecc6e8a1c2c75b13b08126c94f4cf の制空値計算式を採用する.
+	// http://kancollecalc.web.fc2.com/air_supremacy.html の計算結果に合うように計算式を修正する.
+	// seiku ::= floor((P + Ga * lv + 1.5 * In) * sqrt(n) + sqrt(v/10) + Vc)
+	// lv ::= 改修レベル:0-10
+	// alv::= 熟練度:0-7
+	// n  ::= 搭載機数.
+	// P  ::= 装備対空値. api_tyku
+	// In ::= 装備迎撃値. 局地戦闘機:api_houk, その他:0
+	// Ga ::= 改修レベル係数. 艦上戦闘機&水上戦闘機:0.2, 艦上爆撃機:0.25, その他:0
+	// v  ::= 内部熟練度:0-120
+	// Vc ::= 熟練度ボーナス. 艦上戦闘機&水上戦闘機:0-22, 水上爆撃機:0-6, その他:0
+	var item = $mst_slotitem[id];
+	if (!is_airplane(item)) return 0;
+	var seiku = 0;
+	var In = 0;
+	var Ga = 0;
+	var Vc = null;
+	switch (item.api_type[2]) {
+	case 48:// 局地戦闘機.
+		In = item.api_houk;
+		break;
+	case 6:	// 艦上戦闘機.
+	case 45:// 水上戦闘機.
+		Ga = 0.2;
+		Vc = [0, 0, 2, 5, 6, 14, 14, 22];
+		break;
+	case 7:	// 艦上爆撃機.
+		Ga = 0.25;
+		break;
+	case 11:// 水上爆撃機.
+		Vc = [0, 0, 1, 1, 1, 3, 3, 6];
+		break;
+	case 9:	// 艦上偵察機.
+	case 10:// 水上偵察機.
+	case 25:// オートジャイロ.
+	case 26:// 対潜哨戒機.
+	case 41:// 大型飛行艇.
+		return 0; // 制空戦に参加しない機種.
+	case 8:	// 艦上攻撃機.
+	case 47:// 陸上攻撃機.
+	case 56:// 噴式戦闘機.
+	case 57:// 噴式戦闘爆撃機.
+	case 58:// 噴式攻撃機.
+	case 59:// 噴式偵察機.
+	case 94:// 艦上偵察機（II）.
+		break;
+	}
+	if (n > 0) {
+		var P = item.api_tyku;
+		seiku += (P + Ga * lv + 1.5 * In) * Math.sqrt(n);
+	}
+	if (alv > 0) {
+		var v = [0, 10, 25, 40, 55, 70, 85, 100][alv];	// 内部熟練度:下端.
+	//	var v = [9, 24, 39, 54, 69, 85, 99, 120][alv];	// 内部熟練度:上端.
+		seiku += Math.sqrt(v / 10.0);
+		if (Vc) seiku += Vc[alv];	// Vc: 艦上戦闘機、水上戦闘機.
+	}
+	return Math.floor(seiku);
+}
+
 function slotitem_names(idlist) {
 	var rt = [0,''];
 	if (!idlist) return rt;
@@ -864,7 +938,8 @@ function is_airplane(item) {
 function push_fleet_status(tp, deck) {
 	var lv_sum = 0;
 	var fleet_ships = 0;
-	var drumcan = {ships:0, sum:0, msg:''};
+	var drumcan = {ships:0, sum:0, msg:'', brief:''};
+	var slot_seiku = {sum:0, msg:'', brief:''};
 	var j = 0;	var ra = new Array();		var rt = ['','','',0];	var rb = new Array();		var tb = '';
 	for(j = 0;j < 20;j++){
 		ra[j] = '';
@@ -901,11 +976,18 @@ function push_fleet_status(tp, deck) {
 			drumcan.ships++;
 			drumcan.sum += d;
 		}
+		slot_seiku.sum += ship.slot_seiku();
+	}
+	if (slot_seiku.sum) {
+		slot_seiku.msg = '艦隊制空値: ' + slot_seiku.sum + ' ';
+		slot_seiku.brief = ' <i class="icon-fighter-jet"></i>' + slot_seiku.sum;
 	}
 	if (drumcan.sum) {
 		drumcan.msg = 'ドラム缶x' + drumcan.sum + '個 (' + drumcan.ships + '隻) ';
+		drumcan.brief = ' <i class="icon-th-list"></i>' + drumcan.sum + '/<i class="icon-user"></i>' + drumcan.ships;
 	}
-	rt[2] = drumcan.msg +'合計 Lv'+ lv_sum +' ('+ fleet_ships +'隻)';
+	rt[2] = slot_seiku.msg + drumcan.msg +'合計 Lv'+ lv_sum +' ('+ fleet_ships +'隻)';
+	rt[4] = slot_seiku.brief + drumcan.brief;
 	return rt;
 }
 
@@ -1711,8 +1793,11 @@ function push_all_fleets(req) {
 				ra[3] = '母港待機中';
 		}
 		ra[2] += ta[2] + tp[2][3];
-		ht[0] += dpnla.tmprep(2,ra,tp[0][0]) + ta[0] + tp[0][2];
 		ht[f_id] = dpnla.tmprep(2,ra,tp[1][0]) + ta[1] + dpnla.tmprep(0,ra[3],tp[1][3]);
+		if (ta[4]) {
+			ra[0] += '<span class="ts21">' + ta[4] + '</span>';
+		}
+		ht[0] += dpnla.tmprep(2,ra,tp[0][0]) + ta[0] + tp[0][2];
 	}
 	for(i = 0;i < 5;i++){
 		j = i + 1;	ky = 't21_'+ j;		dpnla.tmpviw(0,ky,ht[i]);
