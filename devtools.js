@@ -2829,6 +2829,13 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			print_port();
 		};
 	}
+	else if (api_name == '/api_req_hensei/combined') {
+		// 連合艦隊編成・解除.
+		func = function(json) {
+			$combined_flag = decode_postdata_params(request.request.postData.params).api_combined_type;	// 0:解除, 1:機動部隊, 2:水上部隊, 3:輸送護衛部隊.
+			print_port();
+		};
+	}
 	else if (api_name == '/api_req_hensei/change') {
 		// 艦隊編成.
 		var params = decode_postdata_params(request.request.postData.params);
