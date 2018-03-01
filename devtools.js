@@ -980,7 +980,14 @@ function push_fleet_status(tp, deck) {
 		rb = ship.onslot_name();	ra[9] = rb[0];	ra[12] = rb[1];
 		rb = ship.slot_names();		ra[13] = rb[0];		ra[14] = rb[1];		ra[15] = rb[2];		ra[16] = rb[3];
 		ra[18] = diff_name(ship.c_cond, ship.p_cond);		ra[19] = rb[5];		tb = tp[1][1];
-		if(rb[5] != '') tb = tp[1][2];
+		if ((rb[4] != '') ^ (rb[5] != '')) {
+			ra[19] = (rb[4] != '') ? rb[4] : rb[5];
+			tb = tp[1][2];
+		}
+		if ((rb[4] != '') & (rb[5] != '')) {
+			ra[21] = rb[2];		ra[15] = rb[3];		ra[16] = rb[4];		ra[19] = rb[5];
+			tb = tp[1][3];
+		}
 		rt[0] += dpnla.tmprep(2,ra,tp[0][1]);		rt[1] += dpnla.tmprep(2,ra,tb);
 		var d = slotitem_count(ship.slot, 75);	// ドラム缶.
 		if (d) {
@@ -1804,7 +1811,7 @@ function push_all_fleets(req) {
 				ra[3] = '母港待機中';
 		}
 		ra[2] += ta[2] + tp[2][3];
-		ht[f_id] = dpnla.tmprep(2,ra,tp[1][0]) + ta[1] + dpnla.tmprep(0,ra[3],tp[1][3]);
+		ht[f_id] = dpnla.tmprep(2,ra,tp[1][0]) + ta[1] + dpnla.tmprep(0,ra[3],tp[1][4]);
 		if (ta[4]) {
 			ra[0] += '<span class="ts21">' + ta[4] + '</span>';
 		}
