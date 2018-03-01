@@ -28,6 +28,12 @@ a [class*=" icon-"] {
   display: inline;
 }
 
+.icon-user:before {
+  content: "\f007";
+}
+.icon-th-list:before {
+  content: "\f00b";
+}
 .icon-lock:before {
   content: "\f023";
 }
@@ -39,6 +45,9 @@ a [class*=" icon-"] {
 }
 .icon-suitcase:before {
   content: "\f0f2";
+}
+.icon-fighter-jet:before {
+  content: "\f0fb";
 }
 .icon-arrow-left:before {
   content: "\f060";
