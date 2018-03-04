@@ -1992,7 +1992,7 @@ function ship_name_lv(idx, ae, ff) {
 	else {
 		if (ff) { // 友軍艦隊.
 			var i = idx;	// 0..5
-			var s = '(友軍艦隊' + (i+1) + ')';
+			var s = '<span class="label label-info ts10">'+ (i+1) +'</span> ';
 			var f = $battle_api_data.api_friendly_info;
 			if (f.api_ship_id) s += ship_name(f.api_ship_id[i]);
 			if (f.api_ship_lv) s +=    ' Lv' + f.api_ship_lv[i];
