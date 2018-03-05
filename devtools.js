@@ -57,6 +57,7 @@ var $last_mission = {};
 var $f_maxhps = null;
 var $f_beginhps = null;
 var $e_beginhps = null;
+var $e_prevhps = null;
 var $f_damage = 0;
 var $e_lost_count = 0;
 var $e_leader_lost = false;
@@ -609,6 +610,19 @@ function event_kind_name(id) {	///@param id	非戦闘マスのメッセージ ap
 		case 10: return '1YB第三部隊、西村艦隊は堂々と進撃中。遊撃部隊主力栗田艦隊を援護せよ！進め！';			// 2018冬イベント E-2:D
 		case 11: return '1YB第三部隊西村艦隊はこれよりスリガオ海峡方面へ突入。主力栗田艦隊を援護する！進め！';	// 2018冬イベント E-2:O
 		case 12: return '艦隊はシブヤン海に突入する。対空見張り、厳とせよ！';									// 2018冬イベント E-2:P
+		case 13: return '前線航空基地への航空資材輸送作戦は失敗せり。';											// 2018冬イベント.
+		case 14: return '1YB第一第二部隊栗田艦隊はシブヤン海を進撃中。敵艦載機空襲が予測される。対空警戒を厳とせよ！';		// 2018冬イベント.
+		case 15: return '1YB第一第二部隊栗田艦隊はサマール沖を進撃中。敵機動部隊を発見！全艦突撃せよ！';		// 2018冬イベント.
+		case 16: return '1YB第三部隊西村艦隊はスリガオ海峡に突入せり。栗田艦隊を援護する！天祐を確認し、全艦突撃せよ！';	// 2018冬イベント. typo 確信?
+		case 17: return 'KdMB機動部隊本隊小沢艦隊は敵機動部隊主力を北方に誘引、好機を捉えこれを捕捉撃破せよ！';	// 2018冬イベント E-3:L
+		case 18: return '艦隊左舷にパナイ島を見ゆ……。対空警戒を厳とせよ！';										// 2018冬イベント.
+		case 19: return '艦隊右舷にミンダナオ島を認む。入港準備…－－始めッ！';									// 2018冬イベント.
+		case 20: return '2YB遊撃第二部隊志摩艦隊、出撃！敵残存艦隊を索敵捕捉、掃射せよ！';						// 2018冬イベント.
+		case 21: return '2YB遊撃第二部隊、敵哨戒機を発見す！敵機空襲が予測される。対空警戒、厳とせよ！';		// 2018冬イベント.
+		case 22: return '2YB遊撃第二部隊、戦場海域に突入す！対空、そして対潜警戒も厳とせよ！';					// 2018冬イベント.
+		case 23: return '1YB遊撃第一部隊より高速艦艇を抽出。敵残存艦隊の捜索撃滅に出撃す！';					// 2018冬イベント.
+		case 24: return '連合艦隊機動部隊本隊、出撃！敵機動部隊を撃滅する！続け！';								// 2018冬イベント.
+		case 25: return '艦隊、増速！これより連合艦隊は艦隊決戦を行う！我に続け！';								// 2018冬イベント.
 		default: return '??'+to_string(id);
 	}
 }
@@ -1904,7 +1918,7 @@ function on_next_cell(json) {
 		$battle_log.push(msg);
 		dpnla.tmpviw(1,'c41',arow +'Loss '+ msg);
 	}
-	else if (d.api_event_id == 6) {	// 非戦闘マス.
+	else if (d.api_event_id == 1 || d.api_event_id == 6) {	// 非戦闘マス.
 		var msg = area;
 		msg += ':' + event_kind_name(d.api_event_kind);
 		$battle_log.push(msg);
@@ -1970,10 +1984,13 @@ function on_next_cell(json) {
 
 /// 護衛退避艦リストに艦IDを追加する. idx = 1..6, 7..12
 function add_ship_escape(idx) {
-	if (idx >= 7)
-		$ship_escape[$fdeck_list[2].api_ship[idx-7]] = 1; // 第ニ艦隊から退避.
-	else if (idx >= 1)
-		$ship_escape[$fdeck_list[1].api_ship[idx-1]] = 1; // 第一艦隊から退避.
+	if ($combined_flag) {
+		if (idx >= 7)
+			$ship_escape[$fdeck_list[2].api_ship[idx-7]] = 1; // 第ニ艦隊から退避.
+		else if (idx >= 1)
+			$ship_escape[$fdeck_list[1].api_ship[idx-1]] = 1; // 第一艦隊から退避.
+	} else {
+		$ship_escape[$fdeck_list[$battle_deck_id].api_ship[idx-1]] = 1; // 単艦退避
 }
 
 /// 艦隊番号とLv付き艦名を生成する. idx = 0..5:第一艦隊, 6..11:第二艦隊. ae = 0/null/false:自軍, 1/true:敵軍. ff = 友軍艦隊情報.
@@ -1992,7 +2009,7 @@ function ship_name_lv(idx, ae, ff) {
 	else {
 		if (ff) { // 友軍艦隊.
 			var i = idx;	// 0..5
-			var s = '(友軍艦隊' + (i+1) + ')';
+			var s = '<span class="label label-info ts10">'+ (i+1) +'</span> ';
 			var f = $battle_api_data.api_friendly_info;
 			if (f.api_ship_id) s += ship_name(f.api_ship_id[i]);
 			if (f.api_ship_lv) s +=    ' Lv' + f.api_ship_lv[i];
@@ -2132,7 +2149,7 @@ function on_battle_result(json) {
 		var p = d.api_landing_hp;
 		var s = p.api_now_hp - p.api_sub_value;
 		s = s > 0 ? fraction_percent_name(s, p.api_max_hp) : '達成';
-		msg += '<br />TP:' + p.api_sub_value + '<i class="icon-arrow-right mr0"></i>' + s;
+		msg += '<br />TP：' + p.api_sub_value + ' <i class="icon-arrow-right mr0"></i>' + s;
 	}
 	if (drop_ship_name) {
 		msg += '<br />'+ tp[3] +'drop ship'+ tp[4] + drop_ship_name;
@@ -2479,6 +2496,14 @@ function on_battle(json, battle_api_name) {
 			f_maxhps[idx-1+fidx2nd] = -1;	// 護衛退避した艦を第二艦隊リストから抜く. idx=1..6
 		});
 	}
+	// 友軍艦隊(NPC). @since 2018.Feb WinterEvent
+	var ff = d.api_friendly_battle;
+	var fi = d.api_friendly_info;
+	if (ff && fi) {
+		///@todo ff.api_flare_pos;
+		var t0 = ff.api_flare_pos[0]; if (t0 != -1) result.detail.push({ty:'友軍照明弾(夜戦)',   at: t0, ae: 0, ff: 1});
+		calc_damage(result, "友軍艦隊", ff.api_hougeki, fi.api_nowhps.concat(), $e_prevhps || e_nowhps, null, 1);
+	}
 	if (d.api_touch_plane) {
 		// 触接(夜戦).
 		result.touch = d.api_touch_plane;
@@ -2489,13 +2514,6 @@ function on_battle(json, battle_api_name) {
 		// 照明弾発射(夜戦).
 		var t0 = d.api_flare_pos[0]; if (t0 != -1) result.detail.push({ty:'照明弾(夜戦)',   at: t0, ae: 0});
 		var t1 = d.api_flare_pos[1]; if (t1 != -1) result.detail.push({ty:'敵照明弾(夜戦)', at: t1, ae: 1});
-	}
-	// 友軍艦隊(NPC). @since 2018.Feb WinterEvent
-	var ff = d.api_friendly_battle;
-	var fi = d.api_friendly_info;
-	if (ff && fi) {
-		///@todo ff.api_flare_pos;
-		calc_damage(result, "友軍艦隊", ff.api_hougeki, fi.api_nowhps.concat(), e_nowhps, null, 1);
 	}
 	// calc_damage() の呼び出し順序は、下記資料の戦闘の流れに従っている.
 	// @see http://wikiwiki.jp/kancolle/?%C0%EF%C6%AE%A4%CB%A4%C4%A4%A4%A
@@ -2631,6 +2649,7 @@ function on_battle(json, battle_api_name) {
     }
 	if (!$f_beginhps) $f_beginhps = f_beginhps;
 	if (!$e_beginhps) $e_beginhps = e_beginhps;
+	if (!$e_prevhps)  $e_prevhps  = e_nowhps;
 	$guess_win_rank = guess_win_rank(f_nowhps, f_maxhps, $f_beginhps, e_nowhps, e_maxhps, $e_beginhps, battle_api_name);
 	req.push('戦闘被害：'+ $guess_info_str);
 	req.push('勝敗推定：'+ $guess_win_rank);
@@ -3068,6 +3087,16 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			}
 		};
 	}
+	else if (api_name == '/api_req_kaisou/slot_exchange_index') {
+		func = function(json) {
+			var sid = decode_postdata_params(request.request.postData.params).api_id;
+			var ship = $ship_list[sid];
+			if (ship) {
+				ship.slot = json.api_data.api_slot;
+				print_port();
+			}
+		};
+	}
 	else if (api_name == '/api_get_member/mission') {
 		// 遠征メニュー.
 		func = function(json) { // 遠征任務の受諾をチェックする.
@@ -3169,6 +3198,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		$battle_count++;
 	    $f_beginhps = null;
 	    $e_beginhps = null;
+		$e_prevhps  = null;
 		func = on_battle;
 	}
 	else if (api_name == '/api_req_battle_midnight/battle'
@@ -3184,6 +3214,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		$battle_count++;
 	    $f_beginhps = null;
 	    $e_beginhps = null;
+		$e_prevhps  = null;
 		func = on_battle;
 	}
 	else if (api_name == '/api_req_sortie/night_to_day'
@@ -3192,6 +3223,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		$battle_count++;
 		$f_beginhps = null;
 		$e_beginhps = null;
+		$e_prevhps  = null;
 		func = on_battle;
 	}
 	else if (api_name == '/api_req_practice/battle') {
@@ -3199,6 +3231,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		$battle_count = 1;
 	    $f_beginhps = null;
 	    $e_beginhps = null;
+		$e_prevhps  = null;
 		$battle_log = [];		dpnla.tab14init('');
 		func = on_battle;
 	}
