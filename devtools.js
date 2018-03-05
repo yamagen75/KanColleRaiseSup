@@ -1984,10 +1984,13 @@ function on_next_cell(json) {
 
 /// 護衛退避艦リストに艦IDを追加する. idx = 1..6, 7..12
 function add_ship_escape(idx) {
-	if (idx >= 7)
-		$ship_escape[$fdeck_list[2].api_ship[idx-7]] = 1; // 第ニ艦隊から退避.
-	else if (idx >= 1)
-		$ship_escape[$fdeck_list[1].api_ship[idx-1]] = 1; // 第一艦隊から退避.
+	if ($combined_flag) {
+		if (idx >= 7)
+			$ship_escape[$fdeck_list[2].api_ship[idx-7]] = 1; // 第ニ艦隊から退避.
+		else if (idx >= 1)
+			$ship_escape[$fdeck_list[1].api_ship[idx-1]] = 1; // 第一艦隊から退避.
+	} else {
+		$ship_escape[$fdeck_list[$battle_deck_id].api_ship[idx-1]] = 1; // 単艦退避
 }
 
 /// 艦隊番号とLv付き艦名を生成する. idx = 0..5:第一艦隊, 6..11:第二艦隊. ae = 0/null/false:自軍, 1/true:敵軍. ff = 友軍艦隊情報.
