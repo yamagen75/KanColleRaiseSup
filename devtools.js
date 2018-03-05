@@ -1991,6 +1991,7 @@ function add_ship_escape(idx) {
 			$ship_escape[$fdeck_list[1].api_ship[idx-1]] = 1; // 第一艦隊から退避.
 	} else {
 		$ship_escape[$fdeck_list[$battle_deck_id].api_ship[idx-1]] = 1; // 単艦退避
+	}
 }
 
 /// 艦隊番号とLv付き艦名を生成する. idx = 0..5:第一艦隊, 6..11:第二艦隊. ae = 0/null/false:自軍, 1/true:敵軍. ff = 友軍艦隊情報.
@@ -3267,7 +3268,8 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		// 演習結果.
 		func = on_battle_result;
 	}
-	else if (api_name == '/api_req_combined_battle/goback_port') {
+	else if (api_name == '/api_req_combined_battle/goback_port'
+		|| api_name == '/api_req_sortie/goback_port') {
 		// 護衛退避.
 		on_goback_port();
 	}
