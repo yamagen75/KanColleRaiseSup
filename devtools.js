@@ -824,6 +824,8 @@ function battle_sp_name(a, si) {
 	case 4: return '主副カットイン';
 	case 5: return '主主カットイン';
 	case 6: return '空母夜襲カットイン';
+	case 7: return '主魚電カットイン';
+	case 8: return '魚見電カットイン';
 	default: return a; // 不明.
 	}
 }
