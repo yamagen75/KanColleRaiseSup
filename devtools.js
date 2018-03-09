@@ -2511,9 +2511,12 @@ function on_battle(json, battle_api_name) {
 	var ff = d.api_friendly_battle;
 	var fi = d.api_friendly_info;
 	if (ff && fi) {
-		///@todo ff.api_flare_pos;
+		if ($e_prevhps) {
+			e_nowhps = $e_prevhps.concat();	// e_nowhps には友軍艦隊攻撃後の敵ダメージが入っているので、昼戦終了時のダメージを初期値として使う.
+			e_beginhps = e_nowhps.concat();
+		}
 		var t0 = ff.api_flare_pos[0]; if (t0 != -1) result.detail.push({ty:'友軍照明弾(夜戦)',   at: t0, ae: 0, ff: 1});
-		calc_damage(result, "友軍艦隊", ff.api_hougeki, fi.api_nowhps.concat(), $e_prevhps || e_nowhps, null, 1);
+		calc_damage(result, "友軍艦隊", ff.api_hougeki, fi.api_nowhps.concat(), e_nowhps, null, 1);
 	}
 	if (d.api_touch_plane) {
 		// 触接(夜戦).
