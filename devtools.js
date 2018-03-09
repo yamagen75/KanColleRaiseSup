@@ -608,27 +608,8 @@ function event_kind_name(id) {	///@param id	非戦闘マスのメッセージ ap
 		case 3: return '穏やかな海です';
 		case 4: return '穏やかな海峡です';
 		case 5: return '警戒が必要です';
-	    case 6: return '静かな海です';
-		case 7: return '艦隊は対潜警戒進撃中。引き続き、対潜対空警戒を厳とせよ。';								// 2018冬イベント E-2:L
-		case 8: return '敵哨戒機らしき機影認む。空襲の恐れあり。対空警戒を厳とせよ！';							// 2018冬イベント E-2:J,Q
-		case 9: return '1YB第一第二部隊栗田艦隊はパラワン水道を進撃中。現海域に敵影なし。警戒を厳とせよ！';		// 2018秋イベント E-2:B
-		case 10: return '1YB第三部隊、西村艦隊は堂々と進撃中。遊撃部隊主力栗田艦隊を援護せよ！進め！';			// 2018冬イベント E-2:D
-		case 11: return '1YB第三部隊西村艦隊はこれよりスリガオ海峡方面へ突入。主力栗田艦隊を援護する！進め！';	// 2018冬イベント E-2:O
-		case 12: return '艦隊はシブヤン海に突入する。対空見張り、厳とせよ！';									// 2018冬イベント E-2:P
-		case 13: return '前線航空基地への航空資材輸送作戦は失敗せり。';											// 2018冬イベント.
-		case 14: return '1YB第一第二部隊栗田艦隊はシブヤン海を進撃中。敵艦載機空襲が予測される。対空警戒を厳とせよ！';		// 2018冬イベント.
-		case 15: return '1YB第一第二部隊栗田艦隊はサマール沖を進撃中。敵機動部隊を発見！全艦突撃せよ！';		// 2018冬イベント.
-		case 16: return '1YB第三部隊西村艦隊はスリガオ海峡に突入せり。栗田艦隊を援護する！天祐を確認し、全艦突撃せよ！';	// 2018冬イベント. typo 確信?
-		case 17: return 'KdMB機動部隊本隊小沢艦隊は敵機動部隊主力を北方に誘引、好機を捉えこれを捕捉撃破せよ！';	// 2018冬イベント E-3:L
-		case 18: return '艦隊左舷にパナイ島を見ゆ……。対空警戒を厳とせよ！';										// 2018冬イベント.
-		case 19: return '艦隊右舷にミンダナオ島を認む。入港準備…－－始めッ！';									// 2018冬イベント.
-		case 20: return '2YB遊撃第二部隊志摩艦隊、出撃！敵残存艦隊を索敵捕捉、掃射せよ！';						// 2018冬イベント.
-		case 21: return '2YB遊撃第二部隊、敵哨戒機を発見す！敵機空襲が予測される。対空警戒、厳とせよ！';		// 2018冬イベント.
-		case 22: return '2YB遊撃第二部隊、戦場海域に突入す！対空、そして対潜警戒も厳とせよ！';					// 2018冬イベント.
-		case 23: return '1YB遊撃第一部隊より高速艦艇を抽出。敵残存艦隊の捜索撃滅に出撃す！';					// 2018冬イベント.
-		case 24: return '連合艦隊機動部隊本隊、出撃！敵機動部隊を撃滅する！続け！';								// 2018冬イベント.
-		case 25: return '艦隊、増速！これより連合艦隊は艦隊決戦を行う！我に続け！';								// 2018冬イベント.
-		default: return '??'+to_string(id);
+		case 6: return '静かな海です';
+		default: return $event_kind_names[id] || '??'+to_string(id);
 	}
 }
 
@@ -829,6 +810,8 @@ function battle_sp_name(a, si) {
 	case 4: return '主副カットイン';
 	case 5: return '主主カットイン';
 	case 6: return '空母夜襲カットイン';
+	case 7: return '主魚電カットイン';
+	case 8: return '魚見電カットイン';
 	default: return a; // 不明.
 	}
 }
@@ -930,13 +913,23 @@ function slotitem_delete(slot) {
 
 function ship_delete(list, keep_slot) {
 	if (!list) return;
-	list.forEach(function(id) {
-		var ship = $ship_list[id];
+	for (let id of list) {
+		let ship = $ship_list[id];
 		if (ship) {
 			if (!keep_slot) slotitem_delete(ship.slot);
 			delete $ship_list[id];
 		}
-	});
+		let f_id = $ship_fdeck[id];
+		if (f_id) {
+			let shiplist = $fdeck_list[f_id].api_ship;
+			for (let i = 0; i < shiplist.length; ++i) {
+				if (shiplist[i] != id) continue;
+				shiplist.splice(i, 1);
+				shiplist.push(-1);
+			}
+			delete $ship_fdeck[id];
+		}
+	}
 }
 
 function is_airplane(item) {
@@ -2144,7 +2137,7 @@ function on_battle_result(json) {
 	if (lost) {
 		for (var i in lost) {
 			if (lost[i] == 1) {
-				var id = $fdeck_list[$battle_deck_id].api_ship[i-1];
+				var id = $fdeck_list[$battle_deck_id].api_ship[i-1]; ///@todo 連合第二艦隊LOSTに対応していない..
 				var ship = $ship_list[id];
 				msg += '<br />LOST：'+ ship.name_lv(1);
 				ship_delete([id]);
@@ -2506,9 +2499,12 @@ function on_battle(json, battle_api_name) {
 	var ff = d.api_friendly_battle;
 	var fi = d.api_friendly_info;
 	if (ff && fi) {
-		///@todo ff.api_flare_pos;
+		if ($e_prevhps) {
+			e_nowhps = $e_prevhps.concat();	// e_nowhps には友軍艦隊攻撃後の敵ダメージが入っているので、昼戦終了時のダメージを初期値として使う.
+			e_beginhps = e_nowhps.concat();
+		}
 		var t0 = ff.api_flare_pos[0]; if (t0 != -1) result.detail.push({ty:'友軍照明弾(夜戦)',   at: t0, ae: 0, ff: 1});
-		calc_damage(result, "友軍艦隊", ff.api_hougeki, fi.api_nowhps.concat(), $e_prevhps || e_nowhps, null, 1);
+		calc_damage(result, "友軍艦隊", ff.api_hougeki, fi.api_nowhps.concat(), e_nowhps, null, 1);
 	}
 	if (d.api_touch_plane) {
 		// 触接(夜戦).
@@ -2616,6 +2612,7 @@ function on_battle(json, battle_api_name) {
 		fmt = formation_name(d.api_formation[0])
 			+ '/' + match_name(d.api_formation[2])
 			+ '/敵' + formation_name(d.api_formation[1]);
+		if (d.api_friendly_info) fmt += '+友軍艦隊' + d.api_friendly_info.api_production_type;
 		if (d.api_support_flag) fmt += '+' + support_name(d.api_support_flag);
 		if (d.api_n_support_flag) fmt += '+' + support_name(d.api_n_support_flag);
 		if (d.api_air_base_attack) fmt += '+基地航空隊';
@@ -2650,6 +2647,7 @@ function on_battle(json, battle_api_name) {
 	if ($f_beginhps) {
 		req.push('緒戦被害：'+ $guess_info_str + '，推定：'+ $guess_win_rank);
 		$battle_info += '/追撃';
+		if (d.api_friendly_info) $battle_info += '+友軍艦隊' + d.api_friendly_info.api_production_type;
     } else {
         $battle_info = fmt;
     }
