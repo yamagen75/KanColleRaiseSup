@@ -925,13 +925,23 @@ function slotitem_delete(slot) {
 
 function ship_delete(list, keep_slot) {
 	if (!list) return;
-	list.forEach(function(id) {
-		var ship = $ship_list[id];
+	for (let id of list) {
+		let ship = $ship_list[id];
 		if (ship) {
 			if (!keep_slot) slotitem_delete(ship.slot);
 			delete $ship_list[id];
 		}
-	});
+		let f_id = $ship_fdeck[id];
+		if (f_id) {
+			let shiplist = $fdeck_list[f_id].api_ship;
+			for (let i = 0; i < shiplist.length; ++i) {
+				if (shiplist[i] != id) continue;
+				shiplist.splice(i, 1);
+				shiplist.push(-1);
+			}
+			delete $ship_fdeck[id];
+		}
+	}
 }
 
 function is_airplane(item) {
@@ -2139,7 +2149,7 @@ function on_battle_result(json) {
 	if (lost) {
 		for (var i in lost) {
 			if (lost[i] == 1) {
-				var id = $fdeck_list[$battle_deck_id].api_ship[i-1];
+				var id = $fdeck_list[$battle_deck_id].api_ship[i-1]; ///@todo 連合第二艦隊LOSTに対応していない..
 				var ship = $ship_list[id];
 				msg += '<br />LOST：'+ ship.name_lv(1);
 				ship_delete([id]);
