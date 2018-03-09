@@ -2631,6 +2631,7 @@ function on_battle(json, battle_api_name) {
 		fmt = formation_name(d.api_formation[0])
 			+ '/' + match_name(d.api_formation[2])
 			+ '/敵' + formation_name(d.api_formation[1]);
+		if (d.api_friendly_info) fmt += '+友軍艦隊' + d.api_friendly_info.api_production_type;
 		if (d.api_support_flag) fmt += '+' + support_name(d.api_support_flag);
 		if (d.api_n_support_flag) fmt += '+' + support_name(d.api_n_support_flag);
 		if (d.api_air_base_attack) fmt += '+基地航空隊';
@@ -2665,6 +2666,7 @@ function on_battle(json, battle_api_name) {
 	if ($f_beginhps) {
 		req.push('緒戦被害：'+ $guess_info_str + '，推定：'+ $guess_win_rank);
 		$battle_info += '/追撃';
+		if (d.api_friendly_info) $battle_info += '+友軍艦隊' + d.api_friendly_info.api_production_type;
     } else {
         $battle_info = fmt;
     }
