@@ -467,6 +467,11 @@ function to_string(id,nullstr) {	///< id == null に対して代理文字列を�
 	return id.toString();
 }
 
+function to_date(a) {	///< aが日付型ではなければ日付型に変換して返す.
+	if (a instanceof Date) return a;
+	return new Date(a);
+}
+
 function diff_name(now, prev) {		// now:1, prev:2 -> "(-1)"
 	var diff = now - prev;	// 演算項目のどちらかがundefinedなら減算結果はNaNとなる. 項目がnullならば0として減算する.
 	if (prev == null) return '';	// nullかundefinedなら増減なしと見做して空文字列を返す.
@@ -2740,7 +2745,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		return;
 	}
 	// 時刻を得る.
-	$svDateTime = $pcDateTime = request.startedDateTime;	// PC側の日時(POST).
+	$svDateTime = $pcDateTime = to_date(request.startedDateTime);	// PC側の日時(POST).
 	var h = request.response.headers;
 	if (h && h[0].name == 'Date') {
 		$svDateTime = new Date(h[0].value);		// サーバ側の日時(RESP).
