@@ -2453,27 +2453,27 @@ function guess_win_rank(f_nowhps, f_maxhps, f_beginhps, e_nowhps, e_maxhps, e_be
 	return 'E'; // 検証中!!! 上記以外、つまり敵旗艦生存かつ自艦隊旗艦以外轟沈ならば、E敗北.
 }
 
+function concat_hps(a, c) {
+	var r = a.concat();	// 元のJSONデータを破壊しないようにするため、連合艦隊以外でも複製を作る.
+	if (c) {
+		// 戦闘JSONデータの攻撃/防御の艦番号は、通常艦隊:0..5, 第三遊撃艦隊:0..6, 連合第一艦隊:0..5, 連合第二艦隊:6..11 である.
+		// 連合第一艦隊の編成が5隻以下の場合は、hps[6]が連合第二艦隊の旗艦のHPを保持するように間に埋草を入れる.
+		// guess_win_rank のダメージ集計時に埋草を除外するため maxhps の埋草は -1 でなければならない.
+		r.length = 6; r.fill(-1, a.length, 6);
+		r = r.concat(c);
+		r.has2nd = true;
+		r.idx2nd = 6;
+	}
+	return r;
+}
+
 function on_battle(json, battle_api_name) {
 	var d = $battle_api_data = json.api_data;
-	var fidx2nd = 0;
-	var eidx2nd = 0;
-	var combined = d.api_f_maxhps_combined;
-	var f_maxhps = d.api_f_maxhps.concat(combined ? combined : []); // 通常艦隊[0..5], 増強第三艦隊[0..6], 第一/第二連合艦隊[0..5,6..11]
-	var combined = d.api_f_nowhps_combined;
-	var f_nowhps = d.api_f_nowhps.concat(combined ? combined : []);
-	if (combined) {
-		f_nowhps.has2nd = true;
-		f_nowhps.idx2nd = fidx2nd = d.api_f_nowhps.length;
-	}
+	var f_maxhps = concat_hps(d.api_f_maxhps, d.api_f_maxhps_combined); // 通常艦隊[0..5], 増強第三艦隊[0..6], 第一/第二連合艦隊[0..5,6..11]
+	var f_nowhps = concat_hps(d.api_f_nowhps, d.api_f_nowhps_combined);
 	var f_beginhps = f_nowhps.concat();
-	var combined = d.api_e_maxhps_combined;
-	var e_maxhps = d.api_e_maxhps.concat(combined ? combined : []); // 敵通常艦隊[0..5], 敵主力/敵護衛連合艦隊[0..5,6..11]
-	var combined = d.api_e_nowhps_combined;
-	var e_nowhps = d.api_e_nowhps.concat(combined ? combined : []);
-	if (combined) {
-		e_nowhps.has2nd = true;
-		e_nowhps.idx2nd = eidx2nd = d.api_e_nowhps.length;
-	}
+	var e_maxhps = concat_hps(d.api_e_maxhps, d.api_e_maxhps_combined); // 敵通常艦隊[0..5], 敵主力/敵護衛連合艦隊[0..5,6..11]
+	var e_nowhps = concat_hps(d.api_e_nowhps, d.api_e_nowhps_combined);
 	var e_beginhps = e_nowhps.concat();
 	var has_air_base = false;
 	var result = {
@@ -2492,7 +2492,7 @@ function on_battle(json, battle_api_name) {
 	}
 	if (d.api_escape_idx_combined) {
 		d.api_escape_idx_combined.forEach(function(idx) {
-			f_maxhps[idx-1+fidx2nd] = -1;	// 護衛退避した艦を第二艦隊リストから抜く. idx=1..6
+			f_maxhps[idx-1+f_maxhps.idx2nd] = -1;	// 護衛退避した艦を第二艦隊リストから抜く. idx=1..6
 		});
 	}
 	// 友軍艦隊(NPC). @since 2018.Feb WinterEvent
