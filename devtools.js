@@ -2040,7 +2040,7 @@ function on_battle_result(json) {
 	var h = d.api_get_useitem;
 	var mvp   = d.api_mvp;
 	var mvp_c = d.api_mvp_combined;
-	var lost  = d.api_lost_flag;
+//	var lost  = d.api_lost_flag;
 	var tp = dpnla.tmpget('tp4_1');		var msg = tp[3] +'battle result'+ tp[4];
 	var drop_ship_name = g ? g.api_ship_type + '：'+ g.api_ship_name : null;
 	var drop_item_name = h ? $mst_useitem[h.api_useitem_id].api_name : null;
@@ -2066,7 +2066,7 @@ function on_battle_result(json) {
 			if (rank == 'S' && $f_damage == 0) rank = '完S';
 		}
 		msg += '：'+ rank;
-		$guess_info_str += ', f_lost:' + count_if(lost, 1); // 自轟沈数.
+//		$guess_info_str += ', f_lost:' + count_if(lost, 1); // 自轟沈数.
 		$guess_info_str += ', e_lost:' + (e_leader_lost ? 'x' : '') + e_lost_count; // 敵撃沈数.
 		$guess_info_str += ', rank:' + rank;
 		if (rank != $guess_win_rank) {
@@ -2133,16 +2133,6 @@ function on_battle_result(json) {
 		var id = $fdeck_list[2].api_ship[mvp_c-1];
 		var ship = $ship_list[id];
 		msg += '<br />MVP：'+ ship.name_lv(1) +' +'+ d.api_get_ship_exp_combined[mvp_c] +'exp';
-	}
-	if (lost) {
-		for (var i in lost) {
-			if (lost[i] == 1) {
-				var id = $fdeck_list[$battle_deck_id].api_ship[i-1]; ///@todo 連合第二艦隊LOSTに対応していない..
-				var ship = $ship_list[id];
-				msg += '<br />LOST：'+ ship.name_lv(1);
-				ship_delete([id]);
-			}
-		}
 	}
 	if (d.api_landing_hp) {
 		var p = d.api_landing_hp;
