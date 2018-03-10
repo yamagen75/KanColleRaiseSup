@@ -624,11 +624,11 @@ function mission_clear_name(cr) {	///@param c	遠征クリア api_clear_result
 function slotitem_name(id, lv, alv, p_alv, n, max) {
 	var item = $mst_slotitem[id];
 	if (!item) return id.toString();	// unknown slotitem.
-	var name = item.api_name;		var sta = '<i class="icon-star mr0 ml2"></i>';
+	var name = item.api_name;		var sta = '<i class="fas fa-star mr0 ml2"></i>';
 	if (lv >= 10) name += sta +'max';	// 改修レベルを追加する.
 	else if (lv >= 1) name += sta +'+'+ lv;	// 改修レベルを追加する.
 	if (alv >= 1 || alv < p_alv) {
-		var gmk = '<i class="icon-plane mr0 ml2"></i>';
+		var gmk = '<i class="fas fa-plane mr0 ml2"></i>';
 		if (alv >= 7) name += gmk +'max';	// 熟練度最大ならmaxを追加する.
 		else if (alv >= 1) name += gmk +'+'+ alv;		// さもなくば熟練度数値を追加する.
 		var diff = diff_name(alv, p_alv);
@@ -780,9 +780,9 @@ function damage_name(nowhp, maxhp, pt) {
 		rt = '<span class="label label-default">小破</span>';
 		if(pt) rt = '<span class="label ts9">小破</span>';
 	}else if(r <= 0.85){
-		rt = '<span class="label label-default"><i class="icon-wrench mr0"></i></span>'; // 軽微2.
+		rt = '<span class="label label-default"><i class="fas fa-wrench mr0"></i></span>'; // 軽微2.
 	}else if(r <  1.00){
-		rt = '<span class="label label-default ts10"><i class="icon-wrench mr0"></i></span>'; // 軽微1.
+		rt = '<span class="label label-default ts10"><i class="fas fa-wrench mr0"></i></span>'; // 軽微1.
 	}
 	return rt;
 }
@@ -1010,11 +1010,11 @@ function push_fleet_status(tp, deck) {
 	}
 	if (slot_seiku.sum) {
 		slot_seiku.msg = '艦隊制空値: ' + slot_seiku.sum + ' ';
-		slot_seiku.brief = ' <i class="icon-fighter-jet"></i>' + slot_seiku.sum;
+		slot_seiku.brief = ' <i class="fas fa-fighter-jet"></i>' + slot_seiku.sum;
 	}
 	if (drumcan.sum) {
 		drumcan.msg = 'ドラム缶x' + drumcan.sum + '個 (' + drumcan.ships + '隻) ';
-		drumcan.brief = ' <i class="icon-th-list"></i>' + drumcan.sum + '/<i class="icon-user"></i>' + drumcan.ships;
+		drumcan.brief = ' <i class="fas fa-database"></i>' + drumcan.sum + '/<i class="fas fa-user"></i>' + drumcan.ships;
 	}
 	rt[2] = slot_seiku.msg + drumcan.msg +'合計 Lv'+ lv_sum +' ('+ fleet_ships +'隻)';
 	rt[4] = slot_seiku.brief + drumcan.brief;
@@ -1636,7 +1636,7 @@ function print_port() {
 	var logcnt = $logbook.length;		ra = ['','','&nbsp;','&nbsp;','&nbsp;','&nbsp;','&nbsp;'];
 	rb = ['','','&nbsp;','&nbsp;','&nbsp;','&nbsp;','&nbsp;'];	rc = ['',''];		var emycnt = 0;
 	var enmcnt = Object.keys($enemy_list).length;		var enecnt = enmcnt;	tp = dpnla.tmpget('tp5_4');
-	var rd = ['<i class="icon-arrow-left mr0"></i> ','戦闘ログ：','戦闘ログ消去','敵艦隊：','敵艦ログ消去'];
+	var rd = ['<i class="fas fa-arrow-left mr0"></i> ','戦闘ログ：','戦闘ログ消去','敵艦隊：','敵艦ログ消去'];
 	if(logcnt > 0){
 		rc[0] = 'b561v';	rc[1] = rd[0] + rd[1] + logcnt;		ra[0] = dpnla.tmprep(2,rc,td[3]);
 		rc[0] = 'b561d';	rc[1] = rd[2];	rb[0] = dpnla.tmprep(2,rc,td[4]);
@@ -1685,7 +1685,7 @@ function print_port() {
 	ht += dpnla.tmprep(2,ra,tp[6]);
 	if(ndocks > 0 || repairs > 0 || kdocks > 0){
 		ra = ['','',damage_H,damage_M,damage_L,damage_N];		rb = ['',''];
-		rc = [' <i class="icon-arrow-right mr0"></i>','入渠中：','建造中：'];
+		rc = [' <i class="fas fa-arrow-right mr0"></i>','入渠中：','建造中：'];
 		if(ndocks > 0){
 			rb[0] = 'b12n';		rb[1] = rc[1] + ndocks + rc[0];		ra[0] = dpnla.tmprep(2,rb,td[3]);
 		}else{
@@ -1790,7 +1790,7 @@ function push_all_fleets(req) {
 	for(i = 0;i < 3;i++){
 		j = i + 1;	ky = 'tp2_'+ j;		tp[i] = dpnla.tmpget(ky);
 	}
-	ht[5] = '出撃中：'+ $battle_log.join(' <i class="icon-arrow-right"></i>');
+	ht[5] = '出撃中：'+ $battle_log.join(' <i class="fas fa-arrow-right"></i>');
 	for (var f_id in $fdeck_list) {
 		ky = '';	ra[0] = '';		ra[1] = '';		ra[4] = 'info';
 		var deck = $fdeck_list[f_id];
@@ -1885,7 +1885,7 @@ function on_next_cell(json) {
 	if (!g) g = json.api_data.api_itemget_eo_comment; // EO 1-6 海域ゴールの取得資源.
 	var h = json.api_data.api_happening;
 	var area = d.api_maparea_id + '-' + d.api_mapinfo_no + '-' + d.api_no;
-	var arow = ' <i class="icon-arrow-right"></i>';		var tp = dpnla.tmpget('tp4_1');		var ra = new Array();
+	var arow = ' <i class="fas fa-arrow-right"></i>';		var tp = dpnla.tmpget('tp4_1');		var ra = new Array();
 	$next_mapinfo = $mst_mapinfo[d.api_maparea_id * 10 + d.api_mapinfo_no];
 	if (d.api_event_id == 5) {
 		area += '(boss)';
@@ -2148,7 +2148,7 @@ function on_battle_result(json) {
 		var p = d.api_landing_hp;
 		var s = p.api_now_hp - p.api_sub_value;
 		s = s > 0 ? fraction_percent_name(s, p.api_max_hp) : '達成';
-		msg += '<br />TP：' + p.api_sub_value + ' <i class="icon-arrow-right mr0"></i>' + s;
+		msg += '<br />TP：' + p.api_sub_value + ' <i class="fas fa-arrow-right mr0"></i>' + s;
 	}
 	if (drop_ship_name) {
 		msg += '<br />'+ tp[3] +'drop ship'+ tp[4] + drop_ship_name;
@@ -3041,7 +3041,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			$max_ship     = basic.api_max_chara;
 			$max_slotitem = basic.api_max_slotitem + 3;
 			if ($battle_deck_id > 0) {
-				var btlg = '前回出撃：' + $battle_log.join(' <i class="icon-arrow-right"></i>');
+				var btlg = '前回出撃：' + $battle_log.join(' <i class="fas fa-arrow-right"></i>');
 				$last_mission[$battle_deck_id] = btlg;
 				if($combined_flag && $battle_deck_id == 1) $last_mission[2] = btlg;
 				$battle_deck_id = -1;

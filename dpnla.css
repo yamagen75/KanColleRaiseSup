@@ -2,89 +2,101 @@
 
 /* FONT PATH */
 @font-face {
-  font-family: 'FontAwesome';
-  src: url('material/fontawesome-webfont.woff?v=3.2.1') format('woff');
-  font-weight: normal;
+  font-family: 'Font Awesome 5 Free';
   font-style: normal;
+  font-weight: 400;
+  src: url("material/fa-regular-400.woff") format("woff");
+}
+@font-face {
+  font-family: 'Font Awesome 5 Free';
+  font-style: normal;
+  font-weight: 900;
+  src: url("material/fa-solid-900.woff") format("woff");
 }
 /* FONT AWESOME CORE */
-[class^="icon-"],
-[class*=" icon-"] {
-  font-family: FontAwesome;
-  font-weight: normal;
-  font-style: normal;
-  text-decoration: inherit;
+.fa,
+.fas,
+.far,
+.fal,
+.fab {
+  -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
-  *margin-right: .3em;
-}
-[class^="icon-"]:before,
-[class*=" icon-"]:before {
-  text-decoration: inherit;
   display: inline-block;
-  speak: none;
-}
-a [class^="icon-"],
-a [class*=" icon-"] {
-  display: inline;
-}
+  font-style: normal;
+  font-variant: normal;
+  text-rendering: auto;
+  line-height: 1; }
+.far {
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 400; }
 
-.icon-user:before {
-  content: "\f007";
-}
-.icon-th-list:before {
-  content: "\f00b";
-}
-.icon-lock:before {
-  content: "\f023";
-}
-.icon-unlock:before {
-  content: "\f09c";
-}
-.icon-wrench:before {
-  content: "\f0ad";
-}
-.icon-suitcase:before {
-  content: "\f0f2";
-}
-.icon-fighter-jet:before {
-  content: "\f0fb";
-}
-.icon-arrow-left:before {
-  content: "\f060";
-}
-.icon-arrow-right:before {
-  content: "\f061";
-}
-.icon-arrow-up:before {
-  content: "\f062";
-}
-.icon-arrow-down:before {
-  content: "\f063";
-}
-.icon-info-sign:before {
-  content: "\f05a";
-}
-.icon-question-sign:before {
-  content: "\f059";
-}
-.icon-warning-sign:before {
-  content: "\f071";
-}
-.icon-remove-sign:before {
-  content: "\f057";
-}
-.icon-smile:before {
-  content: "\f118";
-}
-.icon-level-up:before {
-  content: "\f148";
-}
-.icon-plane:before {
-  content: "\f072";
-}
-.icon-star:before {
-  content: "\f005";
-}
+.fa,
+.fas {
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900; }
+
+.fa-lock:before {
+  content: "\f023"; }
+
+.fa-lock-open:before {
+  content: "\f3c1"; }
+
+.fa-wrench:before {
+  content: "\f0ad"; }
+
+.fa-suitcase:before {
+  content: "\f0f2"; }
+
+.fa-arrow-left:before {
+  content: "\f060";}
+
+.fa-arrow-right:before {
+  content: "\f061";}
+
+.fa-arrow-up:before {
+  content: "\f062";}
+
+.fa-arrow-down:before {
+  content: "\f063";}
+
+.fa-info-circle:before {
+  content: "\f05a";}
+
+.fa-question-circle:before {
+  content: "\f059";}
+
+.fa-exclamation-triangle:before {
+  content: "\f071";}
+
+.fa-times-circle:before {
+  content: "\f057"; }
+
+.fa-smile:before {
+  content: "\f118";}
+
+.fa-level-up-alt:before {
+  content: "\f3bf"; }
+
+.fa-plane:before {
+  content: "\f072";}
+
+.fa-star:before {
+  content: "\f005";}
+
+.fa-fighter-jet:before {
+  content: "\f0fb"; }
+
+.fa-database:before {
+  content: "\f1c0"; }
+
+.fa-user:before {
+  content: "\f007"; }
+
+.fa-binoculars:before {
+  content: "\f1e5"; }
+
+.fa-tag:before {
+  content: "\f02b"; }
 
 /* スタイル設定 */
 
@@ -134,7 +146,7 @@ a [class*=" icon-"] {
 #dpnla .ts4 { text-align:right; }
 #dpnla .ts5 { font-weight:bold; }
 #dpnla .ts8 { font-size:132%; font-weight:bold; }
-#dpnla .ts12 { font-size:124%; }
+#dpnla .ts12 { font-size:112%; }
 #dpnla .ts18 { color:#aaa; font-size:84%; text-align:center; }
 #dpnla .ts21 { font-size:84%; }
 #dpnla .ts22 { vertical-align:middle; }
