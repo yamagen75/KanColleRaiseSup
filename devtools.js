@@ -14,6 +14,7 @@ var $tmp_ship_id = -1000;	// ドロップ艦の仮ID.
 var $tmp_slot_id = -1000;	// ドロップ艦装備の仮ID.
 var $max_ship = 0;
 var $max_slotitem = 0;
+var $command_lv = 0;
 var $combined_flag = 0;
 var $fdeck_list = {};
 var $ship_fdeck = {};
@@ -88,6 +89,7 @@ function Ship(data, ship) {
 	this.ndock_item	= data.api_ndock_item; // 入渠消費量[燃料,鋼材].
 	this.ship_id	= data.api_ship_id;
 	this.kyouka	= data.api_kyouka;	// 近代化改修による強化値[火力,雷装,対空,装甲,運].
+	this.sakuteki = data.api_sakuteki;
 	this.nextlv	= data.api_exp[1];
 	if (data.api_slot_ex > 0) {		// api_slot_ex:: 0:増設スロットなし, -1:増設スロット空,　1以上:増設スロット装備ID.
 		this.slot.push(data.api_slot_ex);
@@ -699,6 +701,60 @@ function slotitem_seiku(id, lv, alv, n) {
 	return Math.floor(seiku);
 }
 
+function slotitem_sakuteki(id, lv) { // 装備の素索敵値と索敵スコア判定式(33)値を返す.
+	var item = $mst_slotitem[id];
+	var raw = item.api_saku; // 装備素索敵値.
+	var k = 0; // 装備係数.
+	var s = 0; // 改修による索敵強化値.
+
+	// 改修による索敵強化値
+	switch (item.api_type[2]) {
+		case 12:// 小型電探.
+			s = 1.25 * Math.sqrt(lv);
+			break;
+		case 13:// 大型電探.
+			s = 1.40 * Math.sqrt(lv);
+			break;
+		case 9:	// 艦上偵察機.
+		case 10:// 水上偵察機.
+			s = 1.20 * Math.sqrt(lv);
+			break;
+	}
+	// 装備係数.
+	switch (item.api_type[2]) {
+		case 7:	// 艦上爆撃機.
+		case 12:// 小型電探.
+		case 13:// 大型電探.
+		case 29:// 探照灯.
+		case 42:// 大型探照灯.
+		case 57:// 噴式戦闘爆撃機.
+		case 6:	// 艦上戦闘機.
+		case 45:// 水上戦闘機.
+		case 41:// 大型飛行艇.
+		case 14:// ソナー.
+		case 39:// 水上艦要員.
+		case 26:// 対潜哨戒機.
+		case 34:// 艦隊司令部施設.
+		case 51:// 潜水艦装備.
+			k = 0.6;
+			break;
+		case 8:	// 艦上攻撃機.
+			k = 0.8;
+			break;
+		case 9:	// 艦上偵察機.
+			k = 1.0;
+			break;
+		case 10:// 水上偵察機.
+			k = 1.2;
+			break;
+		case 11:// 水上爆撃機.
+			k = 1.1;
+			break;
+	}
+	this.raw = raw;
+	this.score33 = k * (raw + s);
+}
+
 function slotitem_names(idlist) {
 	var rt = [0,''];
 	if (!idlist) return rt;
@@ -958,12 +1014,52 @@ function is_airplane(item) {
 	}
 }
 
+function Sakuteki33(name, ships, fleet_max) {
+	// 索敵スコア判定式(33) ::= Σ sqrt(各艦素索敵値) + 分岐点係数c * Σ (装備係数k * (装備素索敵値raw + 装備改修による索敵強化値s)) - ceil(0.4 * 司令部レベル) + 2 * 艦隊空き数.
+	var c = 1;
+	var target = 33;
+	var map = '';
+	var score = 0;
+	var m = null;
+	if      (/^1-6/.test(name)) { c = 3; target = 30; map = '1-6'; }
+	else if (/^2-5/.test(name)) { c = 1; target = 33; map = '2-5'; }
+	else if (/^3-5/.test(name)) { c = 4; target = 28; map = '3-5'; }
+	else if (/^6-1/.test(name)) { c = 4; target = 25; map = '6-1'; }
+	else if (/^6-2/.test(name)) { c = 3; target = 40; map = '6-2'; }
+	else if (/^6-5/.test(name)) { c = 3; target = 50; map = '6-5'; }
+	else if (m = /^(\d);/.exec(name)) { c = m[1]; }
+	// 各艦の索敵スコアを合計する.
+	for (var i in ships) {
+		var slot = ships[i].slot;
+		var raw  = ships[i].sakuteki[0];
+		var s33 = 0;
+		for (var i = 0; i < slot.length; ++i) {
+			var value = $slotitem_list[slot[i]];
+			if (value) {
+				var r = new slotitem_sakuteki(value.item_id, value.level);
+				s33 += r.score33;
+				raw -= r.raw; // 艦娘の素索敵値を計算する。sakuteki[1]はケッコンカッコカリ前の索敵値なので使えない.
+			}
+		}
+		score += Math.sqrt(raw) + c * s33;
+	}
+	// 司令部レベルと艦隊空き数による補正値を算入する.
+	score -= Math.ceil(0.4 * $command_lv);
+	score += 2 * (fleet_max - ships.length);
+	var color = (score >= target)? 'cr16' : 'cr6';
+	this.score = score;
+	this.msg = map + '索敵値 (分岐点係数' + c + '): <span class="' + color + '">' + score.toFixed(2) + '</span> ';
+	this.brief = ' <i class="fas fa-binoculars ' + color + '"></i> ';
+	if (c != 1) this.brief = ' <i class="fas fa-code-branch"></i>' + c + ':' + this.brief;
+}
+
 function push_fleet_status(tp, deck) {
 	var lv_sum = 0;
 	var fleet_ships = 0;
 	var drumcan = {ships:0, sum:0, msg:'', brief:''};
 	var slot_seiku = {sum:0, msg:'', brief:''};
-	var j = 0;	var ra = new Array();		var rt = ['','','',0];	var rb = new Array();		var tb = '';
+	var ships = [];
+	var j = 0;	var ra = new Array();		var rt = ['','','',0,''];	var rb = new Array();		var tb = '';
 	for(j = 0;j < 20;j++){
 		ra[j] = '';
 	}
@@ -1007,7 +1103,9 @@ function push_fleet_status(tp, deck) {
 			drumcan.sum += d;
 		}
 		slot_seiku.sum += ship.slot_seiku();
+		ships.push(ship);
 	}
+	var sakuteki = new Sakuteki33(deck.api_name, ships, deck.api_ship.length);
 	if (slot_seiku.sum) {
 		slot_seiku.msg = '艦隊制空値: ' + slot_seiku.sum + ' ';
 		slot_seiku.brief = ' <i class="fas fa-fighter-jet"></i>' + slot_seiku.sum;
@@ -1016,8 +1114,8 @@ function push_fleet_status(tp, deck) {
 		drumcan.msg = 'ドラム缶x' + drumcan.sum + '個 (' + drumcan.ships + '隻) ';
 		drumcan.brief = ' <i class="fas fa-database"></i>' + drumcan.sum + '/<i class="fas fa-user"></i>' + drumcan.ships;
 	}
-	rt[2] = slot_seiku.msg + drumcan.msg +'合計 Lv'+ lv_sum +' ('+ fleet_ships +'隻)';
-	rt[4] = slot_seiku.brief + drumcan.brief;
+	rt[2] = sakuteki.msg + slot_seiku.msg + drumcan.msg +'合計 Lv'+ lv_sum +' ('+ fleet_ships +'隻)';
+	rt[4] = sakuteki.brief + slot_seiku.brief + drumcan.brief;
 	return rt;
 }
 
@@ -3028,6 +3126,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			$combined_flag = json.api_data.api_combined_flag;	// 連合艦隊編成有無.
 			update_material(json.api_data.api_material, $material.autosupply);	// 資材を更新する. 差分を自然増加として記録する.
 			var basic = json.api_data.api_basic;
+			$command_lv	  = basic.api_level;
 			$max_ship     = basic.api_max_chara;
 			$max_slotitem = basic.api_max_slotitem + 3;
 			if ($battle_deck_id > 0) {
