@@ -928,8 +928,8 @@ function decode_postdata_params(params) {
 	var r = {};
 	if (params instanceof Array) params.forEach(function(data) {
 		if (data.name && data.value) {
-			var name  = decodeURI(data.name);
-			var value = decodeURI(data.value);
+			var name  = decodeURIComponent(data.name);
+			var value = decodeURIComponent(data.value);
 			r[name] = (value == "" || isNaN(value)) ? value : +value;  // 数値文字列ならばNumberに変換して格納する. さもなくばstringのまま格納する.
 		}
 	});
@@ -2937,7 +2937,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		// 装備破棄.
 		func = function(json) {
 			var ids = decode_postdata_params(request.request.postData.params).api_slotitem_ids;
-			if (ids) slotitem_delete(/%2C/.test(ids) ? ids.split('%2C') : [ids]);		// 破棄した装備を、リストから抜く.
+			if (ids) slotitem_delete(/,/.test(ids) ? ids.split(',') : [ids]);		// 破棄した装備を、リストから抜く.
 			diff_update_material(json.api_data.api_get_material, $material.destroyitem);	// 装備破棄による資材増加を記録する.
 			print_port();
 		};
@@ -2947,7 +2947,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		func = function(json) {
 	        var dest = decode_postdata_params(request.request.postData.params).api_slot_dest_flag;
 			var ids = decode_postdata_params(request.request.postData.params).api_ship_id;
-			if (ids) ship_delete(/%2C/.test(ids) ? ids.split('%2C') : [ids], dest==0);		// 解体した艦娘が持つ装備を、リストから抜く.
+			if (ids) ship_delete(/,/.test(ids) ? ids.split(',') : [ids], dest==0);		// 解体した艦娘が持つ装備を、リストから抜く.
 			update_material(json.api_data.api_material, $material.destroyship); /// 解体による資材増加を記録する.
 			print_port();
 		};
@@ -2955,7 +2955,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 	else if (api_name == '/api_req_kaisou/powerup') {
 		// 近代化改修.
 		var ids = decode_postdata_params(request.request.postData.params).api_id_items;
-		if (ids) ship_delete(/%2C/.test(ids) ? ids.split('%2C') : [ids]);		// 素材として使った艦娘が持つ装備を、リストから抜く.
+		if (ids) ship_delete(/,/.test(ids) ? ids.split(',') : [ids]);		// 素材として使った艦娘が持つ装備を、リストから抜く.
 		func = function(json) {
 			var d = json.api_data;
 			if (d.api_ship) delta_update_ship_list([d.api_ship]);
@@ -3037,6 +3037,12 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			}
 		}
 		update_fdeck_list($fdeck_list); // 編成結果を $ship_fdeck に反映する.
+		print_port();
+	}
+	else if (api_name == '/api_req_member/updatedeckname') {
+		// 艦隊名変更.
+		var params = decode_postdata_params(request.request.postData.params);
+		$fdeck_list[params.api_deck_id].api_name = params.api_name;
 		print_port();
 	}
 	else if (api_name == '/api_get_member/questlist') {
