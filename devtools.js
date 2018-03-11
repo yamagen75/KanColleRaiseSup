@@ -911,6 +911,16 @@ function battle_cl_name(a) {
 	}
 }
 
+function map_rank_name(a) {
+	switch (a) {
+	case 1: return '丁';
+	case 2: return '丙';
+	case 3: return '乙';
+	case 4: return '甲';
+	default: return '';
+	}
+}
+
 //------------------------------------------------------------------------
 // データ解析.
 //
@@ -2177,11 +2187,8 @@ function on_battle_result(json) {
 	if (e) {
 		if ($next_mapinfo) {
 			var map_rank = $mapinfo_rank[$next_mapinfo.api_id];
-			switch (map_rank) {	// 難度選択海域ならば、艦隊名に難度表記を付加する.
-			case 1: e.api_deck_name += '@丁'; break;
-			case 2: e.api_deck_name += '@丙'; break;
-			case 3: e.api_deck_name += '@乙'; break;
-			case 4: e.api_deck_name += '@甲'; break;
+			if (map_rank) {		// 難度選択海域ならば、艦隊名に難度表記を付加する.
+				e.api_deck_name += '@' + map_rank_name(map_rank);
 			}
 		}
 		var rank = d.api_win_rank;
