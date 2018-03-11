@@ -1,10 +1,28 @@
-$event_sally_tag_names = {
+$event_sally_tag_names_long = {
 // id: 2018冬イベントname.
 1: '警戒部隊',
 2: '栗田艦隊',
 3: '西村艦隊',
 4: '小沢艦隊',
 5: '志摩艦隊'
+};
+
+$event_sally_tag_names_short = {
+// id: 2018冬イベントname.
+1: '警戒',
+2: '栗田',
+3: '西村',
+4: '小沢',
+5: '志摩'
+};
+
+$event_sally_tag_styles = {
+// id: 2018冬イベントname.
+1: 'color:#F2F2F2; background-color:#434343',
+2: 'color:#F9FFE5; background-color:#668029',
+3: 'color:#FFFF51; background-color:#877C11',
+4: 'color:#E5F1FF; background-color:#112861',
+5: 'color:#F0E5FF; background-color:#5F2AB2'
 };
 
 $event_kind_names = {
