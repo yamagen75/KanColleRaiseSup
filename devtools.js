@@ -119,7 +119,7 @@ Ship.prototype.fleet_name_lv = function(pt) {
 
 Ship.prototype.sally_tag = function(names) {
 	if (!this.sally_area) return '';
-	return event_sally_tag(this.sally_area, names) + ' ';
+	return event_sally_tag(this.sally_area, names);
 };
 
 Ship.prototype.sally_tag_short = function() {
