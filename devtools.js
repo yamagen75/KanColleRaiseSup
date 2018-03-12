@@ -130,6 +130,19 @@ Ship.prototype.sally_tag_long = function() {
 	return this.sally_tag($event_sally_tag_names_long);
 };
 
+Ship.prototype.sally_text = function(names) {
+	if (!this.sally_area) return '';
+	return "\t["+event_sally_tag_name(this.sally_area, names)+"]";
+};
+
+Ship.prototype.sally_text_short = function() {
+	return this.sally_text($event_sally_tag_names_short);
+};
+
+Ship.prototype.sally_text_long = function() {
+	return this.sally_text($event_sally_tag_names_long);
+};
+
 Ship.prototype.stype = function() {
 	return $mst_ship[this.ship_id].api_stype;
 };
@@ -1402,9 +1415,10 @@ function print_port() {
 			var ship = lock_condlist[i];
 			ra[0] = ship.fleet_name_lv();		ra[1] = kira_name(ship.c_cond);
 			ra[2] = ship.name_lv();		ra[3] = ship.lv;
-			ra[4] = ship.nextlv;	ra[5] = '';		ra[6] = '';
+			ra[4] = ship.nextlv;	ra[5] = '';		ra[6] = '';		ra[7] = ship.sally_tag_short();
+			var sally_text = ship.sally_text_long();
 			if(ship.locked){
-				mc[2] += ra[3] +'\t'+ ra[2] +'\n';
+				mc[2] += ra[3] +'\t'+ ra[2] + sally_text + '\n';
 			}else{
 				ra[5] = tb[1];
 			}
