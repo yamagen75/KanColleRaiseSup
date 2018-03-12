@@ -94,6 +94,9 @@ function Ship(data, ship) {
 	if (data.api_slot_ex > 0) {		// api_slot_ex:: 0:増設スロットなし, -1:増設スロット空,　1以上:増設スロット装備ID.
 		this.slot.push(data.api_slot_ex);
 	}
+	if (data.api_sally_area !== null) { // お札情報 イベント中限定 0: 札なし, 1～ : 各種札
+		this.sally_area = data.api_sally_area;
+	}
 	this.sortno	= data.api_sortno;
 	this.slot_flg = 0;
 }
@@ -112,6 +115,19 @@ Ship.prototype.fleet_name_lv = function(pt) {
 			name = '<span class="label label-primary ts10">'+ fdeck +'</span>'+ name;
 		}
 		return name;
+};
+
+Ship.prototype.sally_tag = function(names) {
+	if (!this.sally_area) return '';
+	return event_sally_tag(this.sally_area, names) + ' ';
+};
+
+Ship.prototype.sally_tag_short = function() {
+	return this.sally_tag($event_sally_tag_names_short);
+};
+
+Ship.prototype.sally_tag_long = function() {
+	return this.sally_tag($event_sally_tag_names_long);
 };
 
 Ship.prototype.stype = function() {
@@ -602,6 +618,20 @@ function search_name(id) {	///@param id	索敵結果 api_search[]
 	}
 }
 
+function event_sally_tag_name(id, names) {	///@param id	イベント札番号 api_sally_area.
+	return names[id] || '札'+to_string(id);
+}
+
+function event_sally_tag_style(id) {
+	var style = $event_sally_tag_styles[id];
+	if (style) return '<span class="label" style="' + style +'">';
+	else return '<span class="label label-default">';
+}
+
+function event_sally_tag(id, names) {
+	return event_sally_tag_style(id) + event_sally_tag_name(id, names) + '</span>';
+}
+
 function event_kind_name(id) {	///@param id	非戦闘マスのメッセージ api_event_kind.
 	switch (id) {
 		case 0: return '気のせいだった';
@@ -881,6 +911,16 @@ function battle_cl_name(a) {
 	}
 }
 
+function map_rank_name(a) {
+	switch (a) {
+	case 1: return '丁';
+	case 2: return '丙';
+	case 3: return '乙';
+	case 4: return '甲';
+	default: return '';
+	}
+}
+
 //------------------------------------------------------------------------
 // データ解析.
 //
@@ -888,8 +928,8 @@ function decode_postdata_params(params) {
 	var r = {};
 	if (params instanceof Array) params.forEach(function(data) {
 		if (data.name && data.value) {
-			var name  = decodeURI(data.name);
-			var value = decodeURI(data.value);
+			var name  = decodeURIComponent(data.name);
+			var value = decodeURIComponent(data.value);
 			r[name] = (value == "" || isNaN(value)) ? value : +value;  // 数値文字列ならばNumberに変換して格納する. さもなくばstringのまま格納する.
 		}
 	});
@@ -1082,6 +1122,7 @@ function push_fleet_status(tp, deck) {
 		}
 		if (/大破/.test(ra[6])) rt[3] = 1;
 		ra[0] = kira_name(ship.c_cond);		ra[1] = ship.name_lv();		ra[2] = ship.lv;
+		ra[22] = ship.sally_tag_short();		ra[23] = ship.sally_tag_long();
 		ra[3] = ship.nextlv;	ra[4] = ship.nowhp;		ra[5] = ship.maxhp;
 		rb = ship.fuel_name();	ra[7] = rb[0];	ra[10] = rb[1];
 		rb = ship.bull_name();	ra[8] = rb[0];	ra[11] = rb[1];
@@ -2146,11 +2187,8 @@ function on_battle_result(json) {
 	if (e) {
 		if ($next_mapinfo) {
 			var map_rank = $mapinfo_rank[$next_mapinfo.api_id];
-			switch (map_rank) {	// 難度選択海域ならば、艦隊名に難度表記を付加する.
-			case 1: e.api_deck_name += '@丁'; break;
-			case 2: e.api_deck_name += '@丙'; break;
-			case 3: e.api_deck_name += '@乙'; break;
-			case 4: e.api_deck_name += '@甲'; break;
+			if (map_rank) {		// 難度選択海域ならば、艦隊名に難度表記を付加する.
+				e.api_deck_name += '@' + map_rank_name(map_rank);
 			}
 		}
 		var rank = d.api_win_rank;
@@ -2899,7 +2937,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		// 装備破棄.
 		func = function(json) {
 			var ids = decode_postdata_params(request.request.postData.params).api_slotitem_ids;
-			if (ids) slotitem_delete(/%2C/.test(ids) ? ids.split('%2C') : [ids]);		// 破棄した装備を、リストから抜く.
+			if (ids) slotitem_delete(/,/.test(ids) ? ids.split(',') : [ids]);		// 破棄した装備を、リストから抜く.
 			diff_update_material(json.api_data.api_get_material, $material.destroyitem);	// 装備破棄による資材増加を記録する.
 			print_port();
 		};
@@ -2909,7 +2947,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		func = function(json) {
 	        var dest = decode_postdata_params(request.request.postData.params).api_slot_dest_flag;
 			var ids = decode_postdata_params(request.request.postData.params).api_ship_id;
-			if (ids) ship_delete(/%2C/.test(ids) ? ids.split('%2C') : [ids], dest==0);		// 解体した艦娘が持つ装備を、リストから抜く.
+			if (ids) ship_delete(/,/.test(ids) ? ids.split(',') : [ids], dest==0);		// 解体した艦娘が持つ装備を、リストから抜く.
 			update_material(json.api_data.api_material, $material.destroyship); /// 解体による資材増加を記録する.
 			print_port();
 		};
@@ -2917,7 +2955,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 	else if (api_name == '/api_req_kaisou/powerup') {
 		// 近代化改修.
 		var ids = decode_postdata_params(request.request.postData.params).api_id_items;
-		if (ids) ship_delete(/%2C/.test(ids) ? ids.split('%2C') : [ids]);		// 素材として使った艦娘が持つ装備を、リストから抜く.
+		if (ids) ship_delete(/,/.test(ids) ? ids.split(',') : [ids]);		// 素材として使った艦娘が持つ装備を、リストから抜く.
 		func = function(json) {
 			var d = json.api_data;
 			if (d.api_ship) delta_update_ship_list([d.api_ship]);
@@ -2999,6 +3037,12 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			}
 		}
 		update_fdeck_list($fdeck_list); // 編成結果を $ship_fdeck に反映する.
+		print_port();
+	}
+	else if (api_name == '/api_req_member/updatedeckname') {
+		// 艦隊名変更.
+		var params = decode_postdata_params(request.request.postData.params);
+		$fdeck_list[params.api_deck_id].api_name = params.api_name;
 		print_port();
 	}
 	else if (api_name == '/api_get_member/questlist') {
