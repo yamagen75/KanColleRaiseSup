@@ -119,7 +119,7 @@ Ship.prototype.fleet_name_lv = function(pt) {
 
 Ship.prototype.sally_tag = function(names) {
 	if (!this.sally_area) return '';
-	return event_sally_tag(this.sally_area, names) + ' ';
+	return event_sally_tag(this.sally_area, names);
 };
 
 Ship.prototype.sally_tag_short = function() {
@@ -128,6 +128,19 @@ Ship.prototype.sally_tag_short = function() {
 
 Ship.prototype.sally_tag_long = function() {
 	return this.sally_tag($event_sally_tag_names_long);
+};
+
+Ship.prototype.sally_text = function(names) {
+	if (!this.sally_area) return '';
+	return "\t["+event_sally_tag_name(this.sally_area, names)+"]";
+};
+
+Ship.prototype.sally_text_short = function() {
+	return this.sally_text($event_sally_tag_names_short);
+};
+
+Ship.prototype.sally_text_long = function() {
+	return this.sally_text($event_sally_tag_names_long);
 };
 
 Ship.prototype.stype = function() {
@@ -1225,6 +1238,7 @@ function print_port() {
 	var drumcan_cond53 = [];
 	var drumcan_cond50 = [];
 	var drumcan_condxx = [];
+	var tag_names = [];
 	var i = 0;	var j = 0;	var ra = new Array();		var rb = new Array();		var rc = new Array();
 	var tp = new Array();		var tb = new Array();		var tc = new Array();		var td = new Array();
 	var ky = '';	var ht = '';	var ca = 0;		var cb = 0;		var cc = 0;		var cd = 0;
@@ -1325,6 +1339,7 @@ function print_port() {
 				}
 			});
 		}
+		if (ship.sally_area > 0) tag_names.push(ship);
 		if (ship.can_kaizou()) kaizou_list.push(ship);
 	}
 	var lcdoublst = new Array();
@@ -1400,9 +1415,10 @@ function print_port() {
 			var ship = lock_condlist[i];
 			ra[0] = ship.fleet_name_lv();		ra[1] = kira_name(ship.c_cond);
 			ra[2] = ship.name_lv();		ra[3] = ship.lv;
-			ra[4] = ship.nextlv;	ra[5] = '';		ra[6] = '';
+			ra[4] = ship.nextlv;	ra[5] = '';		ra[6] = '';		ra[7] = ship.sally_tag_short();
+			var sally_text = ship.sally_text_long();
 			if(ship.locked){
-				mc[2] += ra[3] +'\t'+ ra[2] +'\n';
+				mc[2] += ra[3] +'\t'+ ra[2] + sally_text + '\n';
 			}else{
 				ra[5] = tb[1];
 			}
@@ -1432,41 +1448,79 @@ function print_port() {
 	}else{
 		dpnla.tmpviw(0,'t31_1_a','');		dpnla.tmpviw(0,'t31_1','');
 	}
-	// 未ロック艦一覧
-	if (unlock_names.length > 0) {
-		unlock_names.sort(function(a,b){
-			var rt = a.lv - b.lv;
-			if(!rt) rt = b.sortno - a.sortno;
-			if(!rt) rt = b.id - a.id;
-			return rt;
-		});
+	// 未ロック艦/お札のついた艦一覧
+	if (unlock_names.length > 0 || tag_names.length > 0) {
+		ky = 't33';		ca = 0;		cb = 1;		cc = 3;		cd = 1;		ce = 1;		ht = '<div id="'+ ky +'_' + cd +'">';
 		tp = dpnla.tmpget('tp3_2');
-		ky = 't33';		ca = 0;		cb = 1;		cc = 3;		cd = 1;
-		ht = '<div id="'+ ky +'_1">';		ra = new Array();
-		for (var i in unlock_names) {
-			var ship = unlock_names[i];
-			ra[0] = ship.fleet_name_lv();		ra[1] = kira_name(ship.c_cond);
-			ra[2] = ship.name_lv();		ra[3] = ship.lv;
-			ra[4] = ship.nextlv;	ra[5] = '';		ra[6] = '';		ra[7] = '';
-			if(ship.nowhp < ship.maxhp){ // ダメージ.
-				ra[6] = tb[2];
-				var ndock = $ndock_list[ship.id];
-				if (ndock) ra[6] = tb[5];
-			}
-			if(ship.slot_flg > 0) ra[7] = tb[3];
-			if(ca == 0){
-				if(cb > cc){
-					cb = 1;		cd++;
+		if (unlock_names.length > 0) {
+			unlock_names.sort(function(a,b){
+				var rt = a.lv - b.lv;
+				if(!rt) rt = b.sortno - a.sortno;
+				if(!rt) rt = b.id - a.id;
+				return rt;
+			});
+			ra = new Array();
+			for (var i in unlock_names) {
+				var ship = unlock_names[i];
+				ra[0] = ship.fleet_name_lv();		ra[1] = kira_name(ship.c_cond);
+				ra[2] = ship.name_lv();		ra[3] = ship.lv;
+				ra[4] = ship.nextlv;	ra[5] = '';		ra[6] = '';		ra[7] = '';
+				if(ship.nowhp < ship.maxhp){ // ダメージ.
+					ra[6] = tb[2];
+					var ndock = $ndock_list[ship.id];
+					if (ndock) ra[6] = tb[5];
 				}
-				if(cb == 1 && cd > 1) ht += '</div><div id="'+ ky +'_'+ cd +'" class="hid">';
-				ht += tp[0];
+				if(ship.slot_flg > 0) ra[7] = tb[3];
+				if(ca == 0){
+					if(cb > cc){
+						cb = 1;		cd++;
+					}
+					if(cb == 1 && cd > ce) ht += '</div><div id="'+ ky +'_'+ cd +'" class="hid">';
+					ht += tp[0];
+				}
+				ht += dpnla.tmprep(2,ra,tp[1]);		ca++;
+				if(ca > 9){
+					ca = 0;		cb++;		ht += tp[2];
+				}
 			}
-			ht += dpnla.tmprep(2,ra,tp[1]);		ca++;
-			if(ca > 9){
-				ca = 0;		cb++;		ht += tp[2];
-			}
+			if(ca > 0)	{ ht += tp[2];	ca = 0;	cb++; }
+			if(cb > cc)	{ cb = 1;		cd++; 	ce = cd; }
 		}
-		if(ca > 0) ht += tp[2];
+		if (tag_names.length > 0) {
+			tag_names.sort(function(a,b){
+				var rt = a.sally_area - b.sally_area;
+				if(!rt) rt = b.stype() - a.stype();
+				if(!rt) rt = b.sortno - a.sortno;
+				if(!rt) rt = b.lv - a.lv;
+				if(!rt) rt = a.id - b.id;
+				return rt;
+			});
+			ra = new Array();
+			for (var i in tag_names) {
+				var ship = tag_names[i];
+				ra[0] = ship.fleet_name_lv();		ra[1] = kira_name(ship.c_cond);
+				ra[2] = ship.name_lv();		ra[3] = ship.lv;
+				ra[4] = ship.nextlv;	ra[5] = '';		ra[6] = '';		ra[7] = '';
+				if(ship.nowhp < ship.maxhp){ // ダメージ.
+					ra[6] = tb[2];
+					var ndock = $ndock_list[ship.id];
+					if (ndock) ra[6] = tb[5];
+				}
+				ra[7] = ship.sally_tag_long();
+				if(ca == 0){
+					if(cb > cc){
+						cb = 1;		cd++;
+					}
+					if(cb == 1 && cd > ce) ht += '</div><div id="'+ ky +'_'+ cd +'" class="hid">';
+					ht += tp[0];
+				}
+				ht += dpnla.tmprep(2,ra,tp[1]);		ca++;
+				if(ca > 9){
+					ca = 0;		cb++;		ht += tp[2];
+				}
+			}
+			if(ca > 0) ht += tp[2];
+		}
 		ht += '</div>';
 		dpnla.tmpviw(0,'t31_2_a',ht);
 		dpnla.tmpviw(0,'t31_2',dpnla.tmpagemk(ky,cd));
