@@ -1450,7 +1450,7 @@ function print_port() {
 	}
 	// 未ロック艦/お札のついた艦一覧
 	if (unlock_names.length > 0 || tag_names.length > 0) {
-		ky = 't33';		ca = 0;		cb = 1;		cc = 3;		cd = 1;		ce = 1;		ht = '<div id="'+ ky +'_' + cd +'">';
+		ky = 't33';		ca = 0;		cb = 1;		cc = 3;		cd = 1;		ht = '<div id="'+ ky +'_1">';
 		tp = dpnla.tmpget('tp3_2');
 		if (unlock_names.length > 0) {
 			unlock_names.sort(function(a,b){
@@ -1475,7 +1475,7 @@ function print_port() {
 					if(cb > cc){
 						cb = 1;		cd++;
 					}
-					if(cb == 1 && cd > ce) ht += '</div><div id="'+ ky +'_'+ cd +'" class="hid">';
+					if(cb == 1 && cd > 1) ht += '</div><div id="'+ ky +'_'+ cd +'" class="hid">';
 					ht += tp[0];
 				}
 				ht += dpnla.tmprep(2,ra,tp[1]);		ca++;
@@ -1484,7 +1484,6 @@ function print_port() {
 				}
 			}
 			if(ca > 0)	{ ht += tp[2];	ca = 0;	cb++; }
-			if(cb > cc)	{ cb = 1;		cd++; 	ce = cd; }
 		}
 		if (tag_names.length > 0) {
 			tag_names.sort(function(a,b){
@@ -1511,7 +1510,7 @@ function print_port() {
 					if(cb > cc){
 						cb = 1;		cd++;
 					}
-					if(cb == 1 && cd > ce) ht += '</div><div id="'+ ky +'_'+ cd +'" class="hid">';
+					if(cb == 1 && cd > 1) ht += '</div><div id="'+ ky +'_'+ cd +'" class="hid">';
 					ht += tp[0];
 				}
 				ht += dpnla.tmprep(2,ra,tp[1]);		ca++;
