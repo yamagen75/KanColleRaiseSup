@@ -4,8 +4,10 @@ var $mst_slotitem	= load_storage('mst_slotitem');
 var $mst_mission	= load_storage('mst_mission');
 var $mst_useitem	= load_storage('mst_useitem');
 var $mst_mapinfo	= load_storage('mst_mapinfo');
+var $mst_maparea	= load_storage('mst_maparea');
 var $ship_list		= load_storage('ship_list');
 var $slotitem_list	= load_storage('slotitem_list');
+var $air_base_list	= load_storage('air_base_list');
 var $enemy_db		= load_storage('enemy_db');
 var $enemy_list	= load_storage('enemy_list');
 var $weekly			= load_storage('weekly');
@@ -49,6 +51,7 @@ var $battle_count = 0;
 var $ndock_list = {};
 var $do_print_port_on_ndock = false;
 var $do_print_port_on_slot_item = false;
+var $require_update_air_base = true;
 var $kdock_list = {};
 var $battle_api_data = null;
 var $battle_deck_id = -1;
@@ -339,6 +342,28 @@ function delta_update_fdeck_list(list) {
 	update_fdeck_list(list, true);
 }
 
+function update_air_base_list(list, is_delta) {
+	if (!list) return;
+	if (!is_delta) $air_base_list = {};
+	for (var base in list) {
+		update_air_base(list[base]);//, true
+	}
+	save_storage('air_base_list', $air_base_list);
+}
+
+function update_air_base(data) {//, is_list
+	if (!data) return;
+	var area = data.api_area_id;
+	var rid = data.api_rid;
+	if (!$air_base_list[area]) $air_base_list[area] = [];
+	$air_base_list[area][rid] = data;
+	//if (!is_list) save_storage('air_base_list', $air_base_list);
+}
+
+function delta_update_air_base_list(list) {
+	update_air_base_list(list, true);
+}
+
 function update_ndock_complete() {
 	// $ndock_list のクリア前に現在のリストで入渠完了した艦がないかチェックする
 	for (var id in $ndock_list) {
@@ -433,6 +458,15 @@ function update_mst_mapinfo(list) {
 		$mst_mapinfo[data.api_id] = data;
 	});
 	save_storage('mst_mapinfo', $mst_mapinfo);
+}
+
+function update_mst_maparea(list) {
+	if (!list) return;
+	$mst_maparea = {};
+	list.forEach(function(data) {
+		$mst_maparea[data.api_id] = data.api_name;
+	});
+	save_storage('mst_maparea', $mst_maparea);
 }
 
 function get_weekly() {
@@ -934,6 +968,52 @@ function map_rank_name(a) {
 	}
 }
 
+function get_maparea_name(id) {
+	return $mst_maparea[id];
+}
+
+function get_air_base_action_name(kind) {
+	switch (kind) {
+	case 0: return '待機';
+	case 1: return '出撃';
+	case 2: return '防空';
+	case 3: return '退避';
+	case 4: return '休息';
+	default: return kind;
+	}
+}
+
+function get_air_base_status_style(status) {
+	switch (status) {
+	case 0: return 'info'; // inactive;
+	case 1: return 'success'; // safe for deploy
+	case 2: return 'warning'; // not replenished
+	case 3: return 'danger'; // not recommended to deploy
+	case 4: return 'primary'; // require update
+	default: return 'default'; // unknown;
+	}
+}
+
+function get_air_base_action_style(kind) {
+	switch (kind) {
+	case 0: return 'info'; // 待機
+	case 1: return 'danger'; // 出撃
+	case 2: return 'warning'; // 防空
+	case 3: return 'primary'; // 退避
+	case 4: return 'success'; // 休息
+	default: return 'default';
+	}
+}
+
+function get_squadron_cond_name(cond) {
+	switch (cond) {
+	case 1: return ''; // 通常
+	case 2: return '<span class="cr7"><i class="far fa-frown"></i></span>'; // 疲労
+	case 3: return '<span class="cr8"><i class="far fa-frown"></i></span>'; // 赤疲労
+	default: return cond;
+	}
+}
+
 //------------------------------------------------------------------------
 // データ解析.
 //
@@ -1150,7 +1230,7 @@ function push_fleet_status(tp, deck) {
 			ra[21] = rb[2];		ra[15] = rb[3];		ra[16] = rb[4];		ra[19] = rb[5];
 			tb = tp[1][3];
 		}
-		rt[0] += dpnla.tmprep(2,ra,tp[0][1]);		rt[1] += dpnla.tmprep(2,ra,tb);
+		rt[0] += dpnla.tmprep(2,ra,tp[0][4]);		rt[1] += dpnla.tmprep(2,ra,tb);
 		var d = slotitem_count(ship.slot, 75);	// ドラム缶.
 		if (d) {
 			drumcan.ships++;
@@ -1170,6 +1250,62 @@ function push_fleet_status(tp, deck) {
 	}
 	rt[2] = sakuteki.msg + slot_seiku.msg + drumcan.msg +'合計 Lv'+ lv_sum +' ('+ fleet_ships +'隻)';
 	rt[4] = sakuteki.brief + slot_seiku.brief + drumcan.brief;
+	return rt;
+}
+
+function push_air_base_status(tp, base) {
+	// 基地航空隊情報
+	var ra = ['','未開放','',''];
+	var base_cond = 1;
+	var base_status = 0;
+	var slot_seiku = 0;
+	if (base) {
+		if (base.api_area_id == 6) ra[1] = '中部';
+		else if (base.api_area_id > 6) ra[1] = 'Event';
+		ra[1] += ' 航空隊' + base.api_rid;
+		base_status = 1;
+		//name_full = base.api_name;
+		var action = base.api_action_kind;
+		var plane_brief = '';
+
+		for (var sq in base.api_plane_info) {
+			var plane = base.api_plane_info[sq];
+			if (plane.api_state == 0  && plane.api_slotid == 0) plane_brief += '<i class="far fa-minus-square"></i>';
+			else {
+				var count = plane.api_count;
+				var max = plane.api_max_count;
+				var item = $slotitem_list[plane.api_slotid];
+				slot_seiku += slotitem_seiku(item.item_id, item.level, item.alv, count, action);
+				if (plane.api_state == 2) {
+					base_status = 3;
+					plane_brief += '<span class="cr1">';
+				}
+				else if (count < max){
+					if (base_status < 2) base_status = 2;
+					plane_brief += '<span class="cr17">';
+				}
+				else {
+					plane_brief += '<span class="cr16">';
+				}
+				plane_brief += '<i class="fas fa-plane ts21"></i>' + '</span>';
+			}
+			if (plane.api_cond > base_cond) base_cond = plane.api_cond;
+		}
+		if (base_cond > 1) base_status = 3;
+		ra[1] += '<span class="label label-' + get_air_base_action_style(action) + ' pull-right ts10 ts3 ts42">' 
+			+ get_air_base_action_name(action) + '</span>';
+		ra[2] += plane_brief;
+		if (base.api_distance != 0) ra[2] += ' <span class="ts21"><i class="fas fa-map"></i>' + base.api_distance + '</span>';
+		ra[2] += ' <span class="ts21"><i class="fas fa-fighter-jet"></i>' + slot_seiku + '</span>';
+		ra[2] += ' ' + get_squadron_cond_name(base_cond);
+	}
+	if ($require_update_air_base) base_status = 4;
+	ra[0] = get_air_base_status_style(base_status);
+	if(ra[2] == '') {
+		ra[2] = '&nbsp;';
+		//ra[3] = 'hid';
+	}
+	rt = dpnla.tmprep(2,ra,tp[0][1]);
 	return rt;
 }
 
@@ -1982,6 +2118,16 @@ function push_all_fleets(req) {
 	for(i = 0;i < 3;i++){
 		j = i + 1;	ky = 'tp2_'+ j;		tp[i] = dpnla.tmpget(ky);
 	}
+	ht[0] = tp[0][0];
+	if ($air_base_list) {
+		for (var area in $air_base_list) {
+			var base = $air_base_list[area];
+			for (var i = 1; i <= 3; i++){
+				ht[0] += push_air_base_status(tp, base[i]);
+			}
+		}
+		ht[0] += tp[0][2];
+	}
 	ht[5] = '出撃中：'+ $battle_log.join(' <i class="fas fa-arrow-right"></i>');
 	for (var f_id in $fdeck_list) {
 		ky = '';	ra[0] = '';		ra[1] = '';		ra[4] = 'info';
@@ -2019,8 +2165,9 @@ function push_all_fleets(req) {
 		if (ta[4]) {
 			ra[0] += '<span class="ts21">' + ta[4] + '</span>';
 		}
-		ht[0] += dpnla.tmprep(2,ra,tp[0][0]) + ta[0] + tp[0][2];
+		ht[0] += dpnla.tmprep(2,ra,tp[0][3]) + ta[0] + tp[0][5];
 	}
+	ht[0] += tp[0][6];
 	for(i = 0;i < 5;i++){
 		j = i + 1;	ky = 't21_'+ j;		dpnla.tmpviw(0,ky,ht[i]);
 	}
@@ -2921,6 +3068,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			update_mst_useitem(json.api_data.api_mst_useitem);
 			update_mst_mission(json.api_data.api_mst_mission);
 			update_mst_mapinfo(json.api_data.api_mst_mapinfo);
+			update_mst_maparea(json.api_data.api_mst_maparea);
 			sync_cloud();
 			var tp = dpnla.tmpget('tp0_4');
 			var ht = tp[6] + dpnla.tmprep(0,' ゲーム情報の取得に成功しました',tp[0]) + tp[7];
@@ -3132,6 +3280,76 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			print_port();
 		};
 	}
+	else if (api_name == '/api_req_air_corps/supply') {
+		// 基地航空隊の補給実施.
+		func = function(json) {
+			var d = json.api_data;
+			var params = decode_postdata_params(request.request.postData.params);
+			var area = params.api_area_id;
+			var rid = params.api_base_id;
+			var plane_info = d.api_plane_info;
+			if ($air_base_list[area]) {
+				if($air_base_list[area][rid]) {
+					for (var i in plane_info) {
+						var squadron = plane_info[i];
+						var sid = squadron.api_squadron_id-1;
+						$air_base_list[area][rid].api_plane_info[sid] = squadron;
+					}
+				}
+			}
+			var now = $material.now.concat();
+			now[0] = d.api_after_fuel;		// 補給後の燃料値.
+			now[3] = d.api_after_bauxite;	// 補給後のボーキサイト値.
+			update_material(now, $material.charge);
+			print_port();
+		};
+	}
+	else if (api_name == '/api_req_air_corps/set_plane') {
+		// 基地航空隊の配備実施.
+		func = function(json) {
+			var d = json.api_data;
+			var params = decode_postdata_params(request.request.postData.params);
+			var area = params.api_area_id;
+			var rid = params.api_base_id;
+			var plane_info = d.api_plane_info;
+			var distance = d.api_distance;
+			if ($air_base_list[area]) {
+				if($air_base_list[area][rid]) {
+					if (distance != null) {
+						$air_base_list[area][rid].api_distance = distance;
+						if (distance == 0) $air_base_list[area][rid].api_action_kind = 0;
+					}
+					for (var i in plane_info) {
+						var squadron = plane_info[i];
+						var sid = squadron.api_squadron_id-1;
+						$air_base_list[area][rid].api_plane_info[sid] = squadron;
+					}
+				}
+			}
+			if (d.api_after_bauxite > 0) {
+				var now = $material.now.concat();
+				now[3] = d.api_after_bauxite;	// 配備後のボーキサイト値.
+				update_material(now, $material.charge);
+			}
+			print_port();
+		};
+	}
+	else if (api_name == '/api_req_air_corps/set_action') {
+		// 基地航空隊の配備実施.
+		var params = decode_postdata_params(request.request.postData.params);
+		var area = params.api_area_id;
+		var rid = params.api_base_id;
+		var action = params.api_action_kind;
+		rid = /,/.test(rid) ? rid.split(',') : [rid];
+		action = /,/.test(action) ? action.split(',') : [action];
+		if ($air_base_list[area]) {
+			for (var i in rid)
+				if ($air_base_list[area][rid[i]]) {
+					$air_base_list[area][rid[i]].api_action_kind = parseInt(action[i]);
+				}
+		}
+		print_port();
+	}
 	else if (api_name == '/api_req_quest/clearitemget') {
 		// 任務クリア.
 		var params = decode_postdata_params(request.request.postData.params);
@@ -3232,6 +3450,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 				if($combined_flag && $battle_deck_id == 1) $last_mission[2] = btlg;
 				$battle_deck_id = -1;
 				$do_print_port_on_slot_item = true;	// 戦闘直後の母港帰還時は、後続する slot_item で艦載機の熟練度が更新されるまで print_port() を遅延する.
+				$require_update_air_base = true;
 			}
 			else {
 				print_port();
@@ -3349,6 +3568,12 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 				if (data.api_eventmap)
 					$mapinfo_rank[data.api_id] = data.api_eventmap.api_selected_rank;
 			});
+			// 基地航空隊の開放前は json.api_data.api_air_base は存在しない
+			if (json.api_data.api_air_base) {
+				update_air_base_list(json.api_data.api_air_base);
+				$require_update_air_base = false;
+				print_port();
+			}
 		};
 	}
 	else if (api_name == '/api_req_map/select_eventmap_rank') {

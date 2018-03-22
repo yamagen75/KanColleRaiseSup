@@ -101,6 +101,12 @@
 .fa-tag:before {
   content: "\f02b"; }
 
+.fa-map:before {
+  content: "\f279"; }
+
+.fa-minus-square:before {
+  content: "\f146"; }
+
 /* スタイル設定 */
 
 #dpnla { padding-top:3px; }
@@ -154,6 +160,7 @@
 #dpnla .ts21 { font-size:84%; }
 #dpnla .ts22 { vertical-align:middle; }
 #dpnla .ts37 { white-space:nowrap; }
+#dpnla .ts42 { font-size:92%; }
 
 #dpnla .ts9 { background-color:#bfa810; }
 #dpnla .ts10 { padding-left:3px; padding-right:3px; }
@@ -162,6 +169,7 @@
 #dpnla .ts36 { padding:4px 0 3px 8px; }
 #dpnla .ts38 { padding-top:0; padding-bottom:0; }
 #dpnla .ts40 { padding-left:10px; }
+#dpnla .ts43 { margin-left: 0px; margin-right: 0px; margin-bottom: 3px; }
 
 #dpnla .ts41 {  }
 
@@ -180,6 +188,7 @@
 #dpnla .cr13 { text-shadow:1px 1px 3px #dd0; }
 #dpnla .cr14 { color:#2f46c5; }
 #dpnla .cr16 { color:#2ad728; }
+#dpnla .cr17 { color:orange; }
 
 #dpnla .cr15 {  }
 
