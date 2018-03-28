@@ -6,7 +6,7 @@ cont.style.top = '635px';
 cont.style.left = '0px';
 cont.style.backgroundColor = '#fff';
 cont.style.width = '650px';
-cont.style.height = '70px';
+cont.style.height = '90px';
 cont.id = 'emorgp1';
 /* 操作するオブジェクト「DMMヘッダ」を取得する */
 var hd_nvnm = 'dmm-ntgnavi-renew';
@@ -58,7 +58,7 @@ if(contb == undefined) htmc += '<div>area-gameが取得出来ません。</div>'
 if(contc == undefined) htmc += '<div>game_frameが取得出来ません。</div>';
 if(contd == undefined) htmc += '<div>'+ hd_nvnm +'が取得出来ません。</div>';
 if(htmc == ''){
-	contb.style.textAlign = 'left';		contb.style.marginTop = '5px';
+	contb.style.textAlign = 'left';		contb.style.marginTop = '4px';
 	contd.style.display = 'none';		contc.width = '840px';
 	document.body.style.minWidth = '816px';
 	scrp.innerHTML = htmb;	document.head.appendChild(scrp);

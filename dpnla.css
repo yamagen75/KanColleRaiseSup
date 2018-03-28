@@ -118,9 +118,11 @@
 #dpnla i.mr0 { margin-right:0; }
 #dpnla i.ml2 { margin-left:2px; }
 #dpnla .hid { display:none; }
+#dpnla .col-org-a { width:20%; }
 
 #dpnla .mb0 { margin-bottom:0; }
 #dpnla .mb3 { margin-bottom:3px; }
+#dpnla .mt3 { margin-top:3px; }
 #dpnla .mb6 { margin-bottom:6px; }
 #dpnla .bw10 { display:inline-block; width:10px; }
 #dpnla .bw40 { display:inline-block; width:40px; }
@@ -134,13 +136,14 @@
 
 #dpnla .ts19 td { text-align:center; }
 #dpnla .ts27 td { text-align:right; }
-#dpnla .ts6 td { padding-top:5px; padding-bottom:0; }
-#dpnla .ts7 td { border:none; padding-bottom:4px; }
+#dpnla .ts6 td { padding-top:1px; padding-bottom:0; line-height:1.0; }
+#dpnla .ts7 td { border:none; padding-top:1px; padding-bottom:0; line-height:1.0; }
+#dpnla .ts41 td { border:none; padding-top:0; padding-bottom:1px; }
 #dpnla .ts16 td { padding-top:2px; padding-bottom:0; }
 #dpnla .ts17 td { border:none; padding-top:0; padding-bottom:2px; }
-#dpnla .ts11 td { padding-top:7px; padding-bottom:6px; }
+#dpnla .ts11 td { padding-top:6px; padding-bottom:6px; }
 #dpnla .ts25 td { padding-top:0; padding-bottom:1px; }
-#dpnla .ts30 td { padding-top:5px; padding-bottom:5px; }
+#dpnla .ts30 td { padding-top:5px; padding-bottom:4px; }
 #dpnla .ts31 td { border-top:1px solid #5cb85c; }
 #dpnla .ts32 td { padding-top:1px; padding-bottom:0; }
 #dpnla .ts33 td { border:none; padding-top:0; padding-bottom:0; }
@@ -171,7 +174,7 @@
 #dpnla .ts40 { padding-left:10px; }
 #dpnla .ts43 { margin-left: 0px; margin-right: 0px; margin-bottom: 3px; }
 
-#dpnla .ts41 {  }
+#dpnla .ts44 { /* 最終番号 */ }
 
 #dpnla .cr1 { color:#e58d89; }
 #dpnla .cr2 { color:#aaa; }
@@ -190,7 +193,7 @@
 #dpnla .cr16 { color:#2ad728; }
 #dpnla .cr17 { color:orange; }
 
-#dpnla .cr15 {  }
+#dpnla .cr15 { /* 最終番号 */ }
 
 #dpnla .pmb11 { position:absolute; display:none; z-index:1; box-shadow:8px 8px 6px -6px #777; }
 #dpnla .pmb11 a { font-size:148%; color:#dc4442; padding-right:3px; }

@@ -22,7 +22,7 @@ function getifmsrc(){
 		ba.innerHTML = '艦これをサブウィンドウで開く';	ba.setAttribute('onclick','subwinopen();');
 		var bp = document.createElement('div');		bp.id = 'emorgb1';
 		bp.style.whiteSpace = 'pre-wrap';	bp.style.position = 'absolute';	bp.style.backgroundColor = '#fff';
-		bp.style.top = '545px';	bp.style.left = '325px';	bp.style.width = '190px';	bp.style.height = '30px';
+		bp.style.top = '542px';	bp.style.left = '310px';	bp.style.width = '220px';	bp.style.height = '37px';
 		bp.appendChild(ba);		document.body.appendChild(bp);
 	}else{
 		window.setTimeout(getifmsrc,1000);

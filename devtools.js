@@ -1182,8 +1182,11 @@ function Sakuteki33(name, ships, fleet_max) {
 	var color = (score >= target)? 'cr16' : 'cr6';
 	this.score = score;
 	this.msg = map + '索敵値 (分岐点係数' + c + '): <span class="' + color + '">' + score.toFixed(2) + '</span> ';
-	this.brief = ' <i class="fas fa-binoculars ' + color + '"></i> ';
-	if (c != 1) this.brief = ' <i class="fas fa-code-branch"></i>' + c + ':' + this.brief;
+	this.brief = '';
+	if(score > 0){
+		this.brief = ' <i class="fas fa-binoculars ' + color + '"></i> ';
+		if (c != 1) this.brief = ' <i class="fas fa-code-branch"></i>' + c + ':' + this.brief;
+	}
 }
 
 function push_fleet_status(tp, deck) {
@@ -1253,7 +1256,7 @@ function push_fleet_status(tp, deck) {
 	return rt;
 }
 
-function push_air_base_status(tp, base) {
+function push_air_base_status(tp, base, fg) {
 	// 基地航空隊情報
 	var ra = ['','未開放','',''];
 	var base_cond = 1;
@@ -1301,6 +1304,9 @@ function push_air_base_status(tp, base) {
 	}
 	if ($require_update_air_base) base_status = 4;
 	ra[0] = get_air_base_status_style(base_status);
+	if(fg > 0){
+		ra[0] += ' mt3';
+	}
 	if(ra[2] == '') {
 		ra[2] = '&nbsp;';
 		//ra[3] = 'hid';
@@ -2118,17 +2124,18 @@ function push_all_fleets(req) {
 	for(i = 0;i < 3;i++){
 		j = i + 1;	ky = 'tp2_'+ j;		tp[i] = dpnla.tmpget(ky);
 	}
-	ht[0] = tp[0][0];
+	var ha = ['','',0];
+	ha[1] = tp[0][0];
 	if ($air_base_list) {
 		for (var area in $air_base_list) {
 			var base = $air_base_list[area];
 			for (var i = 1; i <= 3; i++){
-				ht[0] += push_air_base_status(tp, base[i]);
+				ha[1] += push_air_base_status(tp, base[i], ha[2]);	ha[2] = 1;
 			}
 		}
-		ht[0] += tp[0][2];
 	}
-	ht[5] = '出撃中：'+ $battle_log.join(' <i class="fas fa-arrow-right"></i>');
+	ha[1] += tp[0][2];
+	ha[0] = '出撃中：'+ $battle_log.join(' <i class="fas fa-arrow-right"></i>');
 	for (var f_id in $fdeck_list) {
 		ky = '';	ra[0] = '';		ra[1] = '';		ra[4] = 'info';
 		var deck = $fdeck_list[f_id];
@@ -2147,11 +2154,11 @@ function push_all_fleets(req) {
 			ra[3] = '遠征 【'+ id +' 】 '+ me[2] +' ： '+ me[3];	req.md.push(me);
 		}
 		else if ($combined_flag && f_id == 2 && $battle_deck_id == 1) {
-			ra[3] = ht[5];
+			ra[3] = ha[0];
 			if (ta[3] > 0) { req.damage_H_alart = true; } // 大破進撃警告ON.
 		}
 		else if (deck.api_id == $battle_deck_id) {
-			ra[3] = ht[5];
+			ra[3] = ha[0];
 			if (ta[3] > 0) { req.damage_H_alart = true; } // 大破進撃警告ON.
 		}
 		else {
@@ -2167,7 +2174,7 @@ function push_all_fleets(req) {
 		}
 		ht[0] += dpnla.tmprep(2,ra,tp[0][3]) + ta[0] + tp[0][5];
 	}
-	ht[0] += tp[0][6];
+	ht[0] += ha[1];		ma.push('基地航空隊');
 	for(i = 0;i < 5;i++){
 		j = i + 1;	ky = 't21_'+ j;		dpnla.tmpviw(0,ky,ht[i]);
 	}
@@ -2215,7 +2222,7 @@ function on_mission_check(category) {
 		ra[0] = '任務リストを先頭から最終ページまでめくってください。';		rc = 3;
 	}
 	ht = dpnla.tmprep(2,ra,tp[0]) + ha + tp[2];
-	if(rc > 0) dpnla.pmbopen(220,40,380,170,ht);
+	if(rc > 0) dpnla.pmbopen(220,40,390,223,ht);
 }
 
 function on_next_cell(json) {
