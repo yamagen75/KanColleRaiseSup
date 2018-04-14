@@ -344,18 +344,35 @@ function delta_update_fdeck_list(list) {
 
 function update_air_base_list(list, is_delta) {
 	if (!list) return;
+	var tmp_list = $air_base_list;
 	if (!is_delta) $air_base_list = {};
 	for (var base in list) {
-		update_air_base(list[base]);//, true
+		update_air_base(list[base], tmp_list);//, true
 	}
 	save_storage('air_base_list', $air_base_list);
 }
 
-function update_air_base(data) {//, is_list
+function update_air_base(data, old_data) {//, is_list
 	if (!data) return;
 	var area = data.api_area_id;
 	var rid = data.api_rid;
 	if (!$air_base_list[area]) $air_base_list[area] = [];
+	for (var i = 0; i < 4 ; i++){
+		var plane = data.api_plane_info[i];
+		var change_time = -1;
+		if (old_data) {
+			if (old_data[area]){
+				if (old_data[area][rid]) {
+					var old_plane = old_data[area][rid].api_plane_info[i];
+					if (old_plane.change_end_time != null) change_time = old_plane.change_end_time;
+				}
+			}
+		}
+		if (plane.api_state == 2 && change_time < 0){
+			change_time = $svDateTime.getTime() + 720000;
+		}
+		data.api_plane_info[i].change_end_time = change_time;
+	}
 	$air_base_list[area][rid] = data;
 	//if (!is_list) save_storage('air_base_list', $air_base_list);
 }
@@ -1307,6 +1324,7 @@ function push_air_base_status(tp, base, fg) {
 		base_status = 1;
 		var action = base.api_action_kind;
 		var plane_brief = '';
+		var base_change_time = 0;
 
 		for (var sq in base.api_plane_info) {
 			for(j = 0;j < 8;j++){
@@ -1325,8 +1343,14 @@ function push_air_base_status(tp, base, fg) {
 				if (plane.api_state == 2) {
 					base_status = 3;
 					plane_brief += '<span class="cr1">';
+					var change_time = plane.change_end_time;
+					if (change_time != null && change_time != -1) {
+						if (change_time > base_change_time) base_change_time = change_time;
+						change_time -= $svDateTime.getTime();
+					}
 					ra[0] = '';
 					ra[3] = '<span class="label label-warning ts10 ts3 ts42">配置転換中</span>';
+					if(change_time != null) ra[4] = change_time > 0 ? dpnla.strtimchg(change_time) : '終了';
 				} else {
 					slot_seiku += slotitem_seiku(item.item_id, item.level, item.alv, count, action);
 					var plane_intercept_bonus = slotitem_intercept_bonus(item.item_id);
@@ -1350,6 +1374,7 @@ function push_air_base_status(tp, base, fg) {
 		}
 		if (base_cond > 1) base_status = 3;
 		if (action == 2) slot_seiku *= base_intercept_bonus;
+		if (base_change_time < $svDateTime.getTime() && base_change_time != 0) base_status = 4;
 		ra[1] = (base.api_area_id == 6 ? '中部' : 'Event') + ' 航空隊' + base.api_rid;
 		ra[2] = '<span class="label label-' + get_air_base_action_style(action) + ' pull-right ts10 ts3 ts42">' 
 			+ get_air_base_action_name(action) + '</span>';
@@ -3394,6 +3419,8 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 					for (var i in plane_info) {
 						var squadron = plane_info[i];
 						var sid = squadron.api_squadron_id-1;
+						if (squadron.api_state == 2) squadron.change_end_time = $svDateTime.getTime() + 720000;
+						else squadron.change_end_time = -1;
 						$air_base_list[area][rid].api_plane_info[sid] = squadron;
 					}
 				}
