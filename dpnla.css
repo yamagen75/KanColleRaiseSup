@@ -190,10 +190,10 @@
 #dpnla .cr12 { background-color:#59bcbe; }
 #dpnla .cr13 { text-shadow:1px 1px 3px #dd0; }
 #dpnla .cr14 { color:#2f46c5; }
-#dpnla .cr16 { color:#2ad728; }
-#dpnla .cr17 { color:orange; }
+#dpnla .cr15 { color:#2ad728; }
+#dpnla .cr16 { color:orange; }
 
-#dpnla .cr15 { /* 最終番号 */ }
+#dpnla .cr17 { /* 最終番号 */ }
 
 #dpnla .pmb11 { position:absolute; display:none; z-index:1; box-shadow:8px 8px 6px -6px #777; }
 #dpnla .pmb11 a { font-size:148%; color:#dc4442; padding-right:3px; }

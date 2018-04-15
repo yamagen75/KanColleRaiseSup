@@ -1232,7 +1232,7 @@ function Sakuteki33(name, ships, fleet_max) {
 	// 司令部レベルと艦隊空き数による補正値を算入する.
 	score -= Math.ceil(0.4 * $command_lv);
 	score += 2 * (fleet_max - ships.length);
-	var color = (score >= target)? 'cr16' : 'cr6';
+	var color = (score >= target)? 'cr15' : 'cr6';
 	this.score = score;
 	this.msg = map + '索敵値 (分岐点係数' + c + '): <span class="' + color + '">' + score.toFixed(2) + '</span> ';
 	this.brief = '';
@@ -1358,10 +1358,10 @@ function push_air_base_status(tp, base, fg) {
 						base_intercept_bonus = plane_intercept_bonus;
 					if (count < max){
 						if (base_status < 2) base_status = 2;
-						plane_brief += '<span class="cr17">';
+						plane_brief += '<span class="cr16">';
 					}
 					else {
-						plane_brief += '<span class="cr16">';
+						plane_brief += '<span class="cr15">';
 					}
 					ra[3] = count + ' / ' + max;
 					ra[4] = alv_name(item.alv, item.p_alv);
