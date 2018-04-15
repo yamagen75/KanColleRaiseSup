@@ -952,10 +952,12 @@ function shiplist_names(list) {	// Shipの配列をlv降順に並べて、","区
 	return names.join('，<wbr>');
 }
 
-function damage_name(nowhp, maxhp, pt) {
+function damage_name(nowhp, maxhp, pt, damage) {
 	var r = nowhp / maxhp;
 	var rt = ''; // 無傷.
-	if(r <= 0){
+	if (damage != null && nowhp + damage <= 0){
+		rt = '<span class="label label-primary">撃沈済</span>';
+	}else if(r <= 0){
 		rt = '<span class="label label-primary">撃沈</span>';
 	}else if(r <= 0.25){
 		rt = '<span class="label label-danger">大破</span>';
