@@ -2359,6 +2359,11 @@ function on_next_cell(json) {
 		$battle_log.push(msg);
 		dpnla.tmpviw(1,'c41',arow +'Skip '+ msg);
 	}
+	else if (d.api_event_id == 7 && d.api_event_kind == 0) { // 航空偵察マス.
+		var msg = area + ':航空偵察失敗';
+		$battle_log.push(msg);
+		dpnla.tmpviw(1,'c41',arow +'Event '+ msg);
+	}
 	else if (d.api_event_id == 9) {	// 揚陸地点マス.
 		var msg = area;
 		msg += ':揚陸地点';
