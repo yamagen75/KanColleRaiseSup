@@ -3158,7 +3158,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		$svDateTime = new Date(h[0].value);		// サーバ側の日時(RESP).
 	}
 	// API解析.
-	if (api_name == '/api_start2') {
+	if (api_name == '/api_start2/getData') {
 		// ゲーム開始時点.
 		func = function(json) { // 艦種表を取り込む.
 			update_mst_ship(json.api_data.api_mst_ship);
