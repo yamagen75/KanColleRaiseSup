@@ -2,11 +2,11 @@
 var cont = document.createElement('div');
 cont.style.whiteSpace = 'pre-wrap';
 cont.style.position = 'absolute';
-cont.style.top = '635px';
+cont.style.top = '870px';
 cont.style.left = '0px';
 cont.style.backgroundColor = '#fff';
-cont.style.width = '650px';
-cont.style.height = '90px';
+cont.style.width = '670px';
+cont.style.height = '80px';
 cont.id = 'emorgp1';
 /* 操作するオブジェクト「DMMヘッダ」を取得する */
 var hd_nvnm = 'dmm-ntgnavi-renew';
@@ -15,7 +15,8 @@ if(contd == undefined){
 	hd_nvnm = 'dmm-ntgnavi';
 	var hd_tgs = document.getElementsByTagName('div');
 	for(var hd_i = 0;hd_i < hd_tgs.length;hd_i++){
-		if(hd_tgs[hd_i].className == hd_nvnm){
+		var hd_clnm = hd_tgs[hd_i].className;
+		if(hd_clnm.indexOf(hd_nvnm) >= 0){
 			contd = hd_tgs[hd_i];		break;
 		}
 	}
@@ -34,33 +35,38 @@ htma += '<div id="emorgp3" style="display:none;">';
 htma += '<button type="button" onClick="orgplopenclose(0);" ';
 htma += 'style="margin:5px 0 0 0;padding:0;">開<br />く<br />></button></div>';
 var scrp = document.createElement('script');
-var htmb = 'function orgplopenclose(pt){ var fa = "block"; var fb = "none"; var fc = "650px"; ';
+var htmb = 'function orgplopenclose(pt){ var fa = "block"; var fb = "none"; var fc = "670px"; ';
 htmb += 'if(pt > 0){ fa = "none"; fb = "block"; fc = "18px"; } ';
 htmb += 'document.getElementById("emorgp1").style.width = fc; ';
 htmb += 'document.getElementById("emorgp2").style.display = fa; ';
 htmb += 'document.getElementById("emorgp3").style.display = fb;';
 htmb += ' } function orgdmmhedonoff(pt){ var fa = "none"; var fb = "inline-block"; var fc = "none"; ';
-htmb += 'var fd = "816px"; ';
-htmb += 'if(pt > 0){ fa = "inline-block"; fb = "none"; fc = "block"; fd = "996px"; } ';
+htmb += 'if(pt > 0){ fa = "inline-block"; fb = "none"; fc = "block"; } ';
 htmb += 'document.getElementById("emorgp4").style.display = fb; ';
 htmb += 'document.getElementById("emorgp5").style.display = fa; ';
-htmb += 'orgdmmhedelemntget("'+ hd_nvnm +'").style.display = fc; ';
-htmb += 'document.body.style.minWidth = fd; } function orgdmmhedelemntget(nm){ ';
+htmb += 'orgdmmhedelemntget("'+ hd_nvnm +'").style.display = fc;';
+htmb += ' } function orgdmmhedelemntget(nm){ ';
 htmb += 'var hd = document.getElementById(nm); if(hd == undefined){ ';
 htmb += 'var tgs = document.getElementsByTagName("div"); ';
-htmb += 'for(var i = 0;i < tgs.length;i++){ if(tgs[i].className == nm){ return tgs[i]; } }';
+htmb += 'for(var i = 0;i < tgs.length;i++){ var cnm = tgs[i].className;';
+htmb += ' if(cnm.indexOf(nm) >= 0){ return tgs[i]; } }';
 htmb += ' }else{ return hd; } }';
-/* 操作するオブジェクト「area-game」「game_frame」を取得する */
+/* 操作するオブジェクト「area-game」「main-ntg」「foot」を取得する */
 var contb = document.getElementById('area-game');
-var contc = document.getElementById('game_frame');
+var contc = document.getElementById('main-ntg');
+var conte = document.getElementById('foot');
 var htmc = '';
 if(contb == undefined) htmc += '<div>area-gameが取得出来ません。</div>';
-if(contc == undefined) htmc += '<div>game_frameが取得出来ません。</div>';
+if(contc == undefined) htmc += '<div>main-ntgが取得出来ません。</div>';
 if(contd == undefined) htmc += '<div>'+ hd_nvnm +'が取得出来ません。</div>';
+if(conte == undefined) htmc += '<div>footが取得出来ません。</div>';
 if(htmc == ''){
-	contb.style.textAlign = 'left';		contb.style.marginTop = '4px';
-	contd.style.display = 'none';		contc.width = '840px';
-	document.body.style.minWidth = '816px';
+	contb.style.textAlign = 'left';
+	contb.style.marginLeft = '20px';
+	contb.style.marginTop = '4px';
+	contd.style.display = 'none';
+	conte.style.display = 'none';
+	contc.style.paddingBottom = '0px';
 	scrp.innerHTML = htmb;	document.head.appendChild(scrp);
 }else{
 	htma = htmc;
