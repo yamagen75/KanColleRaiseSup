@@ -705,7 +705,7 @@ function event_kind_name(id) {	///@param id	非戦闘マスのメッセージ ap
 		case 4: return '穏やかな海峡です';
 		case 5: return '警戒が必要です';
 		case 6: return '静かな海です';
-		default: return $event_kind_names[id] || '??'+to_string(id);
+		default: '??'+to_string(id);
 	}
 }
 
@@ -2355,7 +2355,7 @@ function on_next_cell(json) {
 	}
 	else if (d.api_event_id == 1 || d.api_event_id == 6) {	// 非戦闘マス.
 		var msg = area;
-		msg += ':' + event_kind_name(d.api_event_kind);
+		msg += ':' + (d.api_cell_flavor ? d.api_cell_flavor.api_message : event_kind_name(d.api_event_kind));
 		$battle_log.push(msg);
 		dpnla.tmpviw(1,'c41',arow +'Skip '+ msg);
 	}
