@@ -1,32 +1,35 @@
 $event_sally_tag_names_long = {
-// id: 2018冬イベントname.
+// id: 2018初秋イベントname.
 1: '警戒部隊',
-2: '栗田艦隊',
-3: '西村艦隊',
-4: '小沢艦隊',
-5: '志摩艦隊'
+2: '海峡派遣',
+3: '西方作戦',
+4: '欧州特務',
+5: 'Force H',
+6: 'ライン演習'
 };
 
 $event_sally_tag_names_short = {
-// id: 2018冬イベントname.
+// id: 2018初秋イベントname.
 1: '警戒',
-2: '栗田',
-3: '西村',
-4: '小沢',
-5: '志摩'
+2: '海峡',
+3: '西方',
+4: '欧州',
+5: 'Force H',
+6: 'ライン'
 };
 
 $event_sally_tag_styles = {
-// id: 2018冬イベントname.
+// id: 2018初秋イベントname.
 1: 'color:#F2F2F2; background-color:#434343',
-2: 'color:#F9FFE5; background-color:#668029',
-3: 'color:#FFFF51; background-color:#877C11',
-4: 'color:#E5F1FF; background-color:#112861',
-5: 'color:#F0E5FF; background-color:#5F2AB2'
+2: 'color:#CBDF83; background-color:#465B00',
+3: 'color:#D2FFBF; background-color:#1B5D11',
+4: 'color:#FFE8BA; background-color:#924A22',
+5: 'color:#DDF2FF; background-color:#234052',
+6: 'color:#E6DDFF; background-color:#5F479B'
 };
 
 $event_kind_names = {
-// id: 2018冬イベントname.
+// id: 2018初秋イベントname.
 7: '艦隊は対潜警戒進撃中。引き続き、対潜対空警戒を厳とせよ。',
 8: '敵哨戒機らしき機影認む。空襲の恐れあり。対空警戒を厳とせよ！',
 9: '1YB第一第二部隊栗田艦隊はパラワン水道を進撃中。現海域に敵影なし。警戒を厳とせよ！',
