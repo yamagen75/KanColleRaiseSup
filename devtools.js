@@ -705,7 +705,7 @@ function event_kind_name(id) {	///@param id	非戦闘マスのメッセージ ap
 		case 4: return '穏やかな海峡です';
 		case 5: return '警戒が必要です';
 		case 6: return '静かな海です';
-		default: return $event_kind_names[id] || '??'+to_string(id);
+		default: '??'+to_string(id);
 	}
 }
 
@@ -2355,15 +2355,20 @@ function on_next_cell(json) {
 	}
 	else if (d.api_event_id == 1 || d.api_event_id == 6) {	// 非戦闘マス.
 		var msg = area;
-		msg += ':' + event_kind_name(d.api_event_kind);
+		msg += ':' + (d.api_cell_flavor ? d.api_cell_flavor.api_message : event_kind_name(d.api_event_kind));
 		$battle_log.push(msg);
 		dpnla.tmpviw(1,'c41',arow +'Skip '+ msg);
+	}
+	else if (d.api_event_id == 7 && d.api_event_kind == 0) { // 航空偵察マス.
+		var msg = area + ':航空偵察失敗';
+		$battle_log.push(msg);
+		dpnla.tmpviw(1,'c41',arow +'Event '+ msg);
 	}
 	else if (d.api_event_id == 9) {	// 揚陸地点マス.
 		var msg = area;
 		msg += ':揚陸地点';
 		$battle_log.push(msg);
-		print_next('next event', msg);
+		dpnla.tmpviw(1,'c41',arow +'Event '+ msg);
 	}
 	else {	// 戦闘マス.
 		var i = 0;	var ky = 't42';		var ha = '';	var rb = ['m'];		var tb = dpnla.tmpget('tp4_3');
@@ -3194,12 +3199,21 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		// 建造一覧表(建造直後).
 		func = function(json) { // 建造状況を更新する.
 			update_kdock_list(json.api_data);
+			print_port();
 		};
 	}
 	else if (api_name == '/api_req_kousyou/createship') {
 		// 艦娘建造.
-		$material_sum = $material.createship;	// 消費資材は後続の /api_get_member/material パケットにて集計する.
-		// 直後に /api_get_member/kdock と /api_get_member/material パケットが来るので print_port() は不要.
+		let params = decode_postdata_params(request.request.postData.params);
+		let now = $material.now.concat();
+		now[0] -= params.api_item1;
+		now[1] -= params.api_item2;
+		now[2] -= params.api_item3;
+		now[3] -= params.api_item4;
+		now[5] -= params.api_item5;
+		if (params.api_highspeed) now[4] -= params.api_large_flag ? 20 : 1;
+		update_material(now, $material.createship);
+		// 直後に /api_get_member/kdock パケットが来るので print_port() は不要.
 	}
 	else if (api_name == '/api_req_kaisou/remodeling') {
 		// 艦娘改造.
