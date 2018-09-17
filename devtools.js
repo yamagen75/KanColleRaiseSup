@@ -3199,12 +3199,21 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		// 建造一覧表(建造直後).
 		func = function(json) { // 建造状況を更新する.
 			update_kdock_list(json.api_data);
+			print_port();
 		};
 	}
 	else if (api_name == '/api_req_kousyou/createship') {
 		// 艦娘建造.
-		$material_sum = $material.createship;	// 消費資材は後続の /api_get_member/material パケットにて集計する.
-		// 直後に /api_get_member/kdock と /api_get_member/material パケットが来るので print_port() は不要.
+		let params = decode_postdata_params(request.request.postData.params);
+		let now = $material.now.concat();
+		now[0] -= params.api_item1;
+		now[1] -= params.api_item2;
+		now[2] -= params.api_item3;
+		now[3] -= params.api_item4;
+		now[5] -= params.api_item5;
+		if (params.api_highspeed) now[4] -= params.api_large_flag ? 20 : 1;
+		update_material(now, $material.createship);
+		// 直後に /api_get_member/kdock パケットが来るので print_port() は不要.
 	}
 	else if (api_name == '/api_req_kaisou/remodeling') {
 		// 艦娘改造.
