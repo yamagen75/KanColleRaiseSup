@@ -2355,7 +2355,7 @@ function on_next_cell(json) {
 	}
 	else if (d.api_event_id == 1 || d.api_event_id == 6) {	// 非戦闘マス.
 		var msg = area;
-		msg += ':' + (d.api_cell_flavor ? d.api_cell_flavor.api_message : event_kind_name(d.api_event_kind));
+		msg += ':' + (d.api_cell_flavor ? d.api_cell_flavor.api_message.replace(/<br>/gi, '').replace(/　/g, '') : event_kind_name(d.api_event_kind));
 		$battle_log.push(msg);
 		dpnla.tmpviw(1,'c41',arow +'Skip '+ msg);
 	}
