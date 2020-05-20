@@ -426,8 +426,11 @@ function update_mst_ship(list) {
 	var before = {};
 	list.forEach(function(data) {
 		$mst_ship[data.api_id] = data;
-		if (data.api_aftershipid && before[data.api_aftershipid] == null)
-			before[data.api_aftershipid] = data.api_id;
+		if (data.api_aftershipid) {
+			let b = before[data.api_aftershipid];
+			if (b == null || $mst_ship[b].api_afterlv > data.api_afterlv)
+				before[data.api_aftershipid] = data.api_id;
+		}
 	});
 	for (var id in $mst_ship) {
 		var b = before[id];
@@ -1498,13 +1501,13 @@ function print_port() {
 				if(is_airplane(itm)){
 					if(!airplane_list[i]) airplane_list[i] = [];
 					if(!airplane_list[i][lc]) airplane_list[i][lc] = [];
-					if(!airplane_list[i][lc][alv]){
-						airplane_list[i][lc][alv] = [];		airplane_list[i][lc][alv][0] = 0;
+					if(!airplane_list[i][lc][lv]){
+						airplane_list[i][lc][lv] = [];	airplane_list[i][lc][lv][0] = 0;
 					}
 					if(value.alv == value.p_alv){
-						airplane_list[i][lc][alv][0]++;
+						airplane_list[i][lc][lv][0]++;
 					}else{
-						airplane_list[i][lc][alv].push(value.p_alv);
+						airplane_list[i][lc][lv].push(value.p_alv);
 					}
 				}
 			}
@@ -1816,7 +1819,7 @@ function print_port() {
 		for(i = 0;i < 2;i++){
 			hb[i][0] = '<div id="'+ hb[i][1] +'_1">';
 		}
-		tp = dpnla.tmpget('tp5_1');		ht = tp[0];		ra = ['','','',''];		var he = hb[1];
+		tp = dpnla.tmpget('tp5_1');		ht = tp[0];		ra = ['','','',''];		var he = hb[1];		var lva = 0;
 		lockeditem_ids.forEach(function(id) {
 			ca = 1;		itm = $mst_slotitem[id];
 			if(is_airplane(itm)){
@@ -1838,8 +1841,8 @@ function print_port() {
 							he[0] += tc[1];
 						}
 					}
-					rlv = lv % 16;	alv = 16 - ((lv - rlv) / 16);
-					ra[0] = slotitem_name(id,(10 - rlv),alv);		ra[1] = item.shiplist.length;		ra[2] = item.count;
+					rlv = lv % 16;	alv = 16 - ((lv - rlv) / 16);		lva = 10 - rlv;
+					ra[0] = slotitem_name(id,lva,alv);	ra[1] = item.shiplist.length;		ra[2] = item.count;
 					if(ra[1] > 0){
 						ra[3] = shiplist_names(item.shiplist);	ht += dpnla.tmprep(2,ra,tp[1]);
 					}
@@ -1860,14 +1863,14 @@ function print_port() {
 				rb[2] = '';
 				if(lc < 1) rb[2] = tc[4];
 				for (var lv in airplane_list[id][lc]) {
-					alv = 16 - lv;
+					rlv = lv % 16;	alv = 16 - ((lv - rlv) / 16);		lva = 10 - rlv;
 					for (var j in airplane_list[id][lc][lv]) {
 						var plv = airplane_list[id][lc][lv][j];
 						if(j < 1 && plv < 1) continue;
 						if(j < 1){
-							rb[0] = slotitem_name(id,0,alv);	rb[1] = plv;
+							rb[0] = slotitem_name(id,lva,alv);	rb[1] = plv;
 						}else{
-							rb[0] = slotitem_name(id,0,alv,plv);	rb[1] = 1;
+							rb[0] = slotitem_name(id,lva,alv,plv);	rb[1] = 1;
 						}
 						if(he[2] == 0){
 							if(he[3] > he[4]){

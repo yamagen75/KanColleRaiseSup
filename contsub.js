@@ -16,6 +16,15 @@ function getifmsrc(){
 		if(st != undefined) st.style.display = 'none';
 		var gn = document.getElementById('globalNavi');
 		if(gn != undefined) gn.style.display = 'none';
+		
+		var sw = document.getElementById('sectionWrap');
+		if(sw != undefined){
+			var si = sw.getElementsByTagName('iframe');
+			if(si != undefined){
+				si[0].style.marginTop = '10px';
+			}
+		}
+		
 		var sp = document.createElement('script');
 		ht = 'function subwinopen(){ window.open("'+ gu.replace(/&amp;/g,'&');
 		ht += '","kancollesubwin","width=1200,height=727"); ';
