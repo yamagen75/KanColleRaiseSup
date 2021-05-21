@@ -438,6 +438,7 @@ function update_mst_ship(list) {
 			$mst_ship[id].yps_before_shipid = b; // 改装前の艦種ID.
 			do {
 				$mst_ship[id].yps_begin_shipid = b; // 未改装の艦種ID.
+				if (b == 699) break; // 宗谷.
 			} while (b = before[b]);
 		}
 	}
@@ -1584,9 +1585,10 @@ function print_port() {
 	}
 	for (var id in $mst_ship) {
 		var mst = $mst_ship[id];
-		if (mst.yps_begin_shipid) continue; // 改造型を除外する.
 		if (!mst.api_afterlv) continue; // 改造不能型（季節艦、深海棲艦）を除外する.
-		if (!owned_ship_idset[id]) unowned_names.push(ship_name(id)); // 未所有艦名をリストに加える.
+		if (!mst.yps_begin_shipid || mst.yps_begin_shipid == mst.api_id) { // 改造型以外 || 宗谷
+			if (!owned_ship_idset[id]) unowned_names.push(ship_name(id)); // 未所有艦名をリストに加える.
+		}
 	}
 	//
 	// 資材変化を表示する.
